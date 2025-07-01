@@ -1,0 +1,536 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Consulta de Rutas</h1>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="input-group">
+            <input type="text" id="buscarRuta" class="form-control form-control-lg" 
+                   placeholder="Buscar ruta por número o destino..." 
+                   aria-label="Buscar ruta" aria-describedby="btnBuscarRuta">
+            <button class="btn btn-primary" type="button" id="btnBuscarRuta">
+                <i class="bi bi-search"></i> Buscar
+            </button>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <button id="btnBuscarVoz" class="btn btn-outline-primary btn-lg w-100">
+            <i class="bi bi-mic"></i> Buscar por voz
+        </button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="h5 mb-0">Rutas disponibles</h2>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="tablaRutas">
+                <caption>Lista de rutas de transporte público</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Número</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Origen - Destino</th>
+                        <th scope="col">Horario</th>
+                        <th scope="col">Frecuencia</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="rutasResultados">
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p>Cargando rutas...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalles de ruta -->
+<div class="modal fade" id="modalDetalleRuta" tabindex="-1" aria-labelledby="modalDetalleRutaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalDetalleRutaLabel">Detalles de la Ruta</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-5" id="detalleRutaContenido">
+                        <!-- Contenido dinámico de información de la ruta -->
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="h5 mb-0">Recorrido de la ruta</h4>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="mapaRuta" style="height: 400px; background-color: #f0f0f0;">
+                                    <p class="text-center py-5">
+                                        El mapa se cargará al seleccionar una ruta.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnLeerRuta">
+                    <i class="bi bi-volume-up"></i> Leer información
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+<style>
+    /* Estilos para la búsqueda por voz */
+    #btnBuscarVoz:focus {
+        outline: 2px solid #007bff;
+    }
+    
+    /* Estilos para el mapa de ruta */
+    #mapaRuta {
+        border: 1px solid #ddd;
+    }
+    
+    .table-responsive {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    @media (max-width: 768px) {
+        #mapaRuta {
+            height: 250px !important;
+        }
+        
+        /* Ajustar orden de elementos en móvil */
+        .modal-body .row {
+            flex-direction: column-reverse;
+        }
+        
+        .modal-body .col-md-5,
+        .modal-body .col-md-7 {
+            width: 100%;
+        }
+    }
+    
+    /* Mejoras de accesibilidad */
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .alert-info {
+        background-color: #e8f4f8;
+        border-color: #bee5eb;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Función para cargar las rutas desde la API
+    async function cargarRutas() {
+        try {
+            const response = await fetch('/api/rutas');
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                mostrarRutas(data.rutas);
+            } else {
+                throw new Error('Error al cargar las rutas');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('rutasResultados').innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-danger">
+                        <p>Error al cargar las rutas. Intente nuevamente más tarde.</p>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+    
+    // Función para mostrar las rutas en la tabla
+    function mostrarRutas(rutas) {
+        const tbody = document.getElementById('rutasResultados');
+        
+        if (rutas.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center">
+                        <p>No se encontraron rutas disponibles.</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = rutas.map(ruta => `
+            <tr>
+                <td>${ruta.numero}</td>
+                <td>${ruta.nombre}</td>
+                <td>${ruta.origen} - ${ruta.destino}</td>
+                <td>${ruta.hora_inicio} - ${ruta.hora_fin}</td>
+                <td>Cada ${ruta.frecuencia_minutos} min</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-info ver-ruta" 
+                            data-ruta-id="${ruta.id}" 
+                            aria-label="Ver detalles de la ruta ${ruta.numero}">
+                        Ver detalles
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+        
+        // Agregar eventos a los botones de detalle
+        document.querySelectorAll('.ver-ruta').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const rutaId = this.getAttribute('data-ruta-id');
+                mostrarDetalleRuta(rutaId);
+            });
+        });
+    }
+    
+    // Variable global para el mapa de rutas
+    let rutaMap = null;
+    
+    // Función para mostrar el detalle de una ruta
+    async function mostrarDetalleRuta(rutaId) {
+        try {
+            const response = await fetch(`/api/rutas/${rutaId}`);
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                const ruta = data.ruta;
+                const modal = document.getElementById('detalleRutaContenido');
+                
+                // Construir HTML para la información general de la ruta
+                let html = `
+                    <h4 class="mb-3">Ruta ${ruta.numero}: ${ruta.nombre}</h4>
+                    <div class="alert alert-info">
+                        <div class="mb-1"><strong>De:</strong> ${ruta.origen}</div> 
+                        <div><strong>A:</strong> ${ruta.destino}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div><i class="bi bi-clock"></i> <strong>Horario:</strong> ${ruta.hora_inicio} a ${ruta.hora_fin}</div>
+                        <div><i class="bi bi-alarm"></i> <strong>Frecuencia:</strong> Cada ${ruta.frecuencia_minutos} minutos</div>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Descripción:</strong><br>
+                        ${ruta.descripcion || 'No disponible'}
+                    </div>
+                `;
+                
+                // Si hay paradas disponibles
+                if (ruta.paradas && ruta.paradas.length > 0) {
+                    html += `
+                        <h5 class="mt-3">Paradas en esta ruta:</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Orden</th>
+                                        <th>Nombre</th>
+                                        <th>Accesibilidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    
+                    ruta.paradas.forEach(parada => {
+                        html += `
+                            <tr>
+                                <td>${parada.orden || '-'}</td>
+                                <td>
+                                    <strong>${parada.nombre}</strong>
+                                    <div><small>${parada.direccion}</small></div>
+                                </td>
+                                <td>
+                                    ${parada.accesibilidad.rampa ? 
+                                      '<div><i class="bi bi-wheelchair"></i> Rampa</div>' : ''}
+                                    ${parada.accesibilidad.semaforo_sonoro ? 
+                                      '<div><i class="bi bi-volume-up"></i> Semáforo sonoro</div>' : ''}
+                                    ${!parada.accesibilidad.rampa && !parada.accesibilidad.semaforo_sonoro ? 
+                                      '<span class="text-muted">Estándar</span>' : ''}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="alert alert-warning">
+                            No hay información disponible sobre las paradas en esta ruta.
+                        </div>
+                    `;
+                }
+                
+                modal.innerHTML = html;
+                
+                // Mostrar el modal
+                const modalRuta = new bootstrap.Modal(document.getElementById('modalDetalleRuta'));
+                modalRuta.show();
+                
+                // Una vez que se muestre el modal, inicializar el mapa
+                document.getElementById('modalDetalleRuta').addEventListener('shown.bs.modal', function () {
+                    inicializarMapaRuta(ruta);
+                    
+                    // Configurar el botón de lectura
+                    document.getElementById('btnLeerRuta').onclick = function() {
+                        const infoRuta = `Ruta ${ruta.numero}: ${ruta.nombre}. 
+                                         De ${ruta.origen} a ${ruta.destino}. 
+                                         Horario de ${ruta.hora_inicio} a ${ruta.hora_fin}. 
+                                         Frecuencia cada ${ruta.frecuencia_minutos} minutos. 
+                                         ${ruta.paradas ? 'Esta ruta tiene ' + ruta.paradas.length + ' paradas.' : ''}`;
+                        
+                        if (typeof anunciarMensaje === 'function') {
+                            anunciarMensaje(infoRuta);
+                        }
+                    };
+                }, {once: true});
+            }
+        } catch (error) {
+            console.error('Error al cargar detalles:', error);
+            alert('Error al cargar los detalles de la ruta. Intente nuevamente.');
+        }
+    }
+    
+    // Función para inicializar el mapa con la ruta
+    function inicializarMapaRuta(ruta) {
+        // Si ya existe un mapa, lo limpiamos
+        if (rutaMap) {
+            rutaMap.remove();
+        }
+        
+        // Inicializar el mapa
+        rutaMap = L.map('mapaRuta').setView([3.4516, -76.5320], 13); // Coordenadas de Cali
+        
+        // Añadir capa base de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(rutaMap);
+        
+        // Si la ruta tiene paradas, las mostramos en el mapa
+        if (ruta.paradas && ruta.paradas.length > 0) {
+            // Crear un grupo para todos los marcadores
+            const markersGroup = L.featureGroup();
+            
+            // Crear iconos personalizados para diferentes tipos de paradas
+            const iconoParada = L.icon({
+                iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
+                shadowSize: [41, 41]
+            });
+            
+            // Array para almacenar las coordenadas para la línea de ruta
+            const puntosRuta = [];
+            
+            // Añadir marcadores para cada parada
+            ruta.paradas.forEach((parada, index) => {
+                // Añadir al array de puntos de la ruta
+                puntosRuta.push([parada.latitud, parada.longitud]);
+                
+                // Crear el marcador
+                const marker = L.marker([parada.latitud, parada.longitud], {
+                    icon: iconoParada,
+                    title: `${index + 1}. ${parada.nombre}`
+                }).addTo(rutaMap);
+                
+                // Contenido del popup
+                marker.bindPopup(`
+                    <strong>${parada.orden ? `${parada.orden}. ` : ''}${parada.nombre}</strong><br>
+                    ${parada.direccion || ''}<br>
+                    ${parada.tiempo_estimado ? `<strong>Tiempo estimado:</strong> ${parada.tiempo_estimado} min<br>` : ''}
+                    <div class="mt-2">
+                        <strong>Accesibilidad:</strong>
+                        ${parada.accesibilidad.rampa ? '<div><span class="text-success">✓</span> Rampa</div>' : '<div><span class="text-secondary">✗</span> Sin rampa</div>'}
+                        ${parada.accesibilidad.semaforo_sonoro ? '<div><span class="text-success">✓</span> Semáforo sonoro</div>' : '<div><span class="text-secondary">✗</span> Sin semáforo sonoro</div>'}
+                    </div>
+                `);
+                
+                // Añadir al grupo
+                markersGroup.addLayer(marker);
+            });
+            
+            // Crear una línea que conecte las paradas
+            const polyline = L.polyline(puntosRuta, {
+                color: '#3388ff',
+                weight: 4,
+                opacity: 0.7,
+                lineJoin: 'round'
+            }).addTo(rutaMap);
+            
+            // Ajustar el mapa para mostrar todas las paradas
+            try {
+                const bounds = markersGroup.getBounds();
+                rutaMap.fitBounds(bounds, {
+                    padding: [50, 50],
+                    maxZoom: 15
+                });
+            } catch (e) {
+                console.error('Error al ajustar el mapa de ruta:', e);
+                
+                // Si hay error, centrar en la primera parada
+                if (ruta.paradas.length > 0) {
+                    rutaMap.setView([ruta.paradas[0].latitud, ruta.paradas[0].longitud], 13);
+                }
+            }
+        } else {
+            // Si no hay paradas, mostrar mensaje en el mapa
+            document.getElementById('mapaRuta').innerHTML = `
+                <div class="text-center py-5">
+                    <p>No hay información de paradas disponible para esta ruta.</p>
+                </div>
+            `;
+        }
+    }
+    
+    // Cargar las rutas al iniciar
+    cargarRutas();
+    
+    // Manejar el evento de búsqueda
+    document.getElementById('btnBuscarRuta').addEventListener('click', function() {
+        const busqueda = document.getElementById('buscarRuta').value.trim().toLowerCase();
+        // Implementar lógica de filtrado (por ahora filtra en el cliente)
+        // En un futuro, esto podría ser una llamada a la API con parámetros de búsqueda
+        
+        // Cargar rutas primero y luego filtrar
+        cargarRutasFiltradas(busqueda);
+    });
+    
+    // Función para cargar rutas filtradas (simulada)
+    async function cargarRutasFiltradas(busqueda) {
+        try {
+            const response = await fetch('/api/rutas');
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // Filtrar las rutas en el cliente (esto debería hacerse en el servidor idealmente)
+                const rutasFiltradas = data.rutas.filter(ruta => 
+                    ruta.numero.toLowerCase().includes(busqueda) ||
+                    ruta.nombre.toLowerCase().includes(busqueda) ||
+                    ruta.origen.toLowerCase().includes(busqueda) ||
+                    ruta.destino.toLowerCase().includes(busqueda)
+                );
+                
+                mostrarRutas(rutasFiltradas);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    
+    // Implementación de búsqueda por voz
+    document.getElementById('btnBuscarVoz').addEventListener('click', function() {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            // Crear instancia de reconocimiento de voz
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            
+            // Configurar el reconocimiento
+            recognition.lang = 'es-ES';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            
+            // Cambiar el botón para indicar que está escuchando
+            const btnVoz = document.getElementById('btnBuscarVoz');
+            btnVoz.innerHTML = '<i class="bi bi-mic-fill"></i> Escuchando...';
+            btnVoz.classList.add('btn-danger');
+            btnVoz.classList.remove('btn-outline-primary');
+            
+            // Anunciar que se está escuchando
+            if (typeof anunciarMensaje === 'function') {
+                anunciarMensaje('Dime el número o destino de la ruta que deseas buscar');
+            }
+            
+            recognition.start();
+            
+            // Manejar resultados
+            recognition.onresult = function(event) {
+                const resultado = event.results[0][0].transcript.trim();
+                
+                // Colocar el resultado en el campo de búsqueda
+                document.getElementById('buscarRuta').value = resultado;
+                
+                // Anunciar el texto reconocido
+                if (typeof anunciarMensaje === 'function') {
+                    anunciarMensaje(`Buscando: ${resultado}`);
+                }
+                
+                // Ejecutar la búsqueda
+                cargarRutasFiltradas(resultado);
+            };
+            
+            // Restaurar el botón cuando se termine
+            recognition.onend = function() {
+                btnVoz.innerHTML = '<i class="bi bi-mic"></i> Buscar por voz';
+                btnVoz.classList.remove('btn-danger');
+                btnVoz.classList.add('btn-outline-primary');
+            };
+            
+            recognition.onerror = function(event) {
+                console.error('Error en el reconocimiento de voz:', event.error);
+                
+                // Restaurar el botón
+                btnVoz.innerHTML = '<i class="bi bi-mic"></i> Buscar por voz';
+                btnVoz.classList.remove('btn-danger');
+                btnVoz.classList.add('btn-outline-primary');
+                
+                // Anunciar error
+                let mensaje = 'Error en el reconocimiento de voz.';
+                
+                if (event.error === 'no-speech') {
+                    mensaje = 'No se detectó ninguna voz. Intenta de nuevo.';
+                } else if (event.error === 'aborted') {
+                    mensaje = 'Reconocimiento de voz cancelado.';
+                } else if (event.error === 'not-allowed') {
+                    mensaje = 'Permiso de micrófono denegado.';
+                }
+                
+                alert(mensaje);
+                
+                if (typeof anunciarMensaje === 'function') {
+                    anunciarMensaje(mensaje);
+                }
+            };
+        } else {
+            alert('Lo sentimos, tu navegador no soporta el reconocimiento de voz.');
+            
+            if (typeof anunciarMensaje === 'function') {
+                anunciarMensaje('Lo sentimos, tu navegador no soporta el reconocimiento de voz.');
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

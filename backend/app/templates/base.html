@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ title }}{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Estilos personalizados -->
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+    
+    <!-- Meta tags para accesibilidad -->
+    <meta name="description" content="App de asistencia para uso del transporte público en Cali para personas con discapacidad visual">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Barra de navegación accesible -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                <span class="visually-hidden">Inicio - </span>Transporte Accesible Cali
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                    data-bs-target="#navbarMain" aria-controls="navbarMain" 
+                    aria-expanded="false" aria-label="Mostrar menú de navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}" aria-current="page">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.rutas') }}">Consultar Rutas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.paradas') }}">Paradas Cercanas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.ayuda') }}">Ayuda</a>
+                    </li>
+                </ul>
+                <!-- Botón de activación de voz -->
+                <button id="btnActivarVoz" class="btn btn-outline-light ms-2" 
+                        aria-label="Activar asistente de voz">
+                    <i class="bi bi-mic-fill"></i> Voz
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alerta de cookies para accesibilidad (opcional) -->
+    <div class="alert alert-info alert-dismissible fade show" role="alert" id="alertAccesibilidad">
+        <div class="container">
+            <p>Este sitio está optimizado para personas con discapacidad visual. Presiona la tecla ALT+V para activar el asistente de voz.</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <main id="contenido-principal">
+        <div class="container py-4">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>App de Transporte Accesible - Cali</h5>
+                    <p>Una iniciativa para hacer el transporte público más accesible para todos.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Enlaces</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('main.index') }}" class="text-white">Inicio</a></li>
+                        <li><a href="{{ url_for('main.ayuda') }}" class="text-white">Ayuda</a></li>
+                        <li><a href="#" class="text-white">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Accesibilidad</h5>
+                    <button id="btnAumentarTexto" class="btn btn-sm btn-outline-light mb-1">
+                        Aumentar texto
+                    </button>
+                    <button id="btnReducirTexto" class="btn btn-sm btn-outline-light mb-1">
+                        Reducir texto
+                    </button>
+                    <button id="btnAltoContraste" class="btn btn-sm btn-outline-light">
+                        Alto contraste
+                    </button>
+                </div>
+            </div>
+            <hr>
+            <p class="text-center mb-0">&copy; 2025 - App de Transporte Accesible Cali</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript de Bootstrap y dependencias -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- JavaScript personalizado -->
+    <script src="{{ url_for('static', filename='js/accesibilidad.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/asistente-voz.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

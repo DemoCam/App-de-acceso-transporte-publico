@@ -1,0 +1,12 @@
+Flask==2.0.1
+Flask-SQLAlchemy==2.5.1
+Flask-RESTful==0.3.9
+Flask-WTF==0.15.1
+mysql-connector-python==8.0.27
+python-dotenv==0.19.0
+pytest==6.2.5
+Flask-Migrate==3.1.0
+Werkzeug==2.0.1
+# Estos paquetes son opcionales pero recomendados
+# Flask-Bootstrap==3.3.7.1
+# gTTS==2.2.3

@@ -1,0 +1,148 @@
+/* Estilos personalizados para la App de Transporte Accesible Cali */
+
+/* Ajustes generales */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --info-color: #17a2b8;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    
+    --focus-color: #80bdff;
+    --focus-width: 0.25rem;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Mejoras de accesibilidad */
+a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:focus {
+    outline: var(--focus-width) solid var(--focus-color);
+    outline-offset: 2px;
+}
+
+/* Para el modo de alto contraste */
+body.high-contrast {
+    background-color: #000;
+    color: #fff;
+}
+
+.high-contrast .navbar {
+    background-color: #000 !important;
+    border-bottom: 1px solid #fff;
+}
+
+.high-contrast .card {
+    background-color: #000;
+    border-color: #fff;
+    color: #fff;
+}
+
+.high-contrast a {
+    color: #ffff00;
+}
+
+.high-contrast .btn-primary {
+    background-color: #ffff00;
+    border-color: #ffff00;
+    color: #000;
+}
+
+.high-contrast .table {
+    color: #fff;
+    border-color: #fff;
+}
+
+.high-contrast .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #333;
+}
+
+/* Tamaños de texto para accesibilidad */
+body.text-large {
+    font-size: 1.25rem;
+}
+
+body.text-xl {
+    font-size: 1.5rem;
+}
+
+/* Estilos específicos para la navegación */
+.navbar-brand {
+    font-weight: bold;
+}
+
+/* Estilos para tarjetas en la página de inicio */
+.card {
+    transition: transform 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Estilos para botones de accesibilidad */
+.btn-accessibility {
+    margin-bottom: 0.5rem;
+}
+
+/* Estilo para el botón de voz */
+#btnActivarVoz {
+    position: relative;
+    padding-left: 2.5rem;
+}
+
+#btnActivarVoz::before {
+    content: "";
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+/* Estilos para los elementos del mapa */
+#mapaParadas {
+    border-radius: 0 0 0.25rem 0.25rem;
+}
+
+.user-marker {
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.3);
+}
+
+/* Skip link para navegación por teclado */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--primary-color);
+    color: white;
+    padding: 8px;
+    z-index: 1050;
+    transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Aumentar área para touch en dispositivos móviles */
+@media (max-width: 768px) {
+    .nav-link, .btn, .form-control {
+        padding: 0.75rem 1rem;
+    }
+    
+    /* Mayor contraste en textos para móvil */
+    body {
+        font-weight: 500;
+    }
+}

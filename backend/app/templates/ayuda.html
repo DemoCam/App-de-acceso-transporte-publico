@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Ayuda y Guía de Uso</h1>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="list-group" id="list-tab" role="tablist">
+            <a class="list-group-item list-group-item-action active" id="list-inicio-list" data-bs-toggle="list" href="#list-inicio" role="tab" aria-controls="list-inicio">
+                Introducción
+            </a>
+            <a class="list-group-item list-group-item-action" id="list-accesibilidad-list" data-bs-toggle="list" href="#list-accesibilidad" role="tab" aria-controls="list-accesibilidad">
+                Funciones de Accesibilidad
+            </a>
+            <a class="list-group-item list-group-item-action" id="list-rutas-list" data-bs-toggle="list" href="#list-rutas" role="tab" aria-controls="list-rutas">
+                Consulta de Rutas
+            </a>
+            <a class="list-group-item list-group-item-action" id="list-paradas-list" data-bs-toggle="list" href="#list-paradas" role="tab" aria-controls="list-paradas">
+                Paradas Cercanas
+            </a>
+            <a class="list-group-item list-group-item-action" id="list-voz-list" data-bs-toggle="list" href="#list-voz" role="tab" aria-controls="list-voz">
+                Comandos de Voz
+            </a>
+            <a class="list-group-item list-group-item-action" id="list-faq-list" data-bs-toggle="list" href="#list-faq" role="tab" aria-controls="list-faq">
+                Preguntas Frecuentes
+            </a>
+            <a class="list-group-item list-group-item-action" id="list-contacto-list" data-bs-toggle="list" href="#list-contacto" role="tab" aria-controls="list-contacto">
+                Contacto y Soporte
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="tab-content" id="nav-tabContent">
+            <!-- Introducción -->
+            <div class="tab-pane fade show active" id="list-inicio" role="tabpanel" aria-labelledby="list-inicio-list">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Bienvenido a la App de Transporte Accesible</h2>
+                        <p class="card-text">
+                            Esta aplicación está diseñada para asistir a personas con discapacidad visual
+                            en el uso del sistema de transporte público de la ciudad de Cali. 
+                        </p>
+                        <p class="card-text">
+                            Nuestro objetivo es brindar una experiencia accesible que permita:
+                        </p>
+                        <ul>
+                            <li>Consultar rutas de transporte</li>
+                            <li>Ubicar paradas cercanas</li>
+                            <li>Recibir indicaciones de voz</li>
+                            <li>Acceder a información sobre accesibilidad en paradas y estaciones</li>
+                        </ul>
+                        <p class="card-text">
+                            Esta guía te ayudará a conocer todas las funcionalidades disponibles
+                            y cómo utilizarlas de manera efectiva.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Funciones de Accesibilidad -->
+            <div class="tab-pane fade" id="list-accesibilidad" role="tabpanel" aria-labelledby="list-accesibilidad-list">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Funciones de Accesibilidad</h2>
+                        <p class="card-text">
+                            La aplicación cuenta con varias características diseñadas para mejorar la accesibilidad:
+                        </p>
+                        
+                        <h3>Asistente de Voz</h3>
+                        <p>
+                            Presiona <kbd>Alt</kbd>+<kbd>V</kbd> en cualquier momento o usa el botón "Voz" 
+                            en la barra de navegación para activar el asistente de voz.
+                        </p>
+                        
+                        <h3>Ajustes de Texto</h3>
+                        <p>Puedes modificar el tamaño del texto para facilitar su lectura:</p>
+                        <ul>
+                            <li><strong>Aumentar texto:</strong> Botón "Aumentar texto" en el pie de página</li>
+                            <li><strong>Reducir texto:</strong> Botón "Reducir texto" en el pie de página</li>
+                        </ul>
+                        
+                        <h3>Alto Contraste</h3>
+                        <p>
+                            Para personas con baja visión, puedes activar el modo de alto contraste 
+                            con el botón "Alto contraste" en el pie de página.
+                        </p>
+                        
+                        <h3>Navegación por Teclado</h3>
+                        <p>Todas las funciones son accesibles usando solo el teclado:</p>
+                        <ul>
+                            <li>Usa <kbd>Tab</kbd> para moverte entre elementos</li>
+                            <li>Usa <kbd>Enter</kbd> para activar botones o enlaces</li>
+                            <li>Usa <kbd>Espacio</kbd> para activar casillas de verificación</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Consulta de Rutas -->
+            <div class="tab-pane fade" id="list-rutas" role="tabpanel" aria-labelledby="list-rutas-list">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Consulta de Rutas</h2>
+                        <p class="card-text">
+                            La sección de consulta de rutas te permite buscar información sobre las rutas
+                            de transporte público disponibles en Cali.
+                        </p>
+                        
+                        <h3>Cómo buscar una ruta:</h3>
+                        <ol>
+                            <li>Ve a la página "Consultar Rutas" desde el menú principal</li>
+                            <li>Utiliza el campo de búsqueda para ingresar:
+                                <ul>
+                                    <li>Número de ruta</li>
+                                    <li>Nombre de ruta</li>
+                                    <li>Origen o destino</li>
+                                </ul>
+                            </li>
+                            <li>Presiona el botón "Buscar" o la tecla Enter</li>
+                            <li>Los resultados se mostrarán en la tabla debajo</li>
+                        </ol>
+                        
+                        <h3>Ver detalles de una ruta:</h3>
+                        <ol>
+                            <li>En la lista de resultados, haz clic en el botón "Ver detalles" de la ruta deseada</li>
+                            <li>Se abrirá una ventana con información detallada:
+                                <ul>
+                                    <li>Horarios</li>
+                                    <li>Frecuencia de paso</li>
+                                    <li>Lista de paradas en el recorrido</li>
+                                    <li>Información de accesibilidad en cada parada</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        
+                        <h3>Búsqueda por voz:</h3>
+                        <p>
+                            También puedes usar el botón "Buscar por voz" para hacer una consulta hablando.
+                            Solo di el número o nombre de la ruta que buscas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Paradas Cercanas -->
+            <div class="tab-pane fade" id="list-paradas" role="tabpanel" aria-labelledby="list-paradas-list">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Paradas Cercanas</h2>
+                        <p class="card-text">
+                            Esta función te ayuda a encontrar las paradas de transporte público más cercanas a tu ubicación.
+                        </p>
+                        
+                        <h3>Cómo encontrar paradas cercanas:</h3>
+                        <ol>
+                            <li>Ve a la página "Paradas Cercanas" desde el menú principal</li>
+                            <li>Permite que la aplicación acceda a tu ubicación cuando te lo solicite</li>
+                            <li>Tu ubicación actual se mostrará en el mapa</li>
+                            <li>Ajusta los filtros si lo deseas:
+                                <ul>
+                                    <li>Distancia máxima (300m, 500m, 1km, 2km)</li>
+                                    <li>Solo paradas con accesibilidad (rampa o semáforo sonoro)</li>
+                                </ul>
+                            </li>
+                            <li>Haz clic en "Buscar paradas cercanas"</li>
+                        </ol>
+                        
+                        <h3>Resultados:</h3>
+                        <p>
+                            Los resultados se mostrarán tanto en el mapa como en una lista debajo.
+                            Para cada parada verás:
+                        </p>
+                        <ul>
+                            <li>Nombre de la parada</li>
+                            <li>Dirección</li>
+                            <li>Distancia desde tu ubicación</li>
+                            <li>Características de accesibilidad</li>
+                            <li>Rutas que pasan por esa parada</li>
+                        </ul>
+                        
+                        <h3>Uso del mapa:</h3>
+                        <p>
+                            Puedes hacer clic en las paradas del mapa para ver su información, o hacer clic
+                            en un elemento de la lista para centrar el mapa en esa parada.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Comandos de Voz -->
+            <div class="tab-pane fade" id="list-voz" role="tabpanel" aria-labelledby="list-voz-list">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Comandos de Voz</h2>
+                        <p class="card-text">
+                            La aplicación incluye un asistente por voz que te permite interactuar mediante comandos hablados.
+                        </p>
+                        
+                        <h3>Cómo activar el asistente de voz:</h3>
+                        <ul>
+                            <li>Presiona <kbd>Alt</kbd>+<kbd>V</kbd> en cualquier momento</li>
+                            <li>O haz clic en el botón "Voz" en la barra de navegación</li>
+                        </ul>
+                        
+                        <h3>Comandos disponibles:</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Comando</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>"Ir a inicio"</td>
+                                        <td>Navega a la página principal</td>
+                                    </tr>
+                                    <tr>
+                                        <td>"Buscar rutas"</td>
+                                        <td>Navega a la página de consulta de rutas</td>
+                                    </tr>
+                                    <tr>
+                                        <td>"Paradas cercanas"</td>
+                                        <td>Navega a la página de paradas cercanas</td>
+                                    </tr>
+                                    <tr>
+                                        <td>"Buscar ruta [número]"</td>
+                                        <td>Busca una ruta específica (ej: "Buscar ruta A12")</td>
+                                    </tr>
+                                    <tr>
+                                        <td>"Buscar paradas cercanas"</td>
+                                        <td>Inicia la búsqueda de paradas cercanas</td>
+                                    </tr>
+                                    <tr>
+                                        <td>"Aumentar texto"</td>
+                                        <td>Aumenta el tamaño del texto en la página</td>
+                                    </tr>
+                                    <tr>
+                                        <td>"Reducir texto"</td>
+                                        <td>Reduce el tamaño del texto en la página</td>
+                                    </tr>
+                                    <tr>
+                                        <td>"Alto contraste"</td>
+                                        <td>Activa o desactiva el modo de alto contraste</td>
+                                    </tr>
+                                    <tr>
+                                        <td>"Leer página"</td>
+                                        <td>Lee en voz alta el contenido principal de la página</td>
+                                    </tr>
+                                    <tr>
+                                        <td>"Ayuda"</td>
+                                        <td>Navega a esta página de ayuda</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Preguntas Frecuentes -->
+            <div class="tab-pane fade" id="list-faq" role="tabpanel" aria-labelledby="list-faq-list">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Preguntas Frecuentes</h2>
+                        
+                        <div class="accordion" id="accordionFAQ">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        ¿Necesito conexión a internet para usar la aplicación?
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionFAQ">
+                                    <div class="accordion-body">
+                                        Sí, necesitas conexión a internet para acceder a la información de rutas, paradas y usar la geolocalización.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        ¿Cómo puedo reportar un error en la información de rutas o paradas?
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionFAQ">
+                                    <div class="accordion-body">
+                                        Puedes reportar errores o actualizaciones enviando un correo a <a href="mailto:soporte@transporteaccesible.org">soporte@transporteaccesible.org</a> con los detalles del problema encontrado.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingThree">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        ¿La aplicación funciona con lectores de pantalla?
+                                    </button>
+                                </h2>
+                                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionFAQ">
+                                    <div class="accordion-body">
+                                        Sí, la aplicación está optimizada para funcionar con los principales lectores de pantalla como JAWS, NVDA y VoiceOver. Todos los elementos de la interfaz incluyen etiquetas aria para mejorar la experiencia.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFour">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                        ¿Qué navegadores son compatibles con la aplicación?
+                                    </button>
+                                </h2>
+                                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionFAQ">
+                                    <div class="accordion-body">
+                                        La aplicación es compatible con navegadores modernos como Chrome, Firefox, Safari y Edge en sus versiones recientes. Para una mejor experiencia, recomendamos mantener tu navegador actualizado.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFive">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                        ¿La información de rutas y horarios es en tiempo real?
+                                    </button>
+                                </h2>
+                                <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionFAQ">
+                                    <div class="accordion-body">
+                                        Actualmente la aplicación muestra información estática de rutas y horarios programados. Estamos trabajando en implementar actualizaciones en tiempo real en futuras versiones.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contacto y Soporte -->
+            <div class="tab-pane fade" id="list-contacto" role="tabpanel" aria-labelledby="list-contacto-list">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Contacto y Soporte</h2>
+                        <p class="card-text">
+                            Si tienes preguntas, sugerencias o necesitas ayuda, puedes contactarnos por los siguientes medios:
+                        </p>
+                        
+                        <h3>Correo electrónico</h3>
+                        <p>
+                            <a href="mailto:soporte@transporteaccesible.org">soporte@transporteaccesible.org</a>
+                        </p>
+                        
+                        <h3>Teléfono de soporte</h3>
+                        <p>
+                            <a href="tel:+573001234567">+57 300 123 4567</a>
+                        </p>
+                        
+                        <h3>Formulario de contacto</h3>
+                        <form>
+                            <div class="mb-3">
+                                <label for="nombreContacto" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombreContacto" placeholder="Tu nombre">
+                            </div>
+                            <div class="mb-3">
+                                <label for="emailContacto" class="form-label">Correo electrónico</label>
+                                <input type="email" class="form-control" id="emailContacto" placeholder="tucorreo@ejemplo.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="tipoConsulta" class="form-label">Tipo de consulta</label>
+                                <select class="form-select" id="tipoConsulta">
+                                    <option selected>Selecciona una opción</option>
+                                    <option value="1">Problema técnico</option>
+                                    <option value="2">Información incorrecta</option>
+                                    <option value="3">Sugerencia</option>
+                                    <option value="4">Otro</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="mensajeContacto" class="form-label">Mensaje</label>
+                                <textarea class="form-control" id="mensajeContacto" rows="4" placeholder="Escribe tu mensaje aquí..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Enviar mensaje</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

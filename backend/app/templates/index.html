@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center mb-5">
+        <h1 class="display-4 fw-bold">Transporte Accesible Cali</h1>
+        <p class="lead mb-4">
+            Bienvenido a la aplicación de asistencia para acceso al transporte público para personas con discapacidad visual en Cali.
+        </p>
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-5">
+            <button id="btnConsultarRutas" class="btn btn-primary btn-lg px-4 gap-3" onclick="location.href='{{ url_for('main.rutas') }}';">
+                Consultar Rutas
+            </button>
+            <button id="btnParadasCercanas" class="btn btn-outline-secondary btn-lg px-4" onclick="location.href='{{ url_for('main.paradas') }}';">
+                Paradas Cercanas
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <h2 class="text-center mb-4">¿Cómo funciona?</h2>
+    
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title">
+                    <i class="bi bi-search me-2"></i>
+                    Consulta rutas
+                </h3>
+                <p class="card-text">
+                    Busca rutas del transporte público en Cali. Obtén información sobre horarios, frecuencias y recorridos.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title">
+                    <i class="bi bi-geo-alt me-2"></i>
+                    Encuentra paradas cercanas
+                </h3>
+                <p class="card-text">
+                    Localiza las paradas más cercanas a tu ubicación actual y conoce qué rutas pasan por ellas.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title">
+                    <i class="bi bi-mic me-2"></i>
+                    Asistencia por voz
+                </h3>
+                <p class="card-text">
+                    Navega por la aplicación usando comandos de voz y recibe indicaciones audibles para facilitar tu experiencia.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">Información importante</h2>
+            </div>
+            <div class="card-body">
+                <p>
+                    Esta aplicación está en desarrollo constante para mejorar la accesibilidad del transporte público en Cali. 
+                    Si encuentras algún problema o tienes sugerencias, no dudes en contactarnos.
+                </p>
+                <p>
+                    Presiona ALT+V en cualquier momento para activar el asistente de voz o utiliza el botón "Voz" en la barra de navegación.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Código específico para la página de inicio
+    document.addEventListener('DOMContentLoaded', function() {
+        // Anunciar bienvenida con el asistente de voz (cuando esté implementado)
+        if (typeof anunciarMensaje === 'function') {
+            anunciarMensaje('Bienvenido a la aplicación de transporte accesible para Cali. ¿En qué podemos ayudarte hoy?');
+        }
+    });
+</script>
+{% endblock %}

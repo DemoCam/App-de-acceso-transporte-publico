@@ -1,0 +1,3699 @@
+{
+  "paradas": [
+    {
+      "id": 1,
+      "nombre": "Estación Plaza San Bosco",
+      "direccion": "Calle 20 #48-61",
+      "latitud": 3.402259,
+      "longitud": -76.510632,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E45",
+        "P62",
+        "P93",
+        "T14",
+        "T71",
+        "A71",
+        "P99",
+        "E38"
+      ]
+    },
+    {
+      "id": 2,
+      "nombre": "Terminal Plaza Único",
+      "direccion": "Carrera 41 #99-25",
+      "latitud": 3.498501,
+      "longitud": -76.48427,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E40"
+      ]
+    },
+    {
+      "id": 3,
+      "nombre": "Vagón La Flora",
+      "direccion": "Carrera 71 #42-77",
+      "latitud": 3.45805,
+      "longitud": -76.514125,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A60",
+        "A50",
+        "T10",
+        "T70",
+        "E86",
+        "T32"
+      ]
+    },
+    {
+      "id": 4,
+      "nombre": "Estación Palmetto",
+      "direccion": "Carrera 26 #72-63",
+      "latitud": 3.439318,
+      "longitud": -76.560876,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E30",
+        "E91",
+        "T66",
+        "P75"
+      ]
+    },
+    {
+      "id": 5,
+      "nombre": "Estación La Flora",
+      "direccion": "Carrera 64 #55-20",
+      "latitud": 3.406784,
+      "longitud": -76.489551,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E57",
+        "E20",
+        "P98",
+        "E25",
+        "T23",
+        "E27",
+        "A78",
+        "A82"
+      ]
+    },
+    {
+      "id": 6,
+      "nombre": "Vagón Parque Siloé",
+      "direccion": "Calle 49 #43-67",
+      "latitud": 3.484471,
+      "longitud": -76.554691,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E11",
+        "T25",
+        "P87",
+        "P51",
+        "E63",
+        "T31"
+      ]
+    },
+    {
+      "id": 7,
+      "nombre": "Terminal Cosmocentro",
+      "direccion": "Calle 39 #2-12",
+      "latitud": 3.480836,
+      "longitud": -76.53201,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E23",
+        "A84",
+        "A19",
+        "E71",
+        "T88",
+        "E69",
+        "A66"
+      ]
+    },
+    {
+      "id": 8,
+      "nombre": "Estación Caney",
+      "direccion": "Carrera 82 #79-34",
+      "latitud": 3.41235,
+      "longitud": -76.566215,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E98",
+        "A99",
+        "E75"
+      ]
+    },
+    {
+      "id": 9,
+      "nombre": "Estación Valle del Lili",
+      "direccion": "Calle 76 #26-16",
+      "latitud": 3.425085,
+      "longitud": -76.572339,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E39",
+        "P80",
+        "E79",
+        "T48",
+        "A18",
+        "E66",
+        "P33"
+      ]
+    },
+    {
+      "id": 10,
+      "nombre": "Estación Teatro Caney",
+      "direccion": "Calle 14 #22-27",
+      "latitud": 3.476959,
+      "longitud": -76.543324,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P65",
+        "P79"
+      ]
+    },
+    {
+      "id": 11,
+      "nombre": "Terminal Caney",
+      "direccion": "Carrera 2 #26-33",
+      "latitud": 3.419713,
+      "longitud": -76.531134,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P16",
+        "T75",
+        "T85",
+        "E28"
+      ]
+    },
+    {
+      "id": 12,
+      "nombre": "Terminal Calipso",
+      "direccion": "Carrera 77 #36-59",
+      "latitud": 3.400661,
+      "longitud": -76.540607,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "A94",
+        "A50",
+        "P26",
+        "P14",
+        "T41",
+        "E67"
+      ]
+    },
+    {
+      "id": 13,
+      "nombre": "Parada Santa Librada",
+      "direccion": "Carrera 17 #51-89",
+      "latitud": 3.461899,
+      "longitud": -76.575313,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T50",
+        "P24",
+        "T47",
+        "T22",
+        "E14",
+        "T48",
+        "E19",
+        "E41"
+      ]
+    },
+    {
+      "id": 14,
+      "nombre": "Estación Menga",
+      "direccion": "Carrera 34 #79-32",
+      "latitud": 3.441409,
+      "longitud": -76.481373,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "P66"
+      ]
+    },
+    {
+      "id": 15,
+      "nombre": "Parada Mercado Jardín Plaza",
+      "direccion": "Carrera 66 #64-34",
+      "latitud": 3.415159,
+      "longitud": -76.500877,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T86",
+        "P38",
+        "P95",
+        "E38",
+        "T67",
+        "A59",
+        "E33",
+        "A54"
+      ]
+    },
+    {
+      "id": 16,
+      "nombre": "Estación Único",
+      "direccion": "Carrera 40 #13-87",
+      "latitud": 3.456104,
+      "longitud": -76.564424,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E40",
+        "A79",
+        "P43",
+        "E53"
+      ]
+    },
+    {
+      "id": 17,
+      "nombre": "Estación Único",
+      "direccion": "Carrera 11 #23-53",
+      "latitud": 3.481169,
+      "longitud": -76.573251,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A80",
+        "P63"
+      ]
+    },
+    {
+      "id": 18,
+      "nombre": "Terminal La 14",
+      "direccion": "Carrera 72 #94-47",
+      "latitud": 3.419765,
+      "longitud": -76.505996,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T45",
+        "P72",
+        "P84"
+      ]
+    },
+    {
+      "id": 19,
+      "nombre": "Estación Palmetto",
+      "direccion": "Carrera 19 #63-42",
+      "latitud": 3.45565,
+      "longitud": -76.563604,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E75",
+        "A47",
+        "A57",
+        "P58",
+        "A27",
+        "P80",
+        "P64",
+        "E24"
+      ]
+    },
+    {
+      "id": 20,
+      "nombre": "Estación La 14",
+      "direccion": "Carrera 22 #70-42",
+      "latitud": 3.490134,
+      "longitud": -76.496264,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P53",
+        "E23",
+        "E44",
+        "E58",
+        "P31"
+      ]
+    },
+    {
+      "id": 21,
+      "nombre": "Terminal Universidad San Fernando",
+      "direccion": "Avenida Roosevelt #65-22",
+      "latitud": 3.492037,
+      "longitud": -76.501784,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E50",
+        "P11"
+      ]
+    },
+    {
+      "id": 22,
+      "nombre": "Estación Teatro Chipichape",
+      "direccion": "Carrera 72 #1-7",
+      "latitud": 3.442112,
+      "longitud": -76.568554,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P89",
+        "E97"
+      ]
+    },
+    {
+      "id": 23,
+      "nombre": "Estación Único",
+      "direccion": "Calle 84 #72-49",
+      "latitud": 3.488912,
+      "longitud": -76.572098,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P69"
+      ]
+    },
+    {
+      "id": 24,
+      "nombre": "Terminal Caney",
+      "direccion": "Carrera 13 #63-85",
+      "latitud": 3.451473,
+      "longitud": -76.55693,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "A16"
+      ]
+    },
+    {
+      "id": 25,
+      "nombre": "Terminal Andrés Sanín",
+      "direccion": "Calle 69 #35-91",
+      "latitud": 3.408439,
+      "longitud": -76.482899,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E61",
+        "T88",
+        "P45",
+        "T86"
+      ]
+    },
+    {
+      "id": 26,
+      "nombre": "Terminal Andrés Sanín",
+      "direccion": "Calle 6 #32-7",
+      "latitud": 3.409929,
+      "longitud": -76.579172,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E59",
+        "T23",
+        "A22",
+        "E26"
+      ]
+    },
+    {
+      "id": 27,
+      "nombre": "Vagón Parque Menga",
+      "direccion": "Calle 13 #44-75",
+      "latitud": 3.459577,
+      "longitud": -76.534351,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E97",
+        "T57",
+        "E44",
+        "P11"
+      ]
+    },
+    {
+      "id": 28,
+      "nombre": "Parada Teatro Caney",
+      "direccion": "Carrera 99 #87-16",
+      "latitud": 3.496984,
+      "longitud": -76.529526,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P39",
+        "A18",
+        "E14",
+        "E91"
+      ]
+    },
+    {
+      "id": 29,
+      "nombre": "Estación Teatro La Flora",
+      "direccion": "Avenida Roosevelt #98-20",
+      "latitud": 3.488061,
+      "longitud": -76.566067,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A27",
+        "T64",
+        "T74",
+        "T41",
+        "A28",
+        "P95",
+        "E12"
+      ]
+    },
+    {
+      "id": 30,
+      "nombre": "Terminal Colegio Palmetto",
+      "direccion": "Avenida Roosevelt #59-84",
+      "latitud": 3.408608,
+      "longitud": -76.510656,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T74",
+        "P45",
+        "E75",
+        "E72",
+        "T34",
+        "E20",
+        "P56",
+        "T48"
+      ]
+    },
+    {
+      "id": 31,
+      "nombre": "Estación Andrés Sanín",
+      "direccion": "Calle 3 #90-18",
+      "latitud": 3.475191,
+      "longitud": -76.578965,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E96",
+        "A54",
+        "P21",
+        "T26",
+        "E44",
+        "A88"
+      ]
+    },
+    {
+      "id": 32,
+      "nombre": "Estación San Bosco",
+      "direccion": "Carrera 66 #89-3",
+      "latitud": 3.453151,
+      "longitud": -76.56021,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "A97",
+        "T16",
+        "T28",
+        "T54",
+        "P64"
+      ]
+    },
+    {
+      "id": 33,
+      "nombre": "Terminal Mercado Andrés Sanín",
+      "direccion": "Carrera 69 #35-96",
+      "latitud": 3.413601,
+      "longitud": -76.561036,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T76"
+      ]
+    },
+    {
+      "id": 34,
+      "nombre": "Vagón La Flora",
+      "direccion": "Carrera 1 #58-93",
+      "latitud": 3.402029,
+      "longitud": -76.516589,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A58",
+        "E61",
+        "T42",
+        "E28",
+        "P68",
+        "E98",
+        "P14",
+        "P61"
+      ]
+    },
+    {
+      "id": 35,
+      "nombre": "Vagón La Flora",
+      "direccion": "Carrera 77 #50-40",
+      "latitud": 3.427119,
+      "longitud": -76.505769,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T72",
+        "T45"
+      ]
+    },
+    {
+      "id": 36,
+      "nombre": "Terminal Plaza Santa Librada",
+      "direccion": "Calle 74 #92-33",
+      "latitud": 3.454147,
+      "longitud": -76.569285,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E42",
+        "E67",
+        "E62",
+        "A44"
+      ]
+    },
+    {
+      "id": 37,
+      "nombre": "Terminal Teatro Tequendama",
+      "direccion": "Calle 48 #68-25",
+      "latitud": 3.481395,
+      "longitud": -76.556467,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E65",
+        "E11",
+        "P59",
+        "E91",
+        "T39",
+        "P97",
+        "A18"
+      ]
+    },
+    {
+      "id": 38,
+      "nombre": "Parada Teatro La Flora",
+      "direccion": "Calle 35 #89-30",
+      "latitud": 3.483569,
+      "longitud": -76.51746,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E51",
+        "T17"
+      ]
+    },
+    {
+      "id": 39,
+      "nombre": "Estación Palmetto",
+      "direccion": "Calle 7 #66-41",
+      "latitud": 3.474545,
+      "longitud": -76.562613,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "A49",
+        "T83",
+        "P45",
+        "E98"
+      ]
+    },
+    {
+      "id": 40,
+      "nombre": "Estación Centro Comercial Cosmocentro",
+      "direccion": "Carrera 80 #73-50",
+      "latitud": 3.421569,
+      "longitud": -76.5402,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T20",
+        "P14",
+        "P49",
+        "E85",
+        "A62",
+        "A51",
+        "P58",
+        "P16"
+      ]
+    },
+    {
+      "id": 41,
+      "nombre": "Estación Cosmocentro",
+      "direccion": "Carrera 24 #92-89",
+      "latitud": 3.452817,
+      "longitud": -76.56064,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T68",
+        "E99",
+        "P65",
+        "A90"
+      ]
+    },
+    {
+      "id": 42,
+      "nombre": "Estación Jardín Plaza",
+      "direccion": "Calle 16 #17-9",
+      "latitud": 3.439659,
+      "longitud": -76.572996,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "T93",
+        "P30",
+        "P40",
+        "P73",
+        "A40",
+        "T45",
+        "E59"
+      ]
+    },
+    {
+      "id": 43,
+      "nombre": "Estación La 14",
+      "direccion": "Calle 51 #48-54",
+      "latitud": 3.442693,
+      "longitud": -76.532657,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A52",
+        "T72",
+        "E16",
+        "P64",
+        "E26",
+        "A35",
+        "A56",
+        "A60"
+      ]
+    },
+    {
+      "id": 44,
+      "nombre": "Estación Centro Comercial Chipichape",
+      "direccion": "Carrera 54 #36-92",
+      "latitud": 3.454403,
+      "longitud": -76.503145,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A98",
+        "E65"
+      ]
+    },
+    {
+      "id": 45,
+      "nombre": "Estación La 14",
+      "direccion": "Calle 80 #83-47",
+      "latitud": 3.470556,
+      "longitud": -76.530539,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A27",
+        "A46",
+        "A60",
+        "A40"
+      ]
+    },
+    {
+      "id": 46,
+      "nombre": "Estación La Flora",
+      "direccion": "Carrera 66 #74-24",
+      "latitud": 3.426253,
+      "longitud": -76.579332,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "T27",
+        "A72"
+      ]
+    },
+    {
+      "id": 47,
+      "nombre": "Parada Único",
+      "direccion": "Carrera 85 #6-43",
+      "latitud": 3.457011,
+      "longitud": -76.501792,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P16",
+        "E30",
+        "T91",
+        "A69"
+      ]
+    },
+    {
+      "id": 48,
+      "nombre": "Parada Santa Librada",
+      "direccion": "Calle 51 #87-47",
+      "latitud": 3.436691,
+      "longitud": -76.574942,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E16",
+        "T68"
+      ]
+    },
+    {
+      "id": 49,
+      "nombre": "Terminal Puente Santa Librada",
+      "direccion": "Carrera 58 #58-14",
+      "latitud": 3.410159,
+      "longitud": -76.558978,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E38",
+        "A41",
+        "E30",
+        "E34",
+        "T78"
+      ]
+    },
+    {
+      "id": 50,
+      "nombre": "Parada Valle del Lili",
+      "direccion": "Carrera 43 #25-30",
+      "latitud": 3.489017,
+      "longitud": -76.506466,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T28",
+        "E58",
+        "A14",
+        "A97",
+        "P75",
+        "A71",
+        "T42"
+      ]
+    },
+    {
+      "id": 51,
+      "nombre": "Terminal San Bosco",
+      "direccion": "Calle 14 #66-75",
+      "latitud": 3.48542,
+      "longitud": -76.560003,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A36"
+      ]
+    },
+    {
+      "id": 52,
+      "nombre": "Estación La Flora",
+      "direccion": "Avenida Colombia #76-37",
+      "latitud": 3.476491,
+      "longitud": -76.524316,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A16",
+        "E13",
+        "P56",
+        "P66"
+      ]
+    },
+    {
+      "id": 53,
+      "nombre": "Estación Plaza Palmetto",
+      "direccion": "Calle 65 #20-34",
+      "latitud": 3.450437,
+      "longitud": -76.561335,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T18"
+      ]
+    },
+    {
+      "id": 54,
+      "nombre": "Estación Santa Librada",
+      "direccion": "Carrera 95 #67-3",
+      "latitud": 3.484659,
+      "longitud": -76.57518,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "A21",
+        "A56"
+      ]
+    },
+    {
+      "id": 55,
+      "nombre": "Estación Tequendama",
+      "direccion": "Carrera 54 #90-52",
+      "latitud": 3.432873,
+      "longitud": -76.533165,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A82",
+        "E48",
+        "T54",
+        "E40",
+        "A29",
+        "P38"
+      ]
+    },
+    {
+      "id": 56,
+      "nombre": "Estación Caney",
+      "direccion": "Calle 31 #57-59",
+      "latitud": 3.403128,
+      "longitud": -76.5344,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A92",
+        "P38",
+        "A72",
+        "P96",
+        "P21"
+      ]
+    },
+    {
+      "id": 57,
+      "nombre": "Estación Colegio Valle del Lili",
+      "direccion": "Carrera 8 #44-23",
+      "latitud": 3.408045,
+      "longitud": -76.559031,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A10",
+        "A27",
+        "E60",
+        "P19",
+        "E34"
+      ]
+    },
+    {
+      "id": 58,
+      "nombre": "Terminal Cosmocentro",
+      "direccion": "Calle 78 #99-90",
+      "latitud": 3.489349,
+      "longitud": -76.535889,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A92",
+        "A59",
+        "P60",
+        "T40",
+        "T94",
+        "T16",
+        "A93"
+      ]
+    },
+    {
+      "id": 59,
+      "nombre": "Estación Único",
+      "direccion": "Calle 18 #12-23",
+      "latitud": 3.441762,
+      "longitud": -76.540188,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E37",
+        "P34",
+        "E96",
+        "E38",
+        "T33",
+        "E72"
+      ]
+    },
+    {
+      "id": 60,
+      "nombre": "Terminal Parque Cosmocentro",
+      "direccion": "Carrera 41 #16-82",
+      "latitud": 3.455261,
+      "longitud": -76.541039,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E15",
+        "T56",
+        "A60",
+        "T69",
+        "P73"
+      ]
+    },
+    {
+      "id": 61,
+      "nombre": "Terminal Estadio Tequendama",
+      "direccion": "Carrera 98 #36-30",
+      "latitud": 3.455593,
+      "longitud": -76.51819,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E51",
+        "A27",
+        "P56",
+        "P47",
+        "E22",
+        "P93",
+        "E13"
+      ]
+    },
+    {
+      "id": 62,
+      "nombre": "Estación San Fernando",
+      "direccion": "Calle 4 #45-94",
+      "latitud": 3.489417,
+      "longitud": -76.545676,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A95",
+        "E62",
+        "T46",
+        "P84",
+        "A78",
+        "T34",
+        "T48"
+      ]
+    },
+    {
+      "id": 63,
+      "nombre": "Terminal Plaza San Fernando",
+      "direccion": "Carrera 4 #86-59",
+      "latitud": 3.488774,
+      "longitud": -76.572195,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "P18",
+        "A71",
+        "T37",
+        "E31"
+      ]
+    },
+    {
+      "id": 64,
+      "nombre": "Parada Santa Librada",
+      "direccion": "Calle 57 #39-15",
+      "latitud": 3.45327,
+      "longitud": -76.493076,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A62",
+        "T30",
+        "A74",
+        "E59"
+      ]
+    },
+    {
+      "id": 65,
+      "nombre": "Terminal Plaza Valle del Lili",
+      "direccion": "Carrera 14 #47-28",
+      "latitud": 3.492572,
+      "longitud": -76.526781,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A23",
+        "E44",
+        "T68",
+        "P35",
+        "P22",
+        "A17"
+      ]
+    },
+    {
+      "id": 66,
+      "nombre": "Estación Centro Comercial Palmetto",
+      "direccion": "Calle 80 #36-46",
+      "latitud": 3.497143,
+      "longitud": -76.532903,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E48",
+        "T24",
+        "P44",
+        "T25",
+        "P18",
+        "P46",
+        "T22",
+        "A95"
+      ]
+    },
+    {
+      "id": 67,
+      "nombre": "Estación San Fernando",
+      "direccion": "Carrera 27 #73-88",
+      "latitud": 3.425708,
+      "longitud": -76.522574,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A66",
+        "T13",
+        "A19",
+        "E97"
+      ]
+    },
+    {
+      "id": 68,
+      "nombre": "Terminal San Fernando",
+      "direccion": "Carrera 19 #3-52",
+      "latitud": 3.452896,
+      "longitud": -76.4954,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T97",
+        "E97"
+      ]
+    },
+    {
+      "id": 69,
+      "nombre": "Vagón Jardín Plaza",
+      "direccion": "Calle 69 #45-52",
+      "latitud": 3.467059,
+      "longitud": -76.486133,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T55",
+        "T49"
+      ]
+    },
+    {
+      "id": 70,
+      "nombre": "Estación Caney",
+      "direccion": "Carrera 6 #42-80",
+      "latitud": 3.415622,
+      "longitud": -76.549749,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "T52",
+        "A12",
+        "P27",
+        "P66",
+        "T71",
+        "T56"
+      ]
+    },
+    {
+      "id": 71,
+      "nombre": "Parada Chipichape",
+      "direccion": "Calle 55 #99-78",
+      "latitud": 3.445209,
+      "longitud": -76.519852,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E78",
+        "A19"
+      ]
+    },
+    {
+      "id": 72,
+      "nombre": "Estación San Fernando",
+      "direccion": "Carrera 76 #39-95",
+      "latitud": 3.405554,
+      "longitud": -76.481448,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E97",
+        "P95"
+      ]
+    },
+    {
+      "id": 73,
+      "nombre": "Parada Calipso",
+      "direccion": "Calle 8 #88-90",
+      "latitud": 3.432862,
+      "longitud": -76.564688,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A69",
+        "P97",
+        "T24",
+        "E11",
+        "P92"
+      ]
+    },
+    {
+      "id": 74,
+      "nombre": "Estación Valle del Lili",
+      "direccion": "Carrera 67 #58-84",
+      "latitud": 3.481324,
+      "longitud": -76.521155,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E31",
+        "P26",
+        "A71"
+      ]
+    },
+    {
+      "id": 75,
+      "nombre": "Estación Jardín Plaza",
+      "direccion": "Calle 57 #25-61",
+      "latitud": 3.441061,
+      "longitud": -76.549255,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E31",
+        "T60",
+        "T46",
+        "P13",
+        "E51",
+        "E33",
+        "A96"
+      ]
+    },
+    {
+      "id": 76,
+      "nombre": "Estación Único",
+      "direccion": "Calle 37 #39-57",
+      "latitud": 3.426983,
+      "longitud": -76.546182,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P65",
+        "T86",
+        "P37",
+        "E88",
+        "E52",
+        "T53"
+      ]
+    },
+    {
+      "id": 77,
+      "nombre": "Terminal Mercado Cosmocentro",
+      "direccion": "Carrera 58 #34-85",
+      "latitud": 3.440925,
+      "longitud": -76.551999,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "A42",
+        "T96",
+        "P56"
+      ]
+    },
+    {
+      "id": 78,
+      "nombre": "Parada Plaza La Flora",
+      "direccion": "Calle 12 #67-34",
+      "latitud": 3.461518,
+      "longitud": -76.566326,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T58",
+        "T78",
+        "P33"
+      ]
+    },
+    {
+      "id": 79,
+      "nombre": "Estación Palmetto",
+      "direccion": "Calle 54 #3-45",
+      "latitud": 3.484344,
+      "longitud": -76.486167,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A59",
+        "E39",
+        "A53",
+        "A17",
+        "A56"
+      ]
+    },
+    {
+      "id": 80,
+      "nombre": "Estación Cosmocentro",
+      "direccion": "Calle 60 #84-25",
+      "latitud": 3.494638,
+      "longitud": -76.518215,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E26",
+        "E80",
+        "P46",
+        "T25",
+        "P53",
+        "T97",
+        "E74",
+        "T71"
+      ]
+    },
+    {
+      "id": 81,
+      "nombre": "Estación Siloé",
+      "direccion": "Carrera 35 #35-94",
+      "latitud": 3.433642,
+      "longitud": -76.491545,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E68",
+        "T96",
+        "T31"
+      ]
+    },
+    {
+      "id": 82,
+      "nombre": "Terminal Único",
+      "direccion": "Carrera 31 #1-87",
+      "latitud": 3.43186,
+      "longitud": -76.532926,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "T64",
+        "A11",
+        "E91",
+        "P23"
+      ]
+    },
+    {
+      "id": 83,
+      "nombre": "Estación Santa Librada",
+      "direccion": "Carrera 51 #29-8",
+      "latitud": 3.424252,
+      "longitud": -76.527309,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E96",
+        "P83",
+        "T92",
+        "T33",
+        "E70",
+        "P71",
+        "E15",
+        "A85"
+      ]
+    },
+    {
+      "id": 84,
+      "nombre": "Estación Andrés Sanín",
+      "direccion": "Avenida Pasoancho #17-13",
+      "latitud": 3.47916,
+      "longitud": -76.511495,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "P60",
+        "E18",
+        "E41",
+        "E67",
+        "E42",
+        "P93",
+        "T79",
+        "A84"
+      ]
+    },
+    {
+      "id": 85,
+      "nombre": "Parada Hospital Chipichape",
+      "direccion": "Carrera 51 #58-82",
+      "latitud": 3.422534,
+      "longitud": -76.485318,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P26",
+        "A66",
+        "T83",
+        "T58",
+        "A50"
+      ]
+    },
+    {
+      "id": 86,
+      "nombre": "Estación Único",
+      "direccion": "Carrera 45 #83-28",
+      "latitud": 3.479189,
+      "longitud": -76.504286,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "T48",
+        "E53",
+        "E41"
+      ]
+    },
+    {
+      "id": 87,
+      "nombre": "Estación Calipso",
+      "direccion": "Carrera 14 #39-31",
+      "latitud": 3.404887,
+      "longitud": -76.517379,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "P46"
+      ]
+    },
+    {
+      "id": 88,
+      "nombre": "Terminal Colegio Valle del Lili",
+      "direccion": "Carrera 15 #44-16",
+      "latitud": 3.418527,
+      "longitud": -76.548409,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A27",
+        "P79",
+        "T79"
+      ]
+    },
+    {
+      "id": 89,
+      "nombre": "Estación Único",
+      "direccion": "Carrera 15 #33-84",
+      "latitud": 3.459797,
+      "longitud": -76.531971,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "P17",
+        "P37",
+        "E62",
+        "T98",
+        "P12",
+        "A44"
+      ]
+    },
+    {
+      "id": 90,
+      "nombre": "Terminal Menga",
+      "direccion": "Carrera 23 #84-25",
+      "latitud": 3.445742,
+      "longitud": -76.571457,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "T17",
+        "A11",
+        "A98",
+        "E85",
+        "P14",
+        "T24",
+        "A65"
+      ]
+    },
+    {
+      "id": 91,
+      "nombre": "Vagón Hospital La 14",
+      "direccion": "Carrera 60 #92-78",
+      "latitud": 3.405967,
+      "longitud": -76.495138,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P97",
+        "E36"
+      ]
+    },
+    {
+      "id": 92,
+      "nombre": "Vagón Plaza La 14",
+      "direccion": "Carrera 21 #50-63",
+      "latitud": 3.447585,
+      "longitud": -76.577397,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A79",
+        "P68",
+        "P91",
+        "T11"
+      ]
+    },
+    {
+      "id": 93,
+      "nombre": "Estación Calipso",
+      "direccion": "Carrera 42 #55-51",
+      "latitud": 3.43486,
+      "longitud": -76.490329,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E51",
+        "P22",
+        "T48"
+      ]
+    },
+    {
+      "id": 94,
+      "nombre": "Terminal Colegio Tequendama",
+      "direccion": "Calle 4 #59-67",
+      "latitud": 3.441998,
+      "longitud": -76.552327,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E68",
+        "P26",
+        "P35",
+        "T70",
+        "T21",
+        "E38",
+        "E94"
+      ]
+    },
+    {
+      "id": 95,
+      "nombre": "Estación Menga",
+      "direccion": "Calle 70 #19-87",
+      "latitud": 3.460853,
+      "longitud": -76.547164,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P55",
+        "T30",
+        "P80",
+        "T33"
+      ]
+    },
+    {
+      "id": 96,
+      "nombre": "Vagón Estadio Siloé",
+      "direccion": "Calle 5 #62-7",
+      "latitud": 3.48423,
+      "longitud": -76.482185,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T29"
+      ]
+    },
+    {
+      "id": 97,
+      "nombre": "Vagón Caney",
+      "direccion": "Calle 10 #16-8",
+      "latitud": 3.484613,
+      "longitud": -76.534281,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "T35",
+        "P79",
+        "T21"
+      ]
+    },
+    {
+      "id": 98,
+      "nombre": "Estación Teatro Calipso",
+      "direccion": "Avenida Roosevelt #46-55",
+      "latitud": 3.443699,
+      "longitud": -76.506488,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T60",
+        "P94",
+        "A31",
+        "A25"
+      ]
+    },
+    {
+      "id": 99,
+      "nombre": "Vagón Hospital Andrés Sanín",
+      "direccion": "Carrera 59 #1-27",
+      "latitud": 3.475922,
+      "longitud": -76.484432,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P94",
+        "P23",
+        "T70",
+        "P36",
+        "A49",
+        "P33",
+        "A81",
+        "A24"
+      ]
+    },
+    {
+      "id": 100,
+      "nombre": "Terminal Menga",
+      "direccion": "Calle 78 #48-17",
+      "latitud": 3.479025,
+      "longitud": -76.567708,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P45",
+        "T27",
+        "A55",
+        "A88",
+        "P11",
+        "P69",
+        "E52"
+      ]
+    },
+    {
+      "id": 101,
+      "nombre": "Estación Colegio Menga",
+      "direccion": "Calle 65 #80-69",
+      "latitud": 3.404628,
+      "longitud": -76.547556,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A39",
+        "T79"
+      ]
+    },
+    {
+      "id": 102,
+      "nombre": "Parada Parque Menga",
+      "direccion": "Carrera 68 #61-82",
+      "latitud": 3.407448,
+      "longitud": -76.490013,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "P73",
+        "A24",
+        "T59",
+        "P99",
+        "E96",
+        "P34",
+        "E85"
+      ]
+    },
+    {
+      "id": 103,
+      "nombre": "Vagón Calipso",
+      "direccion": "Calle 52 #74-74",
+      "latitud": 3.487964,
+      "longitud": -76.486168,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T10",
+        "A69",
+        "E85",
+        "P10"
+      ]
+    },
+    {
+      "id": 104,
+      "nombre": "Estación Palmetto",
+      "direccion": "Calle 52 #76-94",
+      "latitud": 3.412711,
+      "longitud": -76.501844,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P54",
+        "P45",
+        "E33",
+        "A32"
+      ]
+    },
+    {
+      "id": 105,
+      "nombre": "Terminal Teatro La Flora",
+      "direccion": "Carrera 58 #58-26",
+      "latitud": 3.430949,
+      "longitud": -76.494051,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P44",
+        "E95"
+      ]
+    },
+    {
+      "id": 106,
+      "nombre": "Terminal Chipichape",
+      "direccion": "Carrera 70 #46-42",
+      "latitud": 3.452737,
+      "longitud": -76.49624,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P59",
+        "T93"
+      ]
+    },
+    {
+      "id": 107,
+      "nombre": "Parada San Bosco",
+      "direccion": "Calle 80 #25-67",
+      "latitud": 3.41434,
+      "longitud": -76.523808,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A14",
+        "T44"
+      ]
+    },
+    {
+      "id": 108,
+      "nombre": "Parada Único",
+      "direccion": "Calle 57 #91-66",
+      "latitud": 3.474334,
+      "longitud": -76.486763,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P60",
+        "P68",
+        "A22",
+        "E29",
+        "E88",
+        "P29"
+      ]
+    },
+    {
+      "id": 109,
+      "nombre": "Estación La Flora",
+      "direccion": "Carrera 21 #98-36",
+      "latitud": 3.454441,
+      "longitud": -76.527539,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A10",
+        "T56",
+        "P13"
+      ]
+    },
+    {
+      "id": 110,
+      "nombre": "Vagón Calipso",
+      "direccion": "Carrera 77 #24-27",
+      "latitud": 3.494731,
+      "longitud": -76.557036,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P23",
+        "E32",
+        "P58",
+        "T20",
+        "P60",
+        "P52"
+      ]
+    },
+    {
+      "id": 111,
+      "nombre": "Estación Universidad Valle del Lili",
+      "direccion": "Calle 44 #57-95",
+      "latitud": 3.448424,
+      "longitud": -76.521165,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A64",
+        "P44",
+        "A16",
+        "P89",
+        "E80",
+        "T99",
+        "E48"
+      ]
+    },
+    {
+      "id": 112,
+      "nombre": "Vagón Siloé",
+      "direccion": "Calle 14 #61-11",
+      "latitud": 3.499265,
+      "longitud": -76.540506,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T97",
+        "T74",
+        "P15"
+      ]
+    },
+    {
+      "id": 113,
+      "nombre": "Parada Centro Comercial Valle del Lili",
+      "direccion": "Calle 25 #83-46",
+      "latitud": 3.447873,
+      "longitud": -76.517434,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P56",
+        "P15",
+        "T20",
+        "E72",
+        "P71",
+        "A48"
+      ]
+    },
+    {
+      "id": 114,
+      "nombre": "Terminal San Bosco",
+      "direccion": "Carrera 92 #7-66",
+      "latitud": 3.46515,
+      "longitud": -76.56584,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E69",
+        "A71",
+        "A94",
+        "A25",
+        "P23",
+        "P97"
+      ]
+    },
+    {
+      "id": 115,
+      "nombre": "Estación Menga",
+      "direccion": "Carrera 95 #1-65",
+      "latitud": 3.493269,
+      "longitud": -76.54292,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "T68",
+        "E98",
+        "E54",
+        "P85"
+      ]
+    },
+    {
+      "id": 116,
+      "nombre": "Terminal La 14",
+      "direccion": "Calle 24 #18-29",
+      "latitud": 3.423694,
+      "longitud": -76.493123,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P78",
+        "A35",
+        "P54",
+        "T40",
+        "A82"
+      ]
+    },
+    {
+      "id": 117,
+      "nombre": "Terminal San Bosco",
+      "direccion": "Carrera 32 #99-89",
+      "latitud": 3.473756,
+      "longitud": -76.533465,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "A14",
+        "E87"
+      ]
+    },
+    {
+      "id": 118,
+      "nombre": "Estación Menga",
+      "direccion": "Carrera 98 #62-11",
+      "latitud": 3.421786,
+      "longitud": -76.526356,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P70",
+        "P74"
+      ]
+    },
+    {
+      "id": 119,
+      "nombre": "Vagón Estadio Tequendama",
+      "direccion": "Carrera 25 #11-25",
+      "latitud": 3.402305,
+      "longitud": -76.489748,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E16",
+        "E22",
+        "T41",
+        "P74",
+        "A79",
+        "A49"
+      ]
+    },
+    {
+      "id": 120,
+      "nombre": "Parada Universidad Andrés Sanín",
+      "direccion": "Calle 27 #96-76",
+      "latitud": 3.469315,
+      "longitud": -76.514811,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E46",
+        "T27",
+        "T40",
+        "A45",
+        "P58",
+        "A96"
+      ]
+    },
+    {
+      "id": 121,
+      "nombre": "Vagón Centro Comercial Valle del Lili",
+      "direccion": "Calle 33 #83-13",
+      "latitud": 3.436389,
+      "longitud": -76.505952,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P25",
+        "P53",
+        "P91",
+        "A86",
+        "T20"
+      ]
+    },
+    {
+      "id": 122,
+      "nombre": "Terminal Mercado Calipso",
+      "direccion": "Carrera 53 #54-46",
+      "latitud": 3.472192,
+      "longitud": -76.491154,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A22",
+        "T29",
+        "A33",
+        "A16",
+        "E97",
+        "A86",
+        "T37",
+        "P13"
+      ]
+    },
+    {
+      "id": 123,
+      "nombre": "Terminal Universidad Palmetto",
+      "direccion": "Carrera 99 #56-14",
+      "latitud": 3.453885,
+      "longitud": -76.565261,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E71",
+        "P46",
+        "A66"
+      ]
+    },
+    {
+      "id": 124,
+      "nombre": "Terminal Menga",
+      "direccion": "Carrera 65 #92-12",
+      "latitud": 3.495819,
+      "longitud": -76.492095,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E43",
+        "T78",
+        "P64",
+        "A73",
+        "P87",
+        "A92",
+        "A17",
+        "P39"
+      ]
+    },
+    {
+      "id": 125,
+      "nombre": "Terminal Caney",
+      "direccion": "Avenida 6 #51-82",
+      "latitud": 3.42847,
+      "longitud": -76.525851,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "P33",
+        "P94",
+        "P57",
+        "T58",
+        "A99",
+        "T68",
+        "P48",
+        "E10"
+      ]
+    },
+    {
+      "id": 126,
+      "nombre": "Terminal Andrés Sanín",
+      "direccion": "Calle 66 #89-17",
+      "latitud": 3.414861,
+      "longitud": -76.514426,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "T54",
+        "A34",
+        "E48",
+        "E14"
+      ]
+    },
+    {
+      "id": 127,
+      "nombre": "Terminal Jardín Plaza",
+      "direccion": "Calle 72 #28-42",
+      "latitud": 3.452283,
+      "longitud": -76.513572,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E97",
+        "E16",
+        "T60",
+        "T81",
+        "A91"
+      ]
+    },
+    {
+      "id": 128,
+      "nombre": "Terminal Calipso",
+      "direccion": "Carrera 1 #14-67",
+      "latitud": 3.485798,
+      "longitud": -76.565943,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E24",
+        "E73",
+        "E13",
+        "T40",
+        "T18",
+        "A23",
+        "T87",
+        "P57"
+      ]
+    },
+    {
+      "id": 129,
+      "nombre": "Terminal Calipso",
+      "direccion": "Carrera 18 #31-35",
+      "latitud": 3.488457,
+      "longitud": -76.526507,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P82",
+        "E84",
+        "P79",
+        "E32",
+        "P83",
+        "P29",
+        "E28"
+      ]
+    },
+    {
+      "id": 130,
+      "nombre": "Terminal Biblioteca Palmetto",
+      "direccion": "Carrera 77 #70-63",
+      "latitud": 3.435533,
+      "longitud": -76.559584,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T40",
+        "T35",
+        "P26",
+        "P43",
+        "P62"
+      ]
+    },
+    {
+      "id": 131,
+      "nombre": "Terminal Menga",
+      "direccion": "Carrera 45 #92-59",
+      "latitud": 3.428488,
+      "longitud": -76.55734,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E29",
+        "E72",
+        "P20",
+        "A92",
+        "P30",
+        "P21",
+        "T54"
+      ]
+    },
+    {
+      "id": 132,
+      "nombre": "Estación Mercado Único",
+      "direccion": "Carrera 60 #4-13",
+      "latitud": 3.414439,
+      "longitud": -76.489764,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T36",
+        "T97"
+      ]
+    },
+    {
+      "id": 133,
+      "nombre": "Estación La 14",
+      "direccion": "Carrera 31 #81-36",
+      "latitud": 3.455381,
+      "longitud": -76.514366,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A14",
+        "A21",
+        "P41",
+        "E79"
+      ]
+    },
+    {
+      "id": 134,
+      "nombre": "Estación Santa Librada",
+      "direccion": "Calle 6 #59-38",
+      "latitud": 3.454253,
+      "longitud": -76.515414,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A41",
+        "A44",
+        "A96",
+        "T28",
+        "P80",
+        "T15"
+      ]
+    },
+    {
+      "id": 135,
+      "nombre": "Estación Jardín Plaza",
+      "direccion": "Carrera 50 #78-2",
+      "latitud": 3.408293,
+      "longitud": -76.544649,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P54",
+        "E46",
+        "P88",
+        "P29"
+      ]
+    },
+    {
+      "id": 136,
+      "nombre": "Terminal Jardín Plaza",
+      "direccion": "Carrera 57 #18-58",
+      "latitud": 3.430255,
+      "longitud": -76.560896,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E36",
+        "T49",
+        "P24",
+        "P88",
+        "A80",
+        "E75",
+        "P30",
+        "E63"
+      ]
+    },
+    {
+      "id": 137,
+      "nombre": "Estación Puente Único",
+      "direccion": "Calle 81 #13-74",
+      "latitud": 3.420477,
+      "longitud": -76.560347,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P31",
+        "E10",
+        "T28"
+      ]
+    },
+    {
+      "id": 138,
+      "nombre": "Terminal La Flora",
+      "direccion": "Carrera 32 #41-37",
+      "latitud": 3.475897,
+      "longitud": -76.52499,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A62",
+        "A49"
+      ]
+    },
+    {
+      "id": 139,
+      "nombre": "Estación Cosmocentro",
+      "direccion": "Calle 78 #61-31",
+      "latitud": 3.418868,
+      "longitud": -76.493624,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T69",
+        "T44",
+        "T56",
+        "E95",
+        "A86",
+        "E42",
+        "A98"
+      ]
+    },
+    {
+      "id": 140,
+      "nombre": "Parada Valle del Lili",
+      "direccion": "Carrera 94 #60-58",
+      "latitud": 3.479806,
+      "longitud": -76.536695,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "P15",
+        "E90",
+        "A48",
+        "P82",
+        "A89",
+        "T93",
+        "T39"
+      ]
+    },
+    {
+      "id": 141,
+      "nombre": "Estación Colegio San Fernando",
+      "direccion": "Calle 31 #94-10",
+      "latitud": 3.446948,
+      "longitud": -76.531266,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T93",
+        "T71",
+        "P17",
+        "T45",
+        "P38"
+      ]
+    },
+    {
+      "id": 142,
+      "nombre": "Terminal La 14",
+      "direccion": "Calle 14 #93-62",
+      "latitud": 3.472084,
+      "longitud": -76.507616,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E38",
+        "E88",
+        "P28",
+        "E12",
+        "E58",
+        "P43"
+      ]
+    },
+    {
+      "id": 143,
+      "nombre": "Parada Cosmocentro",
+      "direccion": "Calle 71 #85-95",
+      "latitud": 3.477271,
+      "longitud": -76.519755,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E18",
+        "T90",
+        "E89",
+        "E68",
+        "E65",
+        "P39",
+        "T10",
+        "P36"
+      ]
+    },
+    {
+      "id": 144,
+      "nombre": "Vagón Parque Andrés Sanín",
+      "direccion": "Carrera 51 #42-25",
+      "latitud": 3.435063,
+      "longitud": -76.534322,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E55",
+        "A69",
+        "P23",
+        "A95",
+        "A73",
+        "T47"
+      ]
+    },
+    {
+      "id": 145,
+      "nombre": "Estación Caney",
+      "direccion": "Carrera 53 #37-96",
+      "latitud": 3.478545,
+      "longitud": -76.486881,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T46"
+      ]
+    },
+    {
+      "id": 146,
+      "nombre": "Terminal Jardín Plaza",
+      "direccion": "Carrera 41 #45-20",
+      "latitud": 3.451654,
+      "longitud": -76.498951,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A44",
+        "E77"
+      ]
+    },
+    {
+      "id": 147,
+      "nombre": "Terminal Cosmocentro",
+      "direccion": "Calle 7 #92-12",
+      "latitud": 3.460348,
+      "longitud": -76.482594,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "A23",
+        "E35",
+        "T96",
+        "E77",
+        "T80",
+        "T21"
+      ]
+    },
+    {
+      "id": 148,
+      "nombre": "Terminal Centro Comercial Jardín Plaza",
+      "direccion": "Carrera 26 #37-27",
+      "latitud": 3.466451,
+      "longitud": -76.534861,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A64"
+      ]
+    },
+    {
+      "id": 149,
+      "nombre": "Parada Cosmocentro",
+      "direccion": "Carrera 97 #94-92",
+      "latitud": 3.494482,
+      "longitud": -76.575629,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "P47"
+      ]
+    },
+    {
+      "id": 150,
+      "nombre": "Estación Centro Comercial Único",
+      "direccion": "Calle 70 #38-75",
+      "latitud": 3.434358,
+      "longitud": -76.528308,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T67",
+        "T75",
+        "T13"
+      ]
+    },
+    {
+      "id": 151,
+      "nombre": "Parada Universidad Palmetto",
+      "direccion": "Carrera 14 #32-47",
+      "latitud": 3.463293,
+      "longitud": -76.575471,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A16"
+      ]
+    },
+    {
+      "id": 152,
+      "nombre": "Estación Estadio Jardín Plaza",
+      "direccion": "Calle 22 #14-24",
+      "latitud": 3.419325,
+      "longitud": -76.563903,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T43"
+      ]
+    },
+    {
+      "id": 153,
+      "nombre": "Terminal Parque Valle del Lili",
+      "direccion": "Carrera 36 #5-71",
+      "latitud": 3.49643,
+      "longitud": -76.561464,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P36",
+        "A53",
+        "E58",
+        "E27"
+      ]
+    },
+    {
+      "id": 154,
+      "nombre": "Parada Cosmocentro",
+      "direccion": "Calle 36 #58-20",
+      "latitud": 3.417946,
+      "longitud": -76.487574,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E65"
+      ]
+    },
+    {
+      "id": 155,
+      "nombre": "Parada Teatro Único",
+      "direccion": "Carrera 12 #50-49",
+      "latitud": 3.450968,
+      "longitud": -76.484125,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E92",
+        "E85",
+        "A81"
+      ]
+    },
+    {
+      "id": 156,
+      "nombre": "Parada Jardín Plaza",
+      "direccion": "Calle 62 #35-22",
+      "latitud": 3.493289,
+      "longitud": -76.49255,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E52",
+        "T56",
+        "A62",
+        "E86",
+        "T35"
+      ]
+    },
+    {
+      "id": 157,
+      "nombre": "Estación Cosmocentro",
+      "direccion": "Calle 54 #87-80",
+      "latitud": 3.496469,
+      "longitud": -76.57453,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E12",
+        "A21",
+        "E35",
+        "P93",
+        "T41",
+        "E41"
+      ]
+    },
+    {
+      "id": 158,
+      "nombre": "Estación Siloé",
+      "direccion": "Calle 67 #5-45",
+      "latitud": 3.458505,
+      "longitud": -76.485968,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T89",
+        "P34",
+        "E26",
+        "E12",
+        "T57",
+        "P68",
+        "P26",
+        "P57"
+      ]
+    },
+    {
+      "id": 159,
+      "nombre": "Estación Puente Cosmocentro",
+      "direccion": "Carrera 66 #45-40",
+      "latitud": 3.446314,
+      "longitud": -76.558492,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E28"
+      ]
+    },
+    {
+      "id": 160,
+      "nombre": "Estación Estadio La 14",
+      "direccion": "Carrera 26 #86-75",
+      "latitud": 3.412152,
+      "longitud": -76.541312,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T45",
+        "A36"
+      ]
+    },
+    {
+      "id": 161,
+      "nombre": "Estación Santa Librada",
+      "direccion": "Avenida Colombia #62-15",
+      "latitud": 3.479447,
+      "longitud": -76.511615,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A60",
+        "E98",
+        "E62",
+        "T95",
+        "P40",
+        "P48"
+      ]
+    },
+    {
+      "id": 162,
+      "nombre": "Terminal La 14",
+      "direccion": "Calle 29 #6-89",
+      "latitud": 3.443336,
+      "longitud": -76.528959,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T49",
+        "T99",
+        "P85",
+        "P79",
+        "E34",
+        "P43"
+      ]
+    },
+    {
+      "id": 163,
+      "nombre": "Vagón Colegio Chipichape",
+      "direccion": "Calle 61 #71-9",
+      "latitud": 3.461039,
+      "longitud": -76.506388,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T61"
+      ]
+    },
+    {
+      "id": 164,
+      "nombre": "Parada La 14",
+      "direccion": "Carrera 89 #39-66",
+      "latitud": 3.43124,
+      "longitud": -76.482088,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P79"
+      ]
+    },
+    {
+      "id": 165,
+      "nombre": "Parada La Flora",
+      "direccion": "Carrera 71 #89-54",
+      "latitud": 3.453966,
+      "longitud": -76.486438,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E18"
+      ]
+    },
+    {
+      "id": 166,
+      "nombre": "Vagón Colegio Siloé",
+      "direccion": "Carrera 62 #91-33",
+      "latitud": 3.466911,
+      "longitud": -76.5601,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P56",
+        "T19",
+        "E81"
+      ]
+    },
+    {
+      "id": 167,
+      "nombre": "Estación Único",
+      "direccion": "Carrera 31 #99-27",
+      "latitud": 3.424363,
+      "longitud": -76.496773,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A40",
+        "P99",
+        "E46",
+        "E11",
+        "E84"
+      ]
+    },
+    {
+      "id": 168,
+      "nombre": "Terminal La Flora",
+      "direccion": "Calle 60 #25-20",
+      "latitud": 3.416185,
+      "longitud": -76.569551,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T59",
+        "P82"
+      ]
+    },
+    {
+      "id": 169,
+      "nombre": "Estación Santa Librada",
+      "direccion": "Carrera 6 #69-32",
+      "latitud": 3.489911,
+      "longitud": -76.564423,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E61",
+        "E74",
+        "A94"
+      ]
+    },
+    {
+      "id": 170,
+      "nombre": "Estación San Fernando",
+      "direccion": "Calle 65 #83-40",
+      "latitud": 3.427778,
+      "longitud": -76.541246,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T64",
+        "T60",
+        "T18",
+        "E89",
+        "T95",
+        "E32",
+        "P22",
+        "P15"
+      ]
+    },
+    {
+      "id": 171,
+      "nombre": "Terminal Jardín Plaza",
+      "direccion": "Calle 35 #92-74",
+      "latitud": 3.413333,
+      "longitud": -76.487141,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T32",
+        "E90",
+        "T65",
+        "T51",
+        "T94",
+        "T77",
+        "E41",
+        "T89"
+      ]
+    },
+    {
+      "id": 172,
+      "nombre": "Parada Calipso",
+      "direccion": "Calle 77 #6-82",
+      "latitud": 3.42943,
+      "longitud": -76.516862,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P83",
+        "A53",
+        "A51",
+        "E27",
+        "T87",
+        "A81"
+      ]
+    },
+    {
+      "id": 173,
+      "nombre": "Parada Estadio Caney",
+      "direccion": "Carrera 25 #44-83",
+      "latitud": 3.469318,
+      "longitud": -76.538268,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P93",
+        "A51"
+      ]
+    },
+    {
+      "id": 174,
+      "nombre": "Estación Universidad Valle del Lili",
+      "direccion": "Carrera 86 #22-90",
+      "latitud": 3.42831,
+      "longitud": -76.544666,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A14",
+        "E10",
+        "T21",
+        "E28",
+        "A15",
+        "P41",
+        "T11"
+      ]
+    },
+    {
+      "id": 175,
+      "nombre": "Terminal Calipso",
+      "direccion": "Calle 19 #2-84",
+      "latitud": 3.454158,
+      "longitud": -76.520961,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T10",
+        "P89",
+        "A59",
+        "T61",
+        "T80",
+        "T34"
+      ]
+    },
+    {
+      "id": 176,
+      "nombre": "Parada Clínica Santa Librada",
+      "direccion": "Carrera 46 #57-55",
+      "latitud": 3.423027,
+      "longitud": -76.488534,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A31",
+        "P50",
+        "T84",
+        "E75",
+        "E10"
+      ]
+    },
+    {
+      "id": 177,
+      "nombre": "Estación Estadio San Fernando",
+      "direccion": "Calle 42 #26-88",
+      "latitud": 3.439539,
+      "longitud": -76.552359,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E82",
+        "A27",
+        "E28",
+        "P75",
+        "E22",
+        "P87",
+        "E92"
+      ]
+    },
+    {
+      "id": 178,
+      "nombre": "Estación Chipichape",
+      "direccion": "Calle 6 #77-10",
+      "latitud": 3.420282,
+      "longitud": -76.485108,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A97",
+        "A49",
+        "A13"
+      ]
+    },
+    {
+      "id": 179,
+      "nombre": "Estación Caney",
+      "direccion": "Carrera 18 #70-85",
+      "latitud": 3.404623,
+      "longitud": -76.562299,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T48",
+        "E90",
+        "P40",
+        "T33",
+        "A61",
+        "T79",
+        "T18"
+      ]
+    },
+    {
+      "id": 180,
+      "nombre": "Parada La Flora",
+      "direccion": "Avenida 6 #46-64",
+      "latitud": 3.422367,
+      "longitud": -76.500581,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T34",
+        "E47",
+        "E98",
+        "T90"
+      ]
+    },
+    {
+      "id": 181,
+      "nombre": "Vagón Parque La Flora",
+      "direccion": "Carrera 96 #48-29",
+      "latitud": 3.479992,
+      "longitud": -76.497448,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P93",
+        "P89",
+        "E14",
+        "A83",
+        "E83",
+        "E75",
+        "P86",
+        "A78"
+      ]
+    },
+    {
+      "id": 182,
+      "nombre": "Estación Puente Jardín Plaza",
+      "direccion": "Carrera 89 #48-61",
+      "latitud": 3.469506,
+      "longitud": -76.543971,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T32",
+        "P66",
+        "P64"
+      ]
+    },
+    {
+      "id": 183,
+      "nombre": "Estación Valle del Lili",
+      "direccion": "Carrera 29 #69-63",
+      "latitud": 3.415651,
+      "longitud": -76.540128,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "T11",
+        "T12",
+        "P14",
+        "E41",
+        "P56"
+      ]
+    },
+    {
+      "id": 184,
+      "nombre": "Parada Mercado Palmetto",
+      "direccion": "Calle 49 #88-69",
+      "latitud": 3.471093,
+      "longitud": -76.549674,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A62",
+        "E16",
+        "T61",
+        "T72"
+      ]
+    },
+    {
+      "id": 185,
+      "nombre": "Estación Tequendama",
+      "direccion": "Calle 19 #35-54",
+      "latitud": 3.408966,
+      "longitud": -76.491267,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "P87",
+        "T58",
+        "P32",
+        "A57"
+      ]
+    },
+    {
+      "id": 186,
+      "nombre": "Estación Jardín Plaza",
+      "direccion": "Carrera 85 #69-4",
+      "latitud": 3.45898,
+      "longitud": -76.487208,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T57",
+        "E49",
+        "A54",
+        "A40",
+        "E66",
+        "E54",
+        "E16"
+      ]
+    },
+    {
+      "id": 187,
+      "nombre": "Estación San Bosco",
+      "direccion": "Carrera 81 #32-89",
+      "latitud": 3.450682,
+      "longitud": -76.511375,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A22"
+      ]
+    },
+    {
+      "id": 188,
+      "nombre": "Parada Estadio Menga",
+      "direccion": "Carrera 3 #10-42",
+      "latitud": 3.484955,
+      "longitud": -76.513674,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T23",
+        "E85"
+      ]
+    },
+    {
+      "id": 189,
+      "nombre": "Terminal Siloé",
+      "direccion": "Calle 46 #67-2",
+      "latitud": 3.470307,
+      "longitud": -76.5382,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E57",
+        "T72",
+        "P89",
+        "A42",
+        "E17",
+        "A17",
+        "A57"
+      ]
+    },
+    {
+      "id": 190,
+      "nombre": "Terminal Caney",
+      "direccion": "Calle 10 #17-85",
+      "latitud": 3.492149,
+      "longitud": -76.505318,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "T77",
+        "P57",
+        "P20",
+        "P31",
+        "P68"
+      ]
+    },
+    {
+      "id": 191,
+      "nombre": "Terminal Valle del Lili",
+      "direccion": "Carrera 71 #75-76",
+      "latitud": 3.467705,
+      "longitud": -76.544667,
+      "tipo": "terminal",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "E43",
+        "T79",
+        "E50"
+      ]
+    },
+    {
+      "id": 192,
+      "nombre": "Estación Menga",
+      "direccion": "Carrera 5 #30-79",
+      "latitud": 3.435779,
+      "longitud": -76.494828,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": true
+      },
+      "rutas": [
+        "A43",
+        "P93"
+      ]
+    },
+    {
+      "id": 193,
+      "nombre": "Terminal Palmetto",
+      "direccion": "Autopista Sur #28-39",
+      "latitud": 3.422771,
+      "longitud": -76.566388,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P22",
+        "P76"
+      ]
+    },
+    {
+      "id": 194,
+      "nombre": "Estación Hospital Siloé",
+      "direccion": "Calle 31 #10-76",
+      "latitud": 3.42288,
+      "longitud": -76.528423,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T51",
+        "A82",
+        "E93",
+        "A47"
+      ]
+    },
+    {
+      "id": 195,
+      "nombre": "Vagón Colegio Valle del Lili",
+      "direccion": "Carrera 92 #62-94",
+      "latitud": 3.481925,
+      "longitud": -76.489966,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E88",
+        "E76",
+        "P12",
+        "E43",
+        "T97"
+      ]
+    },
+    {
+      "id": 196,
+      "nombre": "Terminal Colegio Único",
+      "direccion": "Calle 18 #34-59",
+      "latitud": 3.493799,
+      "longitud": -76.504541,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": false,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P96",
+        "T56",
+        "A49",
+        "E68",
+        "T39",
+        "E25",
+        "T77"
+      ]
+    },
+    {
+      "id": 197,
+      "nombre": "Parada Parque Caney",
+      "direccion": "Carrera 38 #27-83",
+      "latitud": 3.435306,
+      "longitud": -76.544802,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "E12",
+        "P25"
+      ]
+    },
+    {
+      "id": 198,
+      "nombre": "Vagón Centro Comercial San Bosco",
+      "direccion": "Calle 77 #5-14",
+      "latitud": 3.43402,
+      "longitud": -76.509368,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "P57"
+      ]
+    },
+    {
+      "id": 199,
+      "nombre": "Estación Andrés Sanín",
+      "direccion": "Carrera 57 #71-50",
+      "latitud": 3.438361,
+      "longitud": -76.572412,
+      "tipo": "estación",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "T17",
+        "P95"
+      ]
+    },
+    {
+      "id": 200,
+      "nombre": "Parada La Flora",
+      "direccion": "Calle 1 #91-85",
+      "latitud": 3.449911,
+      "longitud": -76.481236,
+      "tipo": "regular",
+      "accesibilidad": {
+        "rampa": true,
+        "semaforo_sonoro": false
+      },
+      "rutas": [
+        "A74",
+        "P11",
+        "E90",
+        "P10",
+        "A48"
+      ]
+    }
+  ],
+  "last_update": 1751339490.7014854
+}
