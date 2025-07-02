@@ -3,34 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    
-    <!-- Bootstrap CSS desde CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Transporte Accesible Cali - Modo Simplificado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .header {
+            background-color: #0275d8;
+            color: white;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .diagnostico {
+            background-color: #e2e3e5;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .nav {
+            margin-bottom: 20px;
+        }
+        .nav a {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #0275d8;
+            color: white;
+            text-decoration: none;
+            margin-right: 5px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
-    <div class="container py-5">
-        <div class="row">
-            <div class="col-md-8 mx-auto text-center">
-                <h1 class="display-4 fw-bold">Transporte Accesible Cali</h1>
-                <p class="lead mb-4">
-                    Versión simplificada para pruebas
-                </p>
-                
-                <div class="alert alert-success">
-                    Si estás viendo esta página, la aplicación Flask está funcionando correctamente.
-                </div>
-                
-                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-5">
-                    <a href="/test" class="btn btn-primary btn-lg px-4 gap-3">
-                        Probar API
-                    </a>
-                </div>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1>Transporte Accesible Cali</h1>
+            <p>Modo Simplificado</p>
+        </div>
+        
+        <div class="nav">
+            <a href="/">Inicio</a>
+            <a href="/rutas">Rutas</a>
+            <a href="/paradas">Paradas</a>
+            <a href="/diagnostico">Diagnóstico</a>
+        </div>
+        
+        {% if message %}
+        <div class="message">
+            <p>{{ message }}</p>
+        </div>
+        {% endif %}
+        
+        {% if error %}
+        <div class="error">
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+        
+        {% if diagnostico %}
+        <div class="diagnostico">
+            <h2>Diagnóstico del Sistema</h2>
+            <ul>
+                <li>Flask: {% if diagnostico.flask %}Funcionando{% else %}No disponible{% endif %}</li>
+                <li>Conexión a base de datos: {% if diagnostico.database_connection %}Establecida{% else %}Error{% endif %}</li>
+                {% if diagnostico.database_error %}
+                <li>Error de base de datos: {{ diagnostico.database_error }}</li>
+                {% endif %}
+            </ul>
+            
+            <h3>Tablas en la base de datos:</h3>
+            <ul>
+                <li>Rutas: {{ diagnostico.tables.rutas }} registros</li>
+                <li>Paradas: {{ diagnostico.tables.paradas }} registros</li>
+                <li>Asociaciones Ruta-Parada: {{ diagnostico.tables.ruta_parada }} registros</li>
+                <li>Usuarios: {{ diagnostico.tables.usuarios }} registros</li>
+            </ul>
+        </div>
+        {% endif %}
+        
+        {% if rutas %}
+        <div>
+            <h2>Rutas de Transporte</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Nombre</th>
+                        <th>Origen</th>
+                        <th>Destino</th>
+                        <th>Horario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ruta in rutas %}
+                    <tr>
+                        <td>{{ ruta.numero }}</td>
+                        <td>{{ ruta.nombre }}</td>
+                        <td>{{ ruta.origen }}</td>
+                        <td>{{ ruta.destino }}</td>
+                        <td>{{ ruta.hora_inicio.strftime('%H:%M') }} - {{ ruta.hora_fin.strftime('%H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        
+        {% if paradas %}
+        <div>
+            <h2>Paradas de Transporte</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Dirección</th>
+                        <th>Tipo</th>
+                        <th>Accesibilidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for parada in paradas %}
+                    <tr>
+                        <td>{{ parada.nombre }}</td>
+                        <td>{{ parada.direccion }}</td>
+                        <td>{{ parada.tipo }}</td>
+                        <td>
+                            {% if parada.tiene_rampa %}Rampa{% endif %}
+                            {% if parada.tiene_rampa and parada.tiene_semaforo_sonoro %}, {% endif %}
+                            {% if parada.tiene_semaforo_sonoro %}Semáforo sonoro{% endif %}
+                            {% if not parada.tiene_rampa and not parada.tiene_semaforo_sonoro %}Estándar{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        
+        {% if not message and not error and not diagnostico and not rutas and not paradas %}
+        <div>
+            <h2>Bienvenido al modo simplificado</h2>
+            <p>Esta es una versión simplificada del sistema de Transporte Accesible Cali, diseñada para funcionar con mínimos recursos.</p>
+            <p>Utilice los enlaces de navegación para acceder a las diferentes secciones.</p>
+        </div>
+        {% endif %}
+        
+        <div>
+            <hr>
+            <p><small>© 2025 Transporte Accesible Cali. Para acceder al modo completo, verifique la configuración del sistema.</small></p>
         </div>
     </div>
-
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

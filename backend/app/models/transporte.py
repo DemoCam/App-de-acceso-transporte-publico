@@ -15,11 +15,14 @@ class Ruta(db.Model):
     frecuencia_minutos = db.Column(db.Integer, default=15)
     descripcion = db.Column(db.Text)
     
-    # Relación con paradas (muchos a muchos)
-    paradas = db.relationship('Parada', 
-                             secondary='ruta_parada',
-                             backref=db.backref('rutas', lazy='dynamic'),
-                             lazy='dynamic')
+    # Relación con paradas a través de RutaParada
+    paradas = db.relationship(
+        'Parada',
+        secondary='ruta_parada',
+        backref=db.backref('rutas', lazy='dynamic'),
+        lazy='dynamic',
+        viewonly=True  # Usamos viewonly porque ahora gestionamos la relación a través de RutaParada
+    )
     
     def __repr__(self):
         return f'<Ruta {self.numero}: {self.origen} - {self.destino}>'
@@ -74,10 +77,17 @@ class Parada(db.Model):
             'descripcion': self.descripcion
         }
 
-# Tabla de relación muchos a muchos entre rutas y paradas
-ruta_parada = db.Table('ruta_parada',
-    db.Column('ruta_id', db.Integer, db.ForeignKey('rutas.id'), primary_key=True),
-    db.Column('parada_id', db.Integer, db.ForeignKey('paradas.id'), primary_key=True),
-    db.Column('orden', db.Integer, nullable=False),
-    db.Column('tiempo_estimado', db.Integer, nullable=True)  # Tiempo estimado en minutos desde origen
-)
+# Modelo de asociación entre rutas y paradas
+class RutaParada(db.Model):
+    """Modelo para la relación entre rutas y paradas, con atributos adicionales"""
+    __tablename__ = 'ruta_parada'
+    
+    # Clave primaria compuesta
+    ruta_id = db.Column(db.Integer, db.ForeignKey('rutas.id'), primary_key=True)
+    parada_id = db.Column(db.Integer, db.ForeignKey('paradas.id'), primary_key=True)
+    orden = db.Column(db.Integer, nullable=False)
+    tiempo_estimado = db.Column(db.Integer, nullable=True)  # Tiempo estimado en minutos desde origen
+    
+    # Relaciones para acceder fácilmente a los objetos relacionados
+    ruta = db.relationship('Ruta', backref=db.backref('ruta_paradas', cascade='all, delete-orphan'))
+    parada = db.relationship('Parada', backref=db.backref('ruta_paradas', cascade='all, delete-orphan'))

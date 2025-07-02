@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if ruta %}
+        Editar Ruta {{ ruta.numero }} - {{ super() }}
+    {% else %}
+        Nueva Ruta - {{ super() }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <div class="row">
+        <!-- Menú lateral de administración -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Menú de Administración</h2>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('admin.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-speedometer2 me-2"></i> Dashboard</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_rutas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center active">
+                        <span><i class="bi bi-signpost-2 me-2"></i> Gestión de Rutas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_paradas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-geo-alt me-2"></i> Gestión de Paradas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_rutas_paradas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-link-45deg me-2"></i> Rutas y Paradas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_usuarios') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-people me-2"></i> Gestión de Usuarios</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('main.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-house me-2"></i> Volver al Inicio</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de ruta -->
+        <div class="col-md-9">
+            <div class="card shadow">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="h5 m-0 font-weight-bold text-primary" id="form-title">
+                            {% if ruta %}
+                                Editar Ruta {{ ruta.numero }}
+                            {% else %}
+                                Nueva Ruta
+                            {% endif %}
+                        </h3>
+                        <a href="{{ url_for('admin.gestionar_rutas') }}" class="btn btn-secondary btn-sm">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Mensajes Flash -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" aria-labelledby="form-title">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    {{ form.numero.label(class="form-label") }}
+                                    {{ form.numero(class="form-control" + (" is-invalid" if form.numero.errors else "")) }}
+                                    {% for error in form.numero.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                    <small class="form-text text-muted">Código único de la ruta (ej: T31, A12)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    {{ form.nombre.label(class="form-label") }}
+                                    {{ form.nombre(class="form-control" + (" is-invalid" if form.nombre.errors else "")) }}
+                                    {% for error in form.nombre.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.origen.label(class="form-label") }}
+                                    {{ form.origen(class="form-control" + (" is-invalid" if form.origen.errors else "")) }}
+                                    {% for error in form.origen.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.destino.label(class="form-label") }}
+                                    {{ form.destino(class="form-control" + (" is-invalid" if form.destino.errors else "")) }}
+                                    {% for error in form.destino.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    {{ form.hora_inicio.label(class="form-label") }}
+                                    {{ form.hora_inicio(class="form-control" + (" is-invalid" if form.hora_inicio.errors else ""), type="time") }}
+                                    {% for error in form.hora_inicio.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    {{ form.hora_fin.label(class="form-label") }}
+                                    {{ form.hora_fin(class="form-control" + (" is-invalid" if form.hora_fin.errors else ""), type="time") }}
+                                    {% for error in form.hora_fin.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    {{ form.frecuencia_minutos.label(class="form-label") }}
+                                    {{ form.frecuencia_minutos(class="form-control" + (" is-invalid" if form.frecuencia_minutos.errors else ""), type="number", min="1", step="1") }}
+                                    {% for error in form.frecuencia_minutos.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                    <small class="form-text text-muted">Frecuencia en minutos</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            {{ form.descripcion.label(class="form-label") }}
+                            {{ form.descripcion(class="form-control" + (" is-invalid" if form.descripcion.errors else ""), rows=3) }}
+                            {% for error in form.descripcion.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <small class="form-text text-muted">Descripción detallada para personas con discapacidad visual</small>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin.gestionar_rutas') }}" class="btn btn-outline-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">{{ submit_text|default('Guardar') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Instrucciones de accesibilidad -->
+            <div class="card mt-4 shadow">
+                <div class="card-header bg-info text-white">
+                    <h4 class="h6 mb-0">Consejos para descripciones accesibles</h4>
+                </div>
+                <div class="card-body">
+                    <p>Para hacer que las descripciones de rutas sean más accesibles para personas con discapacidad visual:</p>
+                    <ul>
+                        <li>Incluya puntos de referencia importantes a lo largo de la ruta.</li>
+                        <li>Mencione cruces de calles principales y puntos de transferencia.</li>
+                        <li>Describa la ubicación exacta de las paradas (ej: "frente al Hospital Universitario").</li>
+                        <li>Evite referencias únicamente visuales como "la parada con el anuncio rojo".</li>
+                        <li>Incluya información sobre accesibilidad como rampas y semáforos sonoros.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Script para mejorar accesibilidad del formulario
+    document.addEventListener('DOMContentLoaded', function() {
+        // Añadir descripciones de error más accesibles
+        const form = document.querySelector('form');
+        
+        form.addEventListener('submit', function() {
+            // Buscar el primer campo con error
+            const firstErrorField = document.querySelector('.is-invalid');
+            if (firstErrorField) {
+                // Crear un elemento para anunciar el error
+                const errorAnnouncement = document.createElement('div');
+                errorAnnouncement.setAttribute('role', 'alert');
+                errorAnnouncement.setAttribute('aria-live', 'assertive');
+                errorAnnouncement.className = 'sr-only';
+                errorAnnouncement.textContent = 'Hay errores en el formulario que necesitan ser corregidos.';
+                document.body.appendChild(errorAnnouncement);
+                
+                // Enfoque en el primer campo con error
+                setTimeout(() => {
+                    firstErrorField.focus();
+                    document.body.removeChild(errorAnnouncement);
+                }, 1000);
+            }
+        });
+    });
+</script>
+{% endblock %}

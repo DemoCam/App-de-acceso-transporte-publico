@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar Sesión - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0" id="login-title">Iniciar Sesión</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Mensajes Flash -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('auth.login') }}" aria-labelledby="login-title">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="form-group mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control", autofocus=true) }}
+                            {% for error in form.username.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control") }}
+                            {% for error in form.password.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            {{ form.remember_me(class="form-check-input") }}
+                            {{ form.remember_me.label(class="form-check-label") }}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">¿No tiene una cuenta? <a href="{{ url_for('auth.register') }}" class="link-primary">Regístrese aquí</a></p>
+                </div>
+            </div>
+            
+            <!-- Instrucciones de accesibilidad -->
+            <div class="mt-4">
+                <div class="accordion" id="accordionAccesibilidad">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                Instrucciones de Accesibilidad
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionAccesibilidad">
+                            <div class="accordion-body">
+                                <p>Este formulario de inicio de sesión es completamente accesible con lectores de pantalla.</p>
+                                <ul>
+                                    <li>Use Tab para navegar entre los campos.</li>
+                                    <li>Presione Enter para activar botones.</li>
+                                    <li>Presione Alt+1 para activar el asistente de voz.</li>
+                                </ul>
+                                <p>Si necesita ayuda adicional, visite la sección de <a href="{{ url_for('main.ayuda') }}">Ayuda</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}{{ parada.nombre }} - Detalles de Parada - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Encabezado de la página -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <h1>{{ parada.nombre }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('main.paradas') }}">Paradas</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ parada.nombre }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-lg-4 d-flex align-items-center justify-content-lg-end">
+            <a href="{{ url_for('main.paradas') }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Volver a todas las paradas
+            </a>
+        </div>
+    </div>
+
+    <!-- Información general de la parada -->
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Información General</h2>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Nombre:</dt>
+                        <dd class="col-sm-8">{{ parada.nombre }}</dd>
+                        
+                        <dt class="col-sm-4">Dirección:</dt>
+                        <dd class="col-sm-8">{{ parada.direccion }}</dd>
+                        
+                        <dt class="col-sm-4">Tipo:</dt>
+                        <dd class="col-sm-8">
+                            {% if parada.tipo == 'regular' %}Parada Regular
+                            {% elif parada.tipo == 'estacion' %}Estación
+                            {% elif parada.tipo == 'terminal' %}Terminal
+                            {% else %}{{ parada.tipo|capitalize }}{% endif %}
+                        </dd>
+                        
+                        <dt class="col-sm-4">Ubicación:</dt>
+                        <dd class="col-sm-8">{{ parada.latitud }}, {{ parada.longitud }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mt-4 mt-md-0">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Características de Accesibilidad</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Rampa de acceso
+                            {% if parada.tiene_rampa %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            {% else %}
+                            <i class="bi bi-x-circle-fill text-danger"></i>
+                            {% endif %}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Semáforo sonoro
+                            {% if parada.tiene_semaforo_sonoro %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            {% else %}
+                            <i class="bi bi-x-circle-fill text-danger"></i>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Descripción de la parada -->
+    {% if parada.descripcion %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Descripción</h2>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ parada.descripcion }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Rutas que pasan por esta parada -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Rutas que pasan por esta parada</h2>
+                </div>
+                <div class="card-body">
+                    {% if parada.ruta_paradas|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <caption class="sr-only">Lista de rutas que pasan por la parada {{ parada.nombre }}</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Ruta</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Orden</th>
+                                    <th scope="col">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ruta_parada in parada.ruta_paradas %}
+                                <tr>
+                                    <td>{{ ruta_parada.ruta.numero }}</td>
+                                    <td>{{ ruta_parada.ruta.nombre }}</td>
+                                    <td>{{ ruta_parada.orden }}</td>
+                                    <td>
+                                        <a href="{{ url_for('main.detalle_ruta', ruta_id=ruta_parada.ruta.id) }}" class="btn btn-sm btn-primary">
+                                            Ver detalles
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        No hay rutas asignadas a esta parada actualmente.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

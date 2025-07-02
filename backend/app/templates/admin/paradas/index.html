@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% from "_form_helpers.html" import render_field %}
+
+{% block title %}Gestionar Paradas - Panel de Administración{% endblock %}
+
+{% block content %}
+<main id="main-content" class="container mt-4">
+    <h1 class="mb-4">Gestionar Paradas</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Filtros y Búsqueda
+        </div>
+        <div class="card-body">
+            <form method="get" action="{{ url_for('admin.gestionar_paradas') }}" class="form-inline">
+                <div class="form-group mr-2">
+                    <label for="q" class="sr-only">Buscar</label>
+                    <input type="text" name="q" id="q" class="form-control" placeholder="Buscar por nombre o ID" value="{{ request.args.get('q', '') }}">
+                </div>
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </form>
+        </div>
+    </div>
+
+    <a href="{{ url_for('admin.crear_parada') }}" class="btn btn-success mb-3">
+        <span class="fas fa-plus"></span> Crear Nueva Parada
+    </a>
+
+    {% if paradas.items %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <caption class="sr-only">Lista de paradas registradas en el sistema</caption>
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Latitud</th>
+                    <th scope="col">Longitud</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for parada in paradas.items %}
+                <tr>
+                    <td>{{ parada.id }}</td>
+                    <td>{{ parada.nombre }}</td>
+                    <td>{{ parada.latitud }}</td>
+                    <td>{{ parada.longitud }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.editar_parada', id=parada.id) }}" class="btn btn-sm btn-warning" aria-label="Editar parada {{ parada.nombre }}">
+                            <span class="fas fa-edit"></span> Editar
+                        </a>
+                        <form action="{{ url_for('admin.eliminar_parada', id=parada.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta parada?');">
+                            <button type="submit" class="btn btn-sm btn-danger" aria-label="Eliminar parada {{ parada.nombre }}">
+                                <span class="fas fa-trash"></span> Eliminar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Navegación de páginas de paradas">
+        <ul class="pagination">
+            {% if paradas.has_prev %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('admin.gestionar_paradas', page=paradas.prev_num, q=request.args.get('q', '')) }}">Anterior</a></li>
+            {% endif %}
+            {% for page_num in paradas.iter_pages() %}
+                {% if page_num %}
+                    <li class="page-item {% if paradas.page == page_num %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('admin.gestionar_paradas', page=page_num, q=request.args.get('q', '')) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if paradas.has_next %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('admin.gestionar_paradas', page=paradas.next_num, q=request.args.get('q', '')) }}">Siguiente</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    {% else %}
+    <div class="alert alert-info">
+        No se encontraron paradas. <a href="{{ url_for('admin.crear_parada') }}">Crea la primera</a>.
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

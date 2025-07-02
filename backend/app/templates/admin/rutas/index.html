@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Administración de Rutas - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Administración de Rutas</h1>
+        <a href="{{ url_for('admin.crear_ruta') }}" class="btn btn-primary" aria-label="Crear nueva ruta">
+            <i class="bi bi-plus-circle"></i> Nueva Ruta
+        </a>
+    </div>
+    
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <!-- Menú lateral de administración -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Menú de Administración</h2>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('admin.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-speedometer2 me-2"></i> Dashboard</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_rutas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center active">
+                        <span><i class="bi bi-signpost-2 me-2"></i> Gestión de Rutas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_paradas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-geo-alt me-2"></i> Gestión de Paradas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_rutas_paradas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-link-45deg me-2"></i> Rutas y Paradas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_usuarios') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-people me-2"></i> Gestión de Usuarios</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('main.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-house me-2"></i> Volver al Inicio</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listado de rutas -->
+        <div class="col-md-9">
+            <div class="card shadow">
+                <div class="card-header bg-white py-3">
+                    <h3 class="h5 m-0 font-weight-bold text-primary">Listado de Rutas</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="rutasTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Número</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Origen - Destino</th>
+                                    <th scope="col">Horario</th>
+                                    <th scope="col">Frecuencia</th>
+                                    <th scope="col">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ruta in rutas %}
+                                <tr>
+                                    <td>{{ ruta.numero }}</td>
+                                    <td>{{ ruta.nombre }}</td>
+                                    <td>{{ ruta.origen }} - {{ ruta.destino }}</td>
+                                    <td>{{ ruta.hora_inicio.strftime('%H:%M') }} - {{ ruta.hora_fin.strftime('%H:%M') }}</td>
+                                    <td>{{ ruta.frecuencia_minutos }} min</td>
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="Acciones para ruta {{ ruta.numero }}">
+                                            <a href="{{ url_for('admin.paradas_de_ruta', ruta_id=ruta.id) }}" class="btn btn-info btn-sm" aria-label="Ver paradas de la ruta {{ ruta.numero }}">
+                                                <i class="bi bi-geo"></i> Paradas
+                                            </a>
+                                            <a href="{{ url_for('admin.editar_ruta', id=ruta.id) }}" class="btn btn-primary btn-sm" aria-label="Editar ruta {{ ruta.numero }}">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ ruta.id }}" aria-label="Eliminar ruta {{ ruta.numero }}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Modal de confirmación de eliminación -->
+                                        <div class="modal fade" id="deleteModal{{ ruta.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ ruta.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel{{ ruta.id }}">Confirmar Eliminación</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        ¿Está seguro que desea eliminar la ruta <strong>{{ ruta.numero }} - {{ ruta.nombre }}</strong>?
+                                                        <br>
+                                                        <div class="alert alert-warning mt-3">
+                                                            <i class="bi bi-exclamation-triangle-fill"></i> Esta acción no se puede deshacer y eliminará todas las relaciones con paradas.
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <form action="{{ url_for('admin.eliminar_ruta', id=ruta.id) }}" method="POST" style="display: inline;">
+                                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No hay rutas registradas.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Script para hacer la tabla más accesible
+    document.addEventListener('DOMContentLoaded', function() {
+        // Añadir atributos ARIA a la tabla para mejorar accesibilidad
+        const tabla = document.getElementById('rutasTable');
+        if (tabla) {
+            tabla.setAttribute('role', 'table');
+            tabla.setAttribute('aria-label', 'Listado de rutas de transporte');
+            
+            // Anunciar número total de rutas para lectores de pantalla
+            const numRutas = tabla.querySelectorAll('tbody tr').length;
+            const anuncioRutas = document.createElement('p');
+            anuncioRutas.setAttribute('class', 'sr-only');
+            anuncioRutas.setAttribute('aria-live', 'polite');
+            anuncioRutas.textContent = `Total de rutas encontradas: ${numRutas}`;
+            tabla.parentNode.insertBefore(anuncioRutas, tabla);
+        }
+    });
+</script>
+{% endblock %}

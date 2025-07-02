@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "_form_helpers.html" import render_field %}
+
+{% block title %}{{ legend }} - Panel de Administración{% endblock %}
+
+{% block content %}
+<main id="main-content" class="container mt-4">
+    <h1 class="mb-4">{{ legend }}</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <fieldset>
+                    <legend class="sr-only">{{ legend }}</legend>
+                    {{ render_field(form.nombre_usuario, class="form-control", placeholder="Ej: juan.perez") }}
+                    {{ render_field(form.email, class="form-control", placeholder="Ej: juan.perez@example.com") }}
+                    {{ render_field(form.rol, class="form-control") }}
+                    
+                    {% if not form.instance %}
+                        {{ render_field(form.password, class="form-control") }}
+                        {{ render_field(form.confirm_password, class="form-control") }}
+                    {% else %}
+                        <p class="text-muted">La contraseña no se puede editar directamente. El usuario debe cambiarla desde su perfil.</p>
+                    {% endif %}
+
+                </fieldset>
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
+                    <a href="{{ url_for('admin.gestionar_usuarios') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

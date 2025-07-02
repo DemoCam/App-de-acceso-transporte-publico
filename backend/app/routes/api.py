@@ -1,83 +1,107 @@
 from flask import Blueprint, jsonify, request
-from app.services.mio_service import (
-    obtener_rutas, obtener_ruta, obtener_paradas, 
-    obtener_paradas_cercanas
-)
+from app.models.transporte import Ruta, Parada, RutaParada
+from app.services.mio_service import MioService
+from app import db
+from sqlalchemy.orm import joinedload
 
 api = Blueprint('api', __name__)
 
 @api.route('/rutas', methods=['GET'])
 def get_rutas():
-    """API para obtener todas las rutas de transporte"""
-    # Parámetro de búsqueda opcional
-    busqueda = request.args.get('q', '')
-    
-    # Obtener todas las rutas
-    rutas = obtener_rutas()
-    
-    # Aplicar filtro de búsqueda si se especificó
-    if busqueda:
-        busqueda = busqueda.lower()
-        rutas = [ruta for ruta in rutas if 
-                 busqueda in ruta['numero'].lower() or
-                 busqueda in ruta['nombre'].lower() or
-                 busqueda in ruta['origen'].lower() or
-                 busqueda in ruta['destino'].lower()]
-    
+    """Obtener todas las rutas"""
+    rutas = Ruta.query.all()
     return jsonify({
         'status': 'success',
-        'rutas': rutas
+        'data': [ruta.to_dict() for ruta in rutas]
     })
 
-@api.route('/rutas/<int:id>', methods=['GET'])
-def get_ruta(id):
-    """API para obtener información de una ruta específica"""
-    ruta = obtener_ruta(id)
-    
-    if not ruta:
-        return jsonify({
-            'status': 'error',
-            'message': f'No se encontró la ruta con ID {id}'
-        }), 404
-    
+@api.route('/rutas/<int:ruta_id>', methods=['GET'])
+def get_ruta(ruta_id):
+    """Obtener una ruta específica con sus paradas"""
+    ruta = Ruta.query.get_or_404(ruta_id)
     return jsonify({
         'status': 'success',
-        'ruta': ruta
+        'data': ruta.to_dict(include_paradas=True)
     })
 
 @api.route('/paradas', methods=['GET'])
 def get_paradas():
-    """API para obtener todas las paradas de transporte"""
-    paradas = obtener_paradas()
-    
+    """Obtener todas las paradas"""
+    paradas = Parada.query.all()
     return jsonify({
         'status': 'success',
-        'paradas': paradas
+        'data': [parada.to_dict() for parada in paradas]
     })
 
-@api.route('/paradas/cercanas', methods=['GET'])
-def get_paradas_cercanas():
-    """API para obtener paradas cercanas a una ubicación"""
-    lat = request.args.get('lat', type=float)
-    lng = request.args.get('lng', type=float)
-    distancia = request.args.get('distancia', default=500, type=int)
-    ruta_filtro = request.args.get('ruta', default='')
+@api.route('/paradas/<int:parada_id>', methods=['GET'])
+def get_parada(parada_id):
+    """Obtener una parada específica"""
+    parada = Parada.query.get_or_404(parada_id)
+    return jsonify({
+        'status': 'success',
+        'data': parada.to_dict()
+    })
+
+@api.route('/paradas/<int:parada_id>/rutas', methods=['GET'])
+def get_rutas_por_parada(parada_id):
+    """Obtener todas las rutas que pasan por una parada"""
+    parada = Parada.query.get_or_404(parada_id)
+    rutas = parada.rutas
+    return jsonify({
+        'status': 'success',
+        'data': [ruta.to_dict() for ruta in rutas]
+    })
+
+@api.route('/rutas-paradas', methods=['GET'])
+def get_rutas_paradas():
+    """Obtener todas las asociaciones entre rutas y paradas"""
+    ruta_id = request.args.get('ruta_id', type=int)
+    parada_id = request.args.get('parada_id', type=int)
     
-    if not lat or not lng:
-        return jsonify({
-            'status': 'error',
-            'message': 'Se requieren parámetros de latitud (lat) y longitud (lng)'
-        }), 400
+    query = RutaParada.query.join(Ruta).join(Parada)
     
-    # Obtener paradas cercanas
-    paradas = obtener_paradas_cercanas(lat, lng, distancia)
+    if ruta_id:
+        query = query.filter(RutaParada.ruta_id == ruta_id)
+    if parada_id:
+        query = query.filter(RutaParada.parada_id == parada_id)
     
-    # Filtrar por ruta si se especifica
-    if ruta_filtro:
-        paradas = [parada for parada in paradas if 
-                  any(ruta.lower().find(ruta_filtro.lower()) != -1 for ruta in parada['rutas'])]
+    rutas_paradas = query.all()
     
     return jsonify({
         'status': 'success',
-        'paradas': paradas
+        'data': [{
+            'ruta_id': rp.ruta_id,
+            'ruta': {
+                'numero': rp.ruta.numero,
+                'nombre': rp.ruta.nombre
+            },
+            'parada_id': rp.parada_id,
+            'parada': {
+                'nombre': rp.parada.nombre,
+                'direccion': rp.parada.direccion
+            },
+            'orden': rp.orden,
+            'tiempo_estimado': rp.tiempo_estimado
+        } for rp in rutas_paradas]
+    })
+
+# Endpoints para integración con MIO
+@api.route('/mio/rutas', methods=['GET'])
+def get_mio_rutas():
+    """Obtener rutas del MIO desde el servicio externo"""
+    mio_service = MioService()
+    rutas = mio_service.obtener_rutas()
+    return jsonify({
+        'status': 'success',
+        'data': rutas
+    })
+
+@api.route('/mio/paradas', methods=['GET'])
+def get_mio_paradas():
+    """Obtener paradas del MIO desde el servicio externo"""
+    mio_service = MioService()
+    paradas = mio_service.obtener_paradas()
+    return jsonify({
+        'status': 'success',
+        'data': paradas
     })

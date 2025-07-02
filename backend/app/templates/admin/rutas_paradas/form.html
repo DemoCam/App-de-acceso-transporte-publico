@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "_form_helpers.html" import render_field %}
+
+{% block title %}{{ legend }} - Panel de Administración{% endblock %}
+
+{% block content %}
+<main id="main-content" class="container mt-4">
+    <h1 class="mb-4">{{ legend }}</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <fieldset>
+                    <legend class="sr-only">{{ legend }}</legend>
+                    {{ render_field(form.ruta_id, class="form-control") }}
+                    {{ render_field(form.parada_id, class="form-control") }}
+                    {{ render_field(form.orden, class="form-control", type="number") }}
+                </fieldset>
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
+                    <a href="{{ url_for('admin.gestionar_rutas_paradas') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,228 +1,460 @@
 /**
- * Asistente de voz para la App de Transporte Accesible Cali
+ * Asistente de voz para la aplicación de transporte accesible
+ * Permite interactuar con la aplicación mediante comandos de voz
  */
 
-// Estado del asistente de voz
-let vozActiva = false;
-let reconocimientoVoz = null;
-let sintetizadorVoz = window.speechSynthesis;
+// Inicializar variables para reconocimiento y síntesis de voz
+let recognition = null;
+let speechSynthesis = window.speechSynthesis;
+let isListening = false;
+let isMuted = false;
+let pageDescriptions = {};
 
-// Esperar a que el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    // Elementos DOM
-    const btnActivarVoz = document.getElementById('btnActivarVoz');
-    
-    // Inicializar el asistente de voz
-    inicializarAsistenteVoz();
-    
-    // Verificar si hay soporte para síntesis de voz
-    if (!sintetizadorVoz) {
-        console.error('Tu navegador no soporta síntesis de voz');
+// Configurar descripciones de páginas
+pageDescriptions = {
+    'inicio': 'Bienvenido a Transporte Accesible Cali, tu guía para moverte por la ciudad de manera inclusiva. Aquí puedes consultar rutas, paradas y recibir asistencia para planificar tu viaje.',
+    'rutas': 'En esta sección puedes consultar todas las rutas disponibles del transporte público, ver sus frecuencias y horarios. Selecciona una ruta para ver su recorrido detallado.',
+    'paradas': 'Aquí encuentras información sobre todas las paradas del sistema de transporte, incluyendo características de accesibilidad, ubicación y las rutas que pasan por cada parada.',
+    'ayuda': 'En esta sección encontrarás guías de uso de la aplicación, consejos de accesibilidad y respuestas a preguntas frecuentes sobre el sistema de transporte.',
+    'perfil': 'Esta es tu página de perfil personal donde puedes ver y actualizar tu información, revisar tu historial y personalizar tus preferencias.',
+    'admin': 'Estás en el panel de administración donde puedes gestionar rutas, paradas, asociaciones entre rutas y paradas, y usuarios del sistema.'
+};
+
+// Inicializar el asistente de voz cuando se carga la página
+document.addEventListener('DOMContentLoaded', () => {
+    // Verificar soporte para reconocimiento de voz
+    if ('webkitSpeechRecognition' in window) {
+        // Crear objeto de reconocimiento de voz
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.lang = 'es-ES';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        
+        console.log("Reconocimiento de voz soportado (webkitSpeechRecognition)");
+
+        // Configurar eventos para el reconocimiento de voz
+        recognition.onresult = handleVoiceCommand;
+        recognition.onerror = handleError;
+        recognition.onend = () => {
+            isListening = false;
+            updateVoiceButtonState();
+        };
+
+        // Añadir botón de asistente de voz
+        setupVoiceAssistant();
+    } else if ('SpeechRecognition' in window) {
+        // Soporte para navegadores que implementan el estándar
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.lang = 'es-ES';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        
+        console.log("Reconocimiento de voz soportado (SpeechRecognition)");
+        
+        // Configurar eventos para el reconocimiento de voz
+        recognition.onresult = handleVoiceCommand;
+        recognition.onerror = handleError;
+        recognition.onend = () => {
+            isListening = false;
+            updateVoiceButtonState();
+        };
+
+        // Añadir botón de asistente de voz
+        setupVoiceAssistant();
+    } else {
+        console.warn("El reconocimiento de voz no está disponible en este navegador");
+        // Crear una alerta para informar al usuario
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+        alertDiv.setAttribute('role', 'alert');
+        alertDiv.innerHTML = `
+            <strong>¡Navegador no compatible!</strong> El reconocimiento de voz no está disponible en este navegador. 
+            Intente con Chrome, Edge o Safari para usar esta función.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        `;
+        
+        // Insertar al principio del contenido
+        setTimeout(() => {
+            const content = document.querySelector('.container') || document.querySelector('main') || document.body;
+            if (content) {
+                content.insertBefore(alertDiv, content.firstChild);
+            }
+        }, 1000);
     }
-    
-    // Verificar si hay soporte para reconocimiento de voz
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        console.error('Tu navegador no soporta reconocimiento de voz');
+
+        // Configurar eventos para el reconocimiento de voz
+        recognition.onresult = handleVoiceCommand;
+        recognition.onerror = handleError;
+        recognition.onend = () => {
+            isListening = false;
+            updateVoiceButtonState();
+        };
+
+        // Añadir botón de asistente de voz
+        setupVoiceAssistant();
+    } else {
+        console.warn('El reconocimiento de voz no es compatible con este navegador');
     }
-    
-    // Evento para botón de activar voz
-    if (btnActivarVoz) {
-        btnActivarVoz.addEventListener('click', function() {
-            toggleVoz();
-        });
-    }
-    
-    // Recuperar estado guardado
-    cargarEstadoVoz();
+
+    // Describir la página actual si es la primera visita
+    describeCurrentPage();
 });
 
-// Función para inicializar el asistente de voz
-function inicializarAsistenteVoz() {
-    // Configurar reconocimiento de voz si está disponible
-    if ('webkitSpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        reconocimientoVoz = new SpeechRecognition();
-        reconocimientoVoz.lang = 'es-ES';
-        reconocimientoVoz.continuous = false;
-        reconocimientoVoz.interimResults = false;
-        reconocimientoVoz.maxAlternatives = 1;
-        
-        // Manejar resultados
-        reconocimientoVoz.onresult = function(event) {
-            const comando = event.results[0][0].transcript.trim().toLowerCase();
-            console.log('Comando detectado:', comando);
-            
-            procesarComando(comando);
-        };
-        
-        reconocimientoVoz.onerror = function(event) {
-            console.error('Error en reconocimiento de voz:', event.error);
-        };
-        
-        reconocimientoVoz.onend = function() {
-            // Reiniciar si está activo
-            if (vozActiva) {
-                setTimeout(() => {
-                    reconocimientoVoz.start();
-                }, 1000);
-            }
-        };
-    }
+/**
+ * Configura el asistente de voz añadiendo botones a la interfaz
+ */
+function setupVoiceAssistant() {
+    // Crear botón flotante para activar asistente
+    const voiceButton = document.createElement('button');
+    voiceButton.id = 'voice-assistant-btn';
+    voiceButton.className = 'voice-btn';
+    voiceButton.setAttribute('aria-label', 'Activar asistente de voz');
+    voiceButton.innerHTML = '<i class="bi bi-mic"></i>';
+    voiceButton.title = 'Asistente de voz (Presiona para hablar)';
+    
+    // Añadir estilos del botón
+    voiceButton.style.position = 'fixed';
+    voiceButton.style.bottom = '20px';
+    voiceButton.style.right = '20px';
+    voiceButton.style.width = '60px';
+    voiceButton.style.height = '60px';
+    voiceButton.style.borderRadius = '50%';
+    voiceButton.style.backgroundColor = '#007bff';
+    voiceButton.style.color = 'white';
+    voiceButton.style.border = 'none';
+    voiceButton.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+    voiceButton.style.zIndex = '1000';
+    voiceButton.style.cursor = 'pointer';
+    
+    // Añadir el botón al DOM
+    document.body.appendChild(voiceButton);
+    
+    // Añadir manejador de eventos para el botón
+    voiceButton.addEventListener('click', toggleVoiceRecognition);
+    
+    // Crear botón para silenciar la voz
+    const muteButton = document.createElement('button');
+    muteButton.id = 'voice-mute-btn';
+    muteButton.className = 'voice-btn';
+    muteButton.setAttribute('aria-label', 'Silenciar asistente de voz');
+    muteButton.innerHTML = '<i class="bi bi-volume-up"></i>';
+    muteButton.title = 'Silenciar asistente de voz';
+    
+    // Añadir estilos del botón de silencio
+    muteButton.style.position = 'fixed';
+    muteButton.style.bottom = '20px';
+    muteButton.style.right = '90px';
+    muteButton.style.width = '60px';
+    muteButton.style.height = '60px';
+    muteButton.style.borderRadius = '50%';
+    muteButton.style.backgroundColor = '#28a745';
+    muteButton.style.color = 'white';
+    muteButton.style.border = 'none';
+    muteButton.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+    muteButton.style.zIndex = '1000';
+    muteButton.style.cursor = 'pointer';
+    
+    // Añadir el botón de silencio al DOM
+    document.body.appendChild(muteButton);
+    
+    // Añadir manejador de eventos para el botón de silencio
+    muteButton.addEventListener('click', toggleMute);
+    
+    // Crear elemento para mostrar texto del asistente
+    const voiceOutput = document.createElement('div');
+    voiceOutput.id = 'voice-output';
+    voiceOutput.className = 'voice-output';
+    voiceOutput.setAttribute('aria-live', 'polite');
+    
+    // Añadir estilos del elemento de salida
+    voiceOutput.style.position = 'fixed';
+    voiceOutput.style.bottom = '90px';
+    voiceOutput.style.right = '20px';
+    voiceOutput.style.maxWidth = '300px';
+    voiceOutput.style.padding = '10px 15px';
+    voiceOutput.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    voiceOutput.style.color = 'white';
+    voiceOutput.style.borderRadius = '10px';
+    voiceOutput.style.display = 'none';
+    voiceOutput.style.zIndex = '999';
+    
+    // Añadir el elemento de salida al DOM
+    document.body.appendChild(voiceOutput);
 }
 
-// Función para activar/desactivar el asistente de voz
-function toggleVoz() {
-    vozActiva = !vozActiva;
+/**
+ * Activa o desactiva el reconocimiento de voz
+ */
+function toggleVoiceRecognition() {
+    if (!recognition) return;
     
-    // Actualizar botón
-    const btnActivarVoz = document.getElementById('btnActivarVoz');
-    if (btnActivarVoz) {
-        if (vozActiva) {
-            btnActivarVoz.classList.add('active');
-            btnActivarVoz.innerText = 'Voz activa';
-            btnActivarVoz.setAttribute('aria-pressed', 'true');
-        } else {
-            btnActivarVoz.classList.remove('active');
-            btnActivarVoz.innerText = 'Activar voz';
-            btnActivarVoz.setAttribute('aria-pressed', 'false');
-        }
-    }
-    
-    // Iniciar o detener reconocimiento
-    if (vozActiva) {
-        if (reconocimientoVoz) {
-            try {
-                reconocimientoVoz.start();
-                anunciarMensaje('Asistente de voz activado. Dí "ayuda" para conocer los comandos disponibles.');
-            } catch (e) {
-                console.error('Error al iniciar el reconocimiento de voz:', e);
-            }
+    if (!isListening) {
+        // Iniciar reconocimiento
+        try {
+            recognition.start();
+            isListening = true;
+            updateVoiceButtonState();
+            showVoiceOutput('Te escucho...');
+        } catch (error) {
+            console.error('Error al iniciar el reconocimiento de voz:', error);
         }
     } else {
-        if (reconocimientoVoz) {
-            try {
-                reconocimientoVoz.stop();
-                anunciarMensaje('Asistente de voz desactivado');
-            } catch (e) {
-                console.error('Error al detener el reconocimiento de voz:', e);
-            }
+        // Detener reconocimiento
+        try {
+            recognition.stop();
+            isListening = false;
+            updateVoiceButtonState();
+            hideVoiceOutput();
+        } catch (error) {
+            console.error('Error al detener el reconocimiento de voz:', error);
         }
-    }
-    
-    // Guardar estado
-    localStorage.setItem('vozActiva', vozActiva ? 'true' : 'false');
-}
-
-// Función para anunciar mensajes por voz
-function anunciarMensaje(mensaje) {
-    if (!sintetizadorVoz) return;
-    
-    // Detener cualquier mensaje anterior
-    sintetizadorVoz.cancel();
-    
-    const utterance = new SpeechSynthesisUtterance(mensaje);
-    utterance.lang = 'es-ES';
-    utterance.rate = 1.0; // Velocidad normal
-    utterance.pitch = 1.0; // Tono normal
-    utterance.volume = 1.0; // Volumen máximo
-    
-    sintetizadorVoz.speak(utterance);
-}
-
-// Función para procesar comandos de voz
-function procesarComando(comando) {
-    // Comandos de navegación
-    if (comando.includes('ir a inicio')) {
-        anunciarMensaje('Navegando a la página de inicio');
-        window.location.href = '/';
-        return;
-    }
-    
-    if (comando.includes('buscar rutas') || comando.includes('consultar rutas')) {
-        anunciarMensaje('Navegando a la página de consulta de rutas');
-        window.location.href = '/rutas';
-        return;
-    }
-    
-    if (comando.includes('paradas cercanas')) {
-        anunciarMensaje('Navegando a la página de paradas cercanas');
-        window.location.href = '/paradas';
-        return;
-    }
-    
-    if (comando.includes('ayuda')) {
-        anunciarMensaje('Navegando a la página de ayuda');
-        window.location.href = '/ayuda';
-        return;
-    }
-    
-    // Comandos de búsqueda
-    const buscarRutaMatch = comando.match(/buscar ruta (.*)/);
-    if (buscarRutaMatch && buscarRutaMatch[1]) {
-        const ruta = buscarRutaMatch[1].trim();
-        if (window.location.pathname !== '/rutas') {
-            anunciarMensaje(`Buscando ruta ${ruta}. Navegando a la página de rutas`);
-            window.location.href = `/rutas?q=${encodeURIComponent(ruta)}`;
-        } else {
-            anunciarMensaje(`Buscando ruta ${ruta}`);
-            document.getElementById('buscarRuta').value = ruta;
-            document.getElementById('btnBuscarRuta').click();
-        }
-        return;
-    }
-    
-    if (comando.includes('buscar paradas cercanas')) {
-        if (window.location.pathname !== '/paradas') {
-            anunciarMensaje('Para buscar paradas cercanas, primero navegaré a la página de paradas');
-            window.location.href = '/paradas';
-        } else {
-            anunciarMensaje('Buscando paradas cercanas');
-            document.getElementById('btnBuscarParadas').click();
-        }
-        return;
-    }
-    
-    // Comandos de accesibilidad
-    if (comando.includes('aumentar texto')) {
-        anunciarMensaje('Aumentando el tamaño del texto');
-        document.getElementById('btnAumentarTexto').click();
-        return;
-    }
-    
-    if (comando.includes('reducir texto')) {
-        anunciarMensaje('Reduciendo el tamaño del texto');
-        document.getElementById('btnReducirTexto').click();
-        return;
-    }
-    
-    if (comando.includes('alto contraste')) {
-        anunciarMensaje('Cambiando el modo de contraste');
-        document.getElementById('btnAltoContraste').click();
-        return;
-    }
-    
-    if (comando.includes('leer página')) {
-        const contenidoPrincipal = document.getElementById('contenido-principal');
-        if (contenidoPrincipal) {
-            anunciarMensaje('Leyendo el contenido de la página: ' + contenidoPrincipal.textContent);
-        } else {
-            anunciarMensaje('No puedo encontrar el contenido principal para leer');
-        }
-        return;
-    }
-    
-    // Si el comando no coincide con ninguno conocido
-    anunciarMensaje('Comando no reconocido. Puedes decir "ayuda" para ver comandos disponibles');
-}
-
-// Cargar estado guardado
-function cargarEstadoVoz() {
-    const estadoGuardado = localStorage.getItem('vozActiva');
-    if (estadoGuardado === 'true') {
-        toggleVoz(); // Activa el asistente
     }
 }
 
-// Exportar funciones para uso global
-window.anunciarMensaje = anunciarMensaje;
-window.toggleVoz = toggleVoz;
+/**
+ * Activa o desactiva el sonido del asistente de voz
+ */
+function toggleMute() {
+    isMuted = !isMuted;
+    updateMuteButtonState();
+    
+    if (isMuted) {
+        // Si hay algún mensaje hablando, detenerlo
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+        }
+        showVoiceOutput('Asistente de voz silenciado');
+        setTimeout(() => {
+            hideVoiceOutput();
+        }, 2000);
+    } else {
+        showVoiceOutput('Asistente de voz activado');
+        speak('Asistente de voz activado. ¿En qué puedo ayudarte?');
+        setTimeout(() => {
+            hideVoiceOutput();
+        }, 2000);
+    }
+}
+
+/**
+ * Actualiza el estado visual del botón de silencio
+ */
+function updateMuteButtonState() {
+    const muteButton = document.getElementById('voice-mute-btn');
+    if (!muteButton) return;
+    
+    if (isMuted) {
+        muteButton.style.backgroundColor = '#dc3545';  // Rojo cuando está silenciado
+        muteButton.innerHTML = '<i class="bi bi-volume-mute"></i>';
+        muteButton.title = 'Activar asistente de voz';
+    } else {
+        muteButton.style.backgroundColor = '#28a745';  // Verde cuando está activo
+        muteButton.innerHTML = '<i class="bi bi-volume-up"></i>';
+        muteButton.title = 'Silenciar asistente de voz';
+    }
+}
+
+/**
+ * Actualiza el estado visual del botón del asistente
+ */
+function updateVoiceButtonState() {
+    const voiceButton = document.getElementById('voice-assistant-btn');
+    if (!voiceButton) return;
+    
+    if (isListening) {
+        voiceButton.style.backgroundColor = '#dc3545';  // Rojo cuando está escuchando
+        voiceButton.innerHTML = '<i class="bi bi-mic-fill"></i>';
+        voiceButton.title = 'Asistente escuchando (Presiona para detener)';
+    } else {
+        voiceButton.style.backgroundColor = '#007bff';  // Azul cuando está inactivo
+        voiceButton.innerHTML = '<i class="bi bi-mic"></i>';
+        voiceButton.title = 'Asistente de voz (Presiona para hablar)';
+    }
+}
+
+/**
+ * Muestra el texto de salida del asistente
+ * @param {string} text - El texto a mostrar
+ */
+function showVoiceOutput(text) {
+    const voiceOutput = document.getElementById('voice-output');
+    if (!voiceOutput) return;
+    
+    voiceOutput.textContent = text;
+    voiceOutput.style.display = 'block';
+    
+    // Ocultar después de 5 segundos
+    setTimeout(() => {
+        if (voiceOutput.textContent === text) {
+            hideVoiceOutput();
+        }
+    }, 5000);
+}
+
+/**
+ * Oculta el texto de salida del asistente
+ */
+function hideVoiceOutput() {
+    const voiceOutput = document.getElementById('voice-output');
+    if (voiceOutput) {
+        voiceOutput.style.display = 'none';
+    }
+}
+
+/**
+ * Maneja los comandos de voz recibidos
+ * @param {SpeechRecognitionEvent} event - El evento de reconocimiento
+ */
+function handleVoiceCommand(event) {
+    const command = event.results[0][0].transcript.toLowerCase().trim();
+    showVoiceOutput(`"${command}"`);
+    
+    // Procesar diferentes comandos
+    if (command.includes('ir a') || command.includes('navegar a') || command.includes('abrir')) {
+        navigateToPage(command);
+    } else if (command.includes('describir') || command.includes('explica') || command.includes('qué es')) {
+        describeCurrentPage();
+    } else if (command.includes('buscar') || command.includes('encontrar')) {
+        searchContent(command);
+    } else if (command.includes('ayuda') || command.includes('asistente')) {
+        provideHelp();
+    } else {
+        speakText('No he podido entender el comando. Prueba a decir "ayuda" para ver los comandos disponibles.');
+    }
+}
+
+/**
+ * Navega a una página según el comando de voz
+ * @param {string} command - El comando recibido
+ */
+function navigateToPage(command) {
+    let targetPage = '';
+    
+    if (command.includes('inicio') || command.includes('home')) {
+        targetPage = '/';
+    } else if (command.includes('rutas')) {
+        targetPage = '/rutas';
+    } else if (command.includes('paradas')) {
+        targetPage = '/paradas';
+    } else if (command.includes('ayuda')) {
+        targetPage = '/ayuda';
+    } else if (command.includes('perfil')) {
+        targetPage = '/auth/perfil';
+    } else if (command.includes('administrador') || command.includes('admin')) {
+        targetPage = '/admin';
+    } else {
+        speakText('No reconozco esa página. Puedo navegar a inicio, rutas, paradas, ayuda o perfil.');
+        return;
+    }
+    
+    speakText(`Navegando a ${targetPage.replace('/', '')}`);
+    setTimeout(() => {
+        window.location.href = targetPage;
+    }, 1500);
+}
+
+/**
+ * Describe la página actual
+ */
+function describeCurrentPage() {
+    const currentPath = window.location.pathname;
+    let description = '';
+    
+    if (currentPath === '/' || currentPath.endsWith('/index')) {
+        description = pageDescriptions.inicio;
+    } else if (currentPath.includes('/rutas')) {
+        description = pageDescriptions.rutas;
+    } else if (currentPath.includes('/paradas')) {
+        description = pageDescriptions.paradas;
+    } else if (currentPath.includes('/ayuda')) {
+        description = pageDescriptions.ayuda;
+    } else if (currentPath.includes('/perfil')) {
+        description = pageDescriptions.perfil;
+    } else if (currentPath.includes('/admin')) {
+        description = pageDescriptions.admin;
+    } else {
+        description = 'No tengo información sobre esta página específica.';
+    }
+    
+    speakText(description);
+}
+
+/**
+ * Busca contenido según el comando
+ * @param {string} command - El comando recibido
+ */
+function searchContent(command) {
+    // Implementar según la funcionalidad de búsqueda disponible
+    speakText('Lo siento, la función de búsqueda por voz aún no está disponible.');
+}
+
+/**
+ * Proporciona ayuda sobre el uso del asistente
+ */
+function provideHelp() {
+    const helpText = 'Puedo ayudarte a navegar por la aplicación. Algunos comandos disponibles son: "ir a rutas", "ir a paradas", "describir esta página", "ir a inicio", "ir a perfil" o "ir a ayuda".';
+    speakText(helpText);
+}
+
+/**
+ * Maneja errores de reconocimiento de voz
+ * @param {SpeechRecognitionError} event - El evento de error
+ */
+function handleError(event) {
+    console.error('Error en el reconocimiento de voz:', event.error);
+    isListening = false;
+    updateVoiceButtonState();
+    
+    let errorMessage;
+    switch (event.error) {
+        case 'no-speech':
+            errorMessage = 'No he detectado ninguna palabra. Inténtalo de nuevo.';
+            break;
+        case 'not-allowed':
+            errorMessage = 'El reconocimiento de voz no está permitido. Verifica los permisos del micrófono.';
+            break;
+        default:
+            errorMessage = 'Ha ocurrido un error con el reconocimiento de voz.';
+    }
+    
+    showVoiceOutput(errorMessage);
+}
+
+/**
+ * Convierte texto a voz y lo reproduce
+ * @param {string} text - El texto a convertir y reproducir
+ */
+function speakText(text) {
+    // Mostrar el texto en la interfaz aunque esté silenciado
+    showVoiceOutput(text);
+    
+    // Si está silenciado, solo mostrar el texto pero no reproducir audio
+    if (isMuted) {
+        return;
+    }
+    
+    if (speechSynthesis) {
+        // Detener cualquier voz en reproducción
+        speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'es-ES';
+        utterance.rate = 1.0;  // Velocidad normal
+        utterance.pitch = 1.0; // Tono normal
+        
+        // Seleccionar una voz en español si está disponible
+        const voices = speechSynthesis.getVoices();
+        const spanishVoice = voices.find(voice => voice.lang.includes('es'));
+        if (spanishVoice) {
+            utterance.voice = spanishVoice;
+        }
+        
+        // Reproducir la voz
+        speechSynthesis.speak(utterance);
+    } else {
+        console.warn('La síntesis de voz no es compatible con este navegador');
+        showVoiceOutput(text);
+    }
+}
