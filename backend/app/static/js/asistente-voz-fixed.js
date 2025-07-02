@@ -44,8 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Añadir botón de asistente de voz
         setupVoiceAssistant();
         
-        // Inicializar el estado del botón de silencio
-        updateMuteButtonState();
     } else if ('SpeechRecognition' in window) {
         // Soporte para navegadores que implementan el estándar
         recognition = new SpeechRecognition();
@@ -67,7 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Añadir botón de asistente de voz
         setupVoiceAssistant();
     } else {
-        console.warn("El reconocimiento de voz no está disponible en este navegador");
+        console.warn('El reconocimiento de voz no es compatible con este navegador');
+        
         // Crear una alerta para informar al usuario
         const alertDiv = document.createElement('div');
         alertDiv.className = 'alert alert-warning alert-dismissible fade show';
@@ -87,31 +86,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-        // Configurar eventos para el reconocimiento de voz
-        recognition.onresult = handleVoiceCommand;
-        recognition.onerror = handleError;
-        recognition.onend = () => {
-            isListening = false;
-            updateVoiceButtonState();
-        };
-
-        // Añadir botón de asistente de voz
-        setupVoiceAssistant();
-    } else {
-        console.warn('El reconocimiento de voz no es compatible con este navegador');
-    }
-
     // Mostrar notificación sobre el botón de silencio si es la primera visita
     if (localStorage.getItem('voiceAssistant_infoShown') !== 'true') {
-        showVoiceOutput('Asistente de voz activado. Puedes silenciarlo con el botón verde ubicado encima del botón del micrófono.');
-        localStorage.setItem('voiceAssistant_infoShown', 'true');
         setTimeout(() => {
-            hideVoiceOutput();
-        }, 6000);
+            showVoiceOutput('Asistente de voz disponible. Puedes silenciarlo con el botón verde ubicado arriba del botón del micrófono.');
+            localStorage.setItem('voiceAssistant_infoShown', 'true');
+            setTimeout(() => {
+                hideVoiceOutput();
+            }, 6000);
+        }, 2000);
     }
     
     // Describir la página actual si es la primera visita
-    describeCurrentPage();
+    setTimeout(() => {
+        if (!isMuted) {
+            describeCurrentPage();
+        }
+    }, 1000);
 });
 
 /**
@@ -293,26 +284,19 @@ function updateVoiceButtonState() {
 }
 
 /**
- * Muestra el texto de salida del asistente
+ * Muestra un mensaje en el elemento de salida de voz
  * @param {string} text - El texto a mostrar
  */
 function showVoiceOutput(text) {
     const voiceOutput = document.getElementById('voice-output');
-    if (!voiceOutput) return;
-    
-    voiceOutput.textContent = text;
-    voiceOutput.style.display = 'block';
-    
-    // Ocultar después de 5 segundos
-    setTimeout(() => {
-        if (voiceOutput.textContent === text) {
-            hideVoiceOutput();
-        }
-    }, 5000);
+    if (voiceOutput) {
+        voiceOutput.textContent = text;
+        voiceOutput.style.display = 'block';
+    }
 }
 
 /**
- * Oculta el texto de salida del asistente
+ * Oculta el elemento de salida de voz
  */
 function hideVoiceOutput() {
     const voiceOutput = document.getElementById('voice-output');
@@ -338,6 +322,14 @@ function handleVoiceCommand(event) {
         searchContent(command);
     } else if (command.includes('ayuda') || command.includes('asistente')) {
         provideHelp();
+    } else if (command.includes('silenciar') || command.includes('silencio') || command.includes('mute')) {
+        toggleMute();
+    } else if (command.includes('activar voz') || command.includes('activar sonido') || command.includes('unmute')) {
+        if (isMuted) {
+            toggleMute();
+        } else {
+            speakText('El asistente de voz ya está activado.');
+        }
     } else {
         speakText('No he podido entender el comando. Prueba a decir "ayuda" para ver los comandos disponibles.');
     }
@@ -412,7 +404,7 @@ function searchContent(command) {
  * Proporciona ayuda sobre el uso del asistente
  */
 function provideHelp() {
-    const helpText = 'Puedo ayudarte a navegar por la aplicación. Algunos comandos disponibles son: "ir a rutas", "ir a paradas", "describir esta página", "ir a inicio", "ir a perfil" o "ir a ayuda".';
+    const helpText = 'Puedo ayudarte a navegar por la aplicación. Algunos comandos disponibles son: "ir a rutas", "ir a paradas", "describir esta página", "ir a inicio", "silenciar", "activar voz", o "ir a ayuda".';
     speakText(helpText);
 }
 
@@ -471,8 +463,14 @@ function speakText(text) {
         
         // Reproducir la voz
         speechSynthesis.speak(utterance);
-    } else {
-        console.warn('La síntesis de voz no es compatible con este navegador');
-        showVoiceOutput(text);
+        
+        // Ocultar el mensaje después de un tiempo proporcional a la longitud del texto
+        // (aproximadamente tiempo para leer)
+        const readingTimeMs = Math.min(Math.max(text.length * 90, 2000), 10000);
+        setTimeout(() => {
+            if (!isListening) {
+                hideVoiceOutput();
+            }
+        }, readingTimeMs);
     }
 }

@@ -34,6 +34,10 @@ def index():
     asociaciones_count = RutaParada.query.count()
     usuarios_count = Usuario.query.count()
     
+    # Obtener las últimas 5 rutas y paradas
+    ultimas_rutas = Ruta.query.order_by(Ruta.id.desc()).limit(5).all()
+    ultimas_paradas = Parada.query.order_by(Parada.id.desc()).limit(5).all()
+    
     # Crear diccionario de estadísticas para la plantilla
     stats = {
         'total_rutas': rutas_count,
@@ -42,7 +46,10 @@ def index():
         'total_usuarios': usuarios_count
     }
     
-    return render_template('admin/index.html', stats=stats)
+    return render_template('admin/index.html', 
+                          stats=stats, 
+                          ultimas_rutas=ultimas_rutas, 
+                          ultimas_paradas=ultimas_paradas)
 
 # GESTIÓN DE RUTAS
 @admin.route('/rutas/')
@@ -69,7 +76,12 @@ def crear_ruta():
             hora_inicio=form.hora_inicio.data,
             hora_fin=form.hora_fin.data,
             frecuencia_minutos=form.frecuencia_minutos.data,
-            descripcion=form.descripcion.data
+            descripcion=form.descripcion.data,
+            activa=form.activa.data,
+            tiene_rampa=form.tiene_rampa.data,
+            tiene_audio=form.tiene_audio.data,
+            tiene_espacio_silla=form.tiene_espacio_silla.data,
+            tiene_indicador_visual=form.tiene_indicador_visual.data
         )
         try:
             db.session.add(ruta)
@@ -359,7 +371,10 @@ def crear_usuario():
             db.session.rollback()
             flash('Error: El nombre de usuario o email ya existe.', 'danger')
     
-    return render_template('admin/usuarios/form.html', form=form)
+    return render_template('admin/usuarios/form.html', 
+                          form=form, 
+                          legend="Crear Nuevo Usuario", 
+                          submit_text="Crear Usuario")
 
 @admin.route('/usuarios/editar/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -398,7 +413,11 @@ def editar_usuario(id):
             db.session.rollback()
             flash('Error: El nombre de usuario o email ya existe.', 'danger')
     
-    return render_template('admin/usuarios/form.html', form=form, usuario=usuario)
+    return render_template('admin/usuarios/form.html', 
+                          form=form, 
+                          usuario=usuario,
+                          legend=f"Editar Usuario: {usuario.username}",
+                          submit_text="Actualizar Usuario")
 
 @admin.route('/usuarios/eliminar/<int:id>', methods=['POST'])
 @login_required

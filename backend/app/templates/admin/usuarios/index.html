@@ -51,15 +51,15 @@
                 {% for usuario in usuarios.items %}
                 <tr>
                     <td>{{ usuario.id }}</td>
-                    <td>{{ usuario.nombre_usuario }}</td>
+                    <td>{{ usuario.username }}</td>
                     <td>{{ usuario.email }}</td>
                     <td><span class="badge badge-{{ 'primary' if usuario.rol == 'admin' else 'secondary' }}">{{ usuario.rol }}</span></td>
                     <td>
-                        <a href="{{ url_for('admin.editar_usuario', id=usuario.id) }}" class="btn btn-sm btn-warning" aria-label="Editar usuario {{ usuario.nombre_usuario }}">
+                        <a href="{{ url_for('admin.editar_usuario', id=usuario.id) }}" class="btn btn-sm btn-warning" aria-label="Editar usuario {{ usuario.username }}">
                             <span class="fas fa-edit"></span> Editar
                         </a>
                         <form action="{{ url_for('admin.eliminar_usuario', id=usuario.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a este usuario?');">
-                            <button type="submit" class="btn btn-sm btn-danger" aria-label="Eliminar usuario {{ usuario.nombre_usuario }}">
+                            <button type="submit" class="btn btn-sm btn-danger" aria-label="Eliminar usuario {{ usuario.username }}">
                                 <span class="fas fa-trash"></span> Eliminar
                             </button>
                         </form>

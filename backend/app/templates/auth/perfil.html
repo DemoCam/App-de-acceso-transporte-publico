@@ -104,23 +104,17 @@
                 </div>
             </div>
             
-            <!-- Accesibilidad -->
+            <!-- Ayuda -->
             <div class="card shadow">
                 <div class="card-header bg-info text-white">
-                    <h3 class="h5 mb-0">Herramientas de Accesibilidad</h3>
+                    <h3 class="h5 mb-0">Recursos de Ayuda</h3>
                 </div>
                 <div class="card-body">
-                    <p>Personalice su experiencia:</p>
+                    <p>¿Necesitas ayuda?</p>
                     <div class="d-grid gap-2">
-                        <button id="btnAumentarTexto" class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-fonts"></i> Aumentar Texto
-                        </button>
-                        <button id="btnReducirTexto" class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-fonts"></i> Reducir Texto
-                        </button>
-                        <button id="btnAltoContraste" class="btn btn-outline-dark btn-sm">
-                            <i class="bi bi-circle-half"></i> Alto Contraste
-                        </button>
+                        <a href="{{ url_for('main.ayuda') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-question-circle"></i> Guía de Usuario
+                        </a>
                     </div>
                 </div>
             </div>

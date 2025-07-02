@@ -34,6 +34,12 @@ class RutaForm(FlaskForm):
         Optional(),
         Length(max=500)
     ])
+    activa = BooleanField('Ruta Activa', default=True)
+    # Características de accesibilidad
+    tiene_rampa = BooleanField('Vehículos con rampa de acceso')
+    tiene_audio = BooleanField('Anuncios de audio')
+    tiene_espacio_silla = BooleanField('Espacio para silla de ruedas')
+    tiene_indicador_visual = BooleanField('Indicadores visuales')
     submit = SubmitField('Guardar')
 
 class ParadaForm(FlaskForm):

@@ -162,6 +162,49 @@
                             <small class="form-text text-muted">Descripción detallada para personas con discapacidad visual</small>
                         </div>
 
+                        <!-- Estado de la ruta -->
+                        <div class="form-group mb-4">
+                            <div class="form-check form-switch">
+                                {{ form.activa(class="form-check-input" + (" is-invalid" if form.activa.errors else "")) }}
+                                {{ form.activa.label(class="form-check-label") }}
+                                {% for error in form.activa.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <small class="form-text text-muted">Indica si la ruta está operativa actualmente</small>
+                        </div>
+
+                        <!-- Características de accesibilidad -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h4 class="h6 mb-0">Características de Accesibilidad</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-3">
+                                            {{ form.tiene_rampa(class="form-check-input") }}
+                                            {{ form.tiene_rampa.label(class="form-check-label") }}
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            {{ form.tiene_audio(class="form-check-input") }}
+                                            {{ form.tiene_audio.label(class="form-check-label") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-3">
+                                            {{ form.tiene_espacio_silla(class="form-check-input") }}
+                                            {{ form.tiene_espacio_silla.label(class="form-check-label") }}
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            {{ form.tiene_indicador_visual(class="form-check-input") }}
+                                            {{ form.tiene_indicador_visual.label(class="form-check-label") }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <a href="{{ url_for('admin.gestionar_rutas') }}" class="btn btn-outline-secondary me-md-2">Cancelar</a>
                             <button type="submit" class="btn btn-primary">{{ submit_text|default('Guardar') }}</button>

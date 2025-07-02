@@ -75,7 +75,12 @@ def create_tables(cursor):
         hora_inicio TIME NOT NULL,
         hora_fin TIME NOT NULL,
         frecuencia_minutos INT DEFAULT 15,
-        descripcion TEXT
+        descripcion TEXT,
+        activa BOOLEAN DEFAULT TRUE,
+        tiene_rampa BOOLEAN DEFAULT FALSE,
+        tiene_audio BOOLEAN DEFAULT FALSE,
+        tiene_espacio_silla BOOLEAN DEFAULT FALSE,
+        tiene_indicador_visual BOOLEAN DEFAULT FALSE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """)
     

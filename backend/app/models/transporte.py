@@ -14,6 +14,12 @@ class Ruta(db.Model):
     hora_fin = db.Column(db.Time, nullable=False)
     frecuencia_minutos = db.Column(db.Integer, default=15)
     descripcion = db.Column(db.Text)
+    activa = db.Column(db.Boolean, default=True)
+    # Características de accesibilidad
+    tiene_rampa = db.Column(db.Boolean, default=False)
+    tiene_audio = db.Column(db.Boolean, default=False)
+    tiene_espacio_silla = db.Column(db.Boolean, default=False)
+    tiene_indicador_visual = db.Column(db.Boolean, default=False)
     
     # Relación con paradas a través de RutaParada
     paradas = db.relationship(
@@ -37,13 +43,25 @@ class Ruta(db.Model):
             'hora_inicio': self.hora_inicio.strftime('%H:%M'),
             'hora_fin': self.hora_fin.strftime('%H:%M'),
             'frecuencia_minutos': self.frecuencia_minutos,
-            'descripcion': self.descripcion
+            'descripcion': self.descripcion,
+            'activa': self.activa,
+            'accesibilidad': {
+                'tiene_rampa': self.tiene_rampa,
+                'tiene_audio': self.tiene_audio,
+                'tiene_espacio_silla': self.tiene_espacio_silla,
+                'tiene_indicador_visual': self.tiene_indicador_visual
+            }
         }
         
         if include_paradas:
             data['paradas'] = [parada.to_dict() for parada in self.paradas]
         
         return data
+        
+    @property
+    def horario(self):
+        """Devuelve una representación formateada del horario de la ruta"""
+        return f"{self.hora_inicio.strftime('%H:%M')} - {self.hora_fin.strftime('%H:%M')}"
 
 class Parada(db.Model):
     """Modelo para las paradas de transporte público"""
