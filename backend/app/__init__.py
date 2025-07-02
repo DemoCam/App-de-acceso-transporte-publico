@@ -3,6 +3,7 @@ import secrets
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
 
 # Carga las variables de entorno desde el archivo .env
@@ -17,6 +18,7 @@ if not SECRET_KEY:
 # Inicializa las extensiones
 db = SQLAlchemy()
 login_manager = LoginManager()
+csrf = CSRFProtect()
 
 # Bootstrap será inicializado después de importar Flask
 
@@ -60,6 +62,7 @@ def create_app():
     
     # Inicializar extensiones con la aplicación
     db.init_app(app)
+    csrf.init_app(app)  # Inicializar CSRF protection
     
     # Asegurarnos que Flask-Login se inicialice después de configurar la clave secreta
     with app.app_context():

@@ -15,6 +15,8 @@ class Ruta(db.Model):
     frecuencia_minutos = db.Column(db.Integer, default=15)
     descripcion = db.Column(db.Text)
     activa = db.Column(db.Boolean, default=True)
+    # Coordenadas para el trazado de la ruta (formato JSON)
+    coordenadas = db.Column(db.Text, nullable=True)  # Almacenará un array JSON de coordenadas [lat, lng]
     # Características de accesibilidad
     tiene_rampa = db.Column(db.Boolean, default=False)
     tiene_audio = db.Column(db.Boolean, default=False)
@@ -34,6 +36,16 @@ class Ruta(db.Model):
         return f'<Ruta {self.numero}: {self.origen} - {self.destino}>'
     
     def to_dict(self, include_paradas=False):
+        import json
+        
+        # Parse coordenadas from JSON string to list if present
+        coordenadas_lista = []
+        if self.coordenadas:
+            try:
+                coordenadas_lista = json.loads(self.coordenadas)
+            except (json.JSONDecodeError, TypeError):
+                coordenadas_lista = []  # Si hay error en el formato, devolver lista vacía
+        
         data = {
             'id': self.id,
             'numero': self.numero,
@@ -45,6 +57,7 @@ class Ruta(db.Model):
             'frecuencia_minutos': self.frecuencia_minutos,
             'descripcion': self.descripcion,
             'activa': self.activa,
+            'coordenadas': coordenadas_lista,
             'accesibilidad': {
                 'tiene_rampa': self.tiene_rampa,
                 'tiene_audio': self.tiene_audio,

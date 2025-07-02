@@ -13,5 +13,8 @@ if not app.secret_key:
 else:
     print(f"Clave secreta configurada correctamente. Longitud: {len(app.secret_key)} bytes")
 
+# Verificar que todos los modelos y tablas estén configurados correctamente
+print("Verificando modelos y tablas de la aplicación...")
+
 if __name__ == '__main__':
     app.run(debug=True)

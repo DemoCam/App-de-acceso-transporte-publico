@@ -54,6 +54,16 @@ def update_database():
                     print("La columna 'tiene_audio' ya existe")
                 else:
                     print(f"Error al añadir columna 'tiene_audio': {e}")
+                    
+            # Añadir columna 'coordenadas' para el trazado de rutas en el mapa
+            try:
+                cursor.execute("ALTER TABLE rutas ADD COLUMN coordenadas TEXT NULL COMMENT 'Arreglo de coordenadas [lat, lng] para el trazado de la ruta'")
+                print("Columna 'coordenadas' añadida correctamente")
+            except Error as e:
+                if "Duplicate column name" in str(e):
+                    print("La columna 'coordenadas' ya existe")
+                else:
+                    print(f"Error al añadir columna 'coordenadas': {e}")
             
             # Añadir columna 'tiene_espacio_silla'
             try:

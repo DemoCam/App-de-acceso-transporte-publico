@@ -1,11 +1,13 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, session, json
 from flask_login import login_required, current_user
-from app import db
+from app import db, csrf
 from app.models.transporte import Ruta, Parada, RutaParada
 from app.models.usuario import Usuario, Role
 from app.forms.transporte import RutaForm, ParadaForm, RutaParadaForm
 from app.forms.usuario import UsuarioForm
+from app.forms.import_export import ImportForm
 from datetime import datetime
+import json
 from sqlalchemy.exc import IntegrityError
 from functools import wraps
 from werkzeug.security import generate_password_hash
@@ -68,6 +70,9 @@ def crear_ruta():
     """Crear una nueva ruta"""
     form = RutaForm()
     if form.validate_on_submit():
+        # Obtener coordenadas del formulario
+        coordenadas = request.form.get('coordenadas', '[]')
+        
         ruta = Ruta(
             numero=form.numero.data,
             nombre=form.nombre.data,
@@ -77,6 +82,7 @@ def crear_ruta():
             hora_fin=form.hora_fin.data,
             frecuencia_minutos=form.frecuencia_minutos.data,
             descripcion=form.descripcion.data,
+            coordenadas=coordenadas,  # Guardar las coordenadas como JSON
             activa=form.activa.data,
             tiene_rampa=form.tiene_rampa.data,
             tiene_audio=form.tiene_audio.data,
@@ -102,7 +108,13 @@ def editar_ruta(id):
     form = RutaForm(obj=ruta)
     
     if form.validate_on_submit():
+        # Actualizar los campos del formulario
         form.populate_obj(ruta)
+        
+        # Actualizar coordenadas desde el formulario
+        coordenadas = request.form.get('coordenadas', '[]')
+        ruta.coordenadas = coordenadas
+        
         try:
             db.session.commit()
             flash('Ruta actualizada exitosamente.', 'success')
@@ -478,3 +490,236 @@ def eliminar_usuario(id):
     db.session.commit()
     flash('Usuario eliminado exitosamente.', 'success')
     return redirect(url_for('admin.gestionar_usuarios'))
+
+# IMPORTACIÓN DE DATOS
+@admin.route('/importar', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def importar_datos():
+    """Página para importar datos desde archivos JSON"""
+    form = ImportForm()
+    
+    if form.validate_on_submit():
+        # Procesar el archivo subido
+        archivo = form.archivo.data
+        tipo_datos = form.tipo_datos.data
+        solo_vista_previa = form.vista_previa.data
+        
+        try:
+            # Leer el contenido del archivo JSON
+            contenido = archivo.read().decode('utf-8')
+            datos = json.loads(contenido)
+            
+            if not isinstance(datos, list):
+                flash('El formato del archivo no es válido. Debe ser una lista de objetos.', 'danger')
+                return redirect(url_for('admin.importar_datos'))
+            
+            # Si es solo vista previa, mostrar los datos
+            if solo_vista_previa:
+                # Guardar datos en la sesión para la vista previa
+                session['import_data'] = contenido
+                return render_template('admin/importar_datos.html', 
+                                      form=form, 
+                                      preview_data=datos, 
+                                      tipo_datos=tipo_datos, 
+                                      json_data=contenido,
+                                      rutas_js=json.dumps(datos))
+            else:
+                # Procesar la importación directamente
+                resultado = procesar_importacion(datos, tipo_datos)
+                flash(resultado, 'success')
+                return redirect(url_for('admin.importar_datos'))
+                
+        except json.JSONDecodeError:
+            flash('El archivo no contiene un JSON válido', 'danger')
+        except Exception as e:
+            flash(f'Error al procesar el archivo: {str(e)}', 'danger')
+            
+    return render_template('admin/importar_datos.html', form=form)
+
+@admin.route('/importar/guardar', methods=['POST'])
+@login_required
+@admin_required
+def importar_datos_guardar():
+    """Guardar los datos importados después de la vista previa"""
+    if request.method == 'POST':
+        # Extraer datos del formulario
+        tipo_datos = request.form.get('tipo_datos')
+        json_data = request.form.get('json_data', '[]')
+        
+        # La validación CSRF ahora se maneja automáticamente por Flask-WTF
+        
+        try:
+            # Convertir de nuevo a objeto Python
+            datos = json.loads(json_data)
+            
+            # Procesar la importación
+            resultado = procesar_importacion(datos, tipo_datos)
+            flash(resultado, 'success')
+        except Exception as e:
+            flash(f'Error al guardar los datos: {str(e)}', 'danger')
+    
+    return redirect(url_for('admin.importar_datos'))
+
+def procesar_importacion(datos, tipo_datos):
+    """
+    Procesa la importación de datos según el tipo
+    
+    Args:
+        datos (list): Lista de diccionarios con los datos a importar
+        tipo_datos (str): Tipo de datos ('paradas', 'rutas', 'rutas_paradas')
+    
+    Returns:
+        str: Mensaje con el resultado de la importación
+    """
+    contador = 0
+    
+    if tipo_datos == 'paradas':
+        # Importar paradas
+        creadas = 0
+        actualizadas = 0
+        for item in datos:
+            try:
+                # Verificar si ya existe una parada con el mismo nombre
+                parada_existente = Parada.query.filter_by(nombre=item.get('nombre', '')).first()
+                
+                if parada_existente:
+                    # Actualizar la parada existente
+                    parada_existente.direccion = item.get('direccion', parada_existente.direccion)
+                    parada_existente.latitud = item.get('latitud', parada_existente.latitud)
+                    parada_existente.longitud = item.get('longitud', parada_existente.longitud)
+                    parada_existente.tipo = item.get('tipo', parada_existente.tipo)
+                    parada_existente.tiene_rampa = item.get('tiene_rampa', parada_existente.tiene_rampa)
+                    parada_existente.tiene_semaforo_sonoro = item.get('tiene_semaforo_sonoro', parada_existente.tiene_semaforo_sonoro)
+                    parada_existente.descripcion = item.get('descripcion', parada_existente.descripcion)
+                    actualizadas += 1
+                else:
+                    # Crear nueva parada
+                    parada = Parada(
+                        nombre=item.get('nombre', ''),
+                        direccion=item.get('direccion', ''),
+                        latitud=item.get('latitud', 0),
+                        longitud=item.get('longitud', 0),
+                        tipo=item.get('tipo', 'regular'),
+                        tiene_rampa=item.get('tiene_rampa', False),
+                        tiene_semaforo_sonoro=item.get('tiene_semaforo_sonoro', False),
+                        descripcion=item.get('descripcion', '')
+                    )
+                    db.session.add(parada)
+                    creadas += 1
+                contador += 1
+            except Exception as e:
+                db.session.rollback()
+                raise Exception(f"Error al importar la parada {item.get('nombre', '')}: {str(e)}")
+        
+        db.session.commit()
+        return f"Se han procesado {contador} paradas: {creadas} nuevas y {actualizadas} actualizadas."
+        
+    elif tipo_datos == 'rutas':
+        # Importar rutas
+        creadas = 0
+        actualizadas = 0
+        for item in datos:
+            try:
+                # Convertir horas de string a objeto Time
+                hora_inicio = datetime.strptime(item.get('hora_inicio', '00:00'), '%H:%M').time()
+                hora_fin = datetime.strptime(item.get('hora_fin', '23:59'), '%H:%M').time()
+                
+                # Convertir coordenadas a string JSON si existen
+                coordenadas_json = None
+                if 'coordenadas' in item and item['coordenadas']:
+                    coordenadas_json = json.dumps(item['coordenadas'])
+                
+                # Verificar si ya existe una ruta con el mismo número
+                ruta_existente = Ruta.query.filter_by(numero=item.get('numero', '')).first()
+                
+                if ruta_existente:
+                    # Actualizar la ruta existente
+                    ruta_existente.nombre = item.get('nombre', ruta_existente.nombre)
+                    ruta_existente.origen = item.get('origen', ruta_existente.origen)
+                    ruta_existente.destino = item.get('destino', ruta_existente.destino)
+                    ruta_existente.hora_inicio = hora_inicio
+                    ruta_existente.hora_fin = hora_fin
+                    ruta_existente.frecuencia_minutos = item.get('frecuencia_minutos', ruta_existente.frecuencia_minutos)
+                    ruta_existente.descripcion = item.get('descripcion', ruta_existente.descripcion)
+                    ruta_existente.activa = item.get('activa', ruta_existente.activa)
+                    ruta_existente.coordenadas = coordenadas_json
+                    ruta_existente.tiene_rampa = item.get('tiene_rampa', ruta_existente.tiene_rampa)
+                    ruta_existente.tiene_audio = item.get('tiene_audio', ruta_existente.tiene_audio)
+                    ruta_existente.tiene_espacio_silla = item.get('tiene_espacio_silla', ruta_existente.tiene_espacio_silla)
+                    ruta_existente.tiene_indicador_visual = item.get('tiene_indicador_visual', ruta_existente.tiene_indicador_visual)
+                    actualizadas += 1
+                else:
+                    # Crear nueva ruta
+                    ruta = Ruta(
+                        numero=item.get('numero', ''),
+                        nombre=item.get('nombre', ''),
+                        origen=item.get('origen', ''),
+                        destino=item.get('destino', ''),
+                        hora_inicio=hora_inicio,
+                        hora_fin=hora_fin,
+                        frecuencia_minutos=item.get('frecuencia_minutos', 15),
+                        descripcion=item.get('descripcion', ''),
+                        activa=item.get('activa', True),
+                        coordenadas=coordenadas_json,
+                        tiene_rampa=item.get('tiene_rampa', False),
+                        tiene_audio=item.get('tiene_audio', False),
+                        tiene_espacio_silla=item.get('tiene_espacio_silla', False),
+                        tiene_indicador_visual=item.get('tiene_indicador_visual', False)
+                    )
+                    db.session.add(ruta)
+                    creadas += 1
+                contador += 1
+            except Exception as e:
+                db.session.rollback()
+                raise Exception(f"Error al importar la ruta {item.get('numero', '')}: {str(e)}")
+        
+        db.session.commit()
+        return f"Se han procesado {contador} rutas: {creadas} nuevas y {actualizadas} actualizadas."
+        
+    elif tipo_datos == 'rutas_paradas':
+        # Importar asociaciones ruta-parada
+        creadas = 0
+        actualizadas = 0
+        for item in datos:
+            try:
+                # Buscar la ruta y parada por número y nombre respectivamente
+                ruta = Ruta.query.filter_by(numero=item.get('ruta_numero', '')).first()
+                parada = Parada.query.filter_by(nombre=item.get('parada_nombre', '')).first()
+                
+                if not ruta:
+                    raise Exception(f"No se encontró la ruta con número '{item.get('ruta_numero', '')}'")
+                if not parada:
+                    raise Exception(f"No se encontró la parada con nombre '{item.get('parada_nombre', '')}'")
+                
+                # Verificar si ya existe la asociación
+                asociacion_existente = RutaParada.query.filter_by(
+                    ruta_id=ruta.id, 
+                    parada_id=parada.id
+                ).first()
+                
+                if asociacion_existente:
+                    # Actualizar la asociación existente
+                    asociacion_existente.orden = item.get('orden', 1)
+                    asociacion_existente.tiempo_estimado = item.get('tiempo_estimado', 0)
+                    actualizadas += 1
+                else:
+                    # Crear nueva asociación
+                    asociacion = RutaParada(
+                        ruta_id=ruta.id,
+                        parada_id=parada.id,
+                        orden=item.get('orden', 1),
+                        tiempo_estimado=item.get('tiempo_estimado', 0)
+                    )
+                    db.session.add(asociacion)
+                    creadas += 1
+                
+                contador += 1
+            except Exception as e:
+                db.session.rollback()
+                raise Exception(f"Error en asociación: {str(e)}")
+        
+        db.session.commit()
+        return f"Se han procesado {contador} asociaciones ruta-parada: {creadas} nuevas y {actualizadas} actualizadas."
+    
+    return "No se realizó ninguna importación."

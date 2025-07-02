@@ -162,6 +162,22 @@
                             <small class="form-text text-muted">Descripción detallada para personas con discapacidad visual</small>
                         </div>
 
+                        <!-- Mapa para dibujar la ruta -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h4 class="h6 mb-0">Dibujar Ruta en el Mapa</h4>
+                            </div>
+                            <div class="card-body">
+                                <div id="map-drawer" style="height: 500px; width: 100%;" class="rounded border"></div>
+                                <div class="mt-2 d-flex justify-content-between">
+                                    <small class="form-text text-muted">Haga clic en el mapa para añadir puntos. Haga clic en un punto para eliminarlo.</small>
+                                    <button type="button" id="clear-route" class="btn btn-sm btn-outline-danger">Limpiar ruta</button>
+                                </div>
+                                <!-- Campo oculto para almacenar las coordenadas -->
+                                <input type="hidden" name="coordenadas" id="coordinates-input" value="{% if ruta and ruta.coordenadas %}{{ ruta.coordenadas }}{% endif %}">
+                            </div>
+                        </div>
+
                         <!-- Estado de la ruta -->
                         <div class="form-group mb-4">
                             <div class="form-check form-switch">
@@ -234,11 +250,111 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block scripts %}
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
-    // Script para mejorar accesibilidad del formulario
     document.addEventListener('DOMContentLoaded', function() {
-        // Añadir descripciones de error más accesibles
+        // --- LÓGICA DEL MAPA DE DIBUJO ---
+        
+        // Coordenadas iniciales para Cali
+        const map = L.map('map-drawer').setView([3.4516, -76.5320], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        const coordinatesInput = document.getElementById('coordinates-input');
+        let routePoints = [];
+        let markers = [];
+        let currentPolyline = null;
+        
+        // Si hay coordenadas existentes (en caso de edición), cargarlas
+        if (coordinatesInput.value) {
+            try {
+                routePoints = JSON.parse(coordinatesInput.value);
+                drawRoute();
+            } catch (e) {
+                console.error('Error al parsear coordenadas:', e);
+            }
+        }
+        
+        // Función para dibujar la ruta con los puntos actuales
+        function drawRoute() {
+            // Limpiar la línea existente
+            if (currentPolyline) {
+                map.removeLayer(currentPolyline);
+            }
+            
+            // Limpiar los marcadores existentes
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            // Crear nueva línea si hay al menos 2 puntos
+            if (routePoints.length > 1) {
+                currentPolyline = L.polyline(routePoints, { 
+                    color: 'blue', 
+                    weight: 5,
+                    opacity: 0.7
+                }).addTo(map);
+                
+                // Centrar mapa en la ruta
+                map.fitBounds(currentPolyline.getBounds());
+            }
+            
+            // Añadir marcadores para cada punto
+            routePoints.forEach((point, index) => {
+                const marker = L.marker(point, {
+                    title: `Punto ${index + 1}`,
+                    draggable: true
+                }).addTo(map);
+                
+                // Permitir arrastrar para modificar punto
+                marker.on('dragend', function(e) {
+                    const newPos = e.target.getLatLng();
+                    routePoints[index] = [newPos.lat, newPos.lng];
+                    drawRoute();
+                    updateCoordinatesInput();
+                });
+                
+                // Hacer clic para eliminar punto
+                marker.on('click', function() {
+                    map.removeLayer(marker);
+                    routePoints.splice(index, 1);
+                    drawRoute();
+                    updateCoordinatesInput();
+                });
+                
+                markers.push(marker);
+            });
+            
+            // Actualizar el input oculto
+            updateCoordinatesInput();
+        }
+        
+        // Actualizar el campo oculto con las coordenadas como JSON
+        function updateCoordinatesInput() {
+            coordinatesInput.value = JSON.stringify(routePoints);
+        }
+        
+        // Añadir nuevo punto al hacer clic en el mapa
+        map.on('click', function(e) {
+            const newPoint = [e.latlng.lat, e.latlng.lng];
+            routePoints.push(newPoint);
+            drawRoute();
+        });
+        
+        // Botón para limpiar la ruta
+        document.getElementById('clear-route').addEventListener('click', function() {
+            // Confirmar antes de limpiar
+            if (confirm('¿Está seguro de que desea eliminar todos los puntos de la ruta?')) {
+                routePoints = [];
+                drawRoute();
+            }
+        });
+        
+        // Script para mejorar accesibilidad del formulario
         const form = document.querySelector('form');
         
         form.addEventListener('submit', function() {

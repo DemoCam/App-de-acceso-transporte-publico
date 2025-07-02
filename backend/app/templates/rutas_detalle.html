@@ -163,9 +163,13 @@
             <h2 class="h5 mb-0">Mapa de la Ruta</h2>
         </div>
         <div class="card-body">
-            <!-- Aquí iría el mapa (se puede integrar Google Maps o similar) -->
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle-fill me-2"></i> El mapa interactivo estará disponible próximamente.
+            <div id="mapa-ruta" style="height: 400px;" data-ruta-id="{{ ruta.id }}">
+                <!-- El mapa se cargará aquí con JavaScript -->
+            </div>
+            <div id="mapa-no-disponible" class="d-none">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill me-2"></i> El trazado de esta ruta aún no está disponible en el mapa.
+                </div>
             </div>
         </div>
     </div>
@@ -173,9 +177,124 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Código para interactividad adicional si se requiere
+        const mapContainer = document.getElementById('mapa-ruta');
+        const noMapMessage = document.getElementById('mapa-no-disponible');
+        const rutaId = mapContainer.getAttribute('data-ruta-id');
+        
+        // Inicializar el mapa centrado en Cali
+        const mapCenter = [3.4516, -76.5320]; // Coordenadas de Cali
+        const map = L.map('mapa-ruta').setView(mapCenter, 13);
+        
+        // Añadir capa base de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Cargar datos de la ruta
+        fetch(`/api/rutas/${rutaId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const ruta = data.data;
+                    
+                    // Si tiene coordenadas, dibujar la línea de la ruta
+                    if (ruta.coordenadas && ruta.coordenadas.length > 1) {
+                        // Dibujar la ruta como una polyline
+                        const polyline = L.polyline(ruta.coordenadas, {
+                            color: '#0d6efd',  // Color azul primario de Bootstrap
+                            weight: 5,
+                            opacity: 0.8
+                        }).addTo(map);
+                        
+                        // Ajustar el mapa para mostrar toda la ruta
+                        map.fitBounds(polyline.getBounds());
+                        
+                        // Añadir marcadores de origen y destino
+                        if (ruta.coordenadas.length >= 2) {
+                            // Marcador de origen (primer punto)
+                            const origenIcon = L.divIcon({
+                                className: 'origen-marker',
+                                html: '<i class="bi bi-geo-alt-fill" style="color: green; font-size: 24px;"></i>',
+                                iconSize: [24, 24],
+                                iconAnchor: [12, 24]
+                            });
+                            
+                            // Marcador de destino (último punto)
+                            const destinoIcon = L.divIcon({
+                                className: 'destino-marker',
+                                html: '<i class="bi bi-geo-alt-fill" style="color: red; font-size: 24px;"></i>',
+                                iconSize: [24, 24],
+                                iconAnchor: [12, 24]
+                            });
+                            
+                            // Añadir marcadores al mapa con popups
+                            L.marker(ruta.coordenadas[0], {icon: origenIcon})
+                                .addTo(map)
+                                .bindPopup(`<b>Origen:</b> ${ruta.origen}`);
+                                
+                            L.marker(ruta.coordenadas[ruta.coordenadas.length - 1], {icon: destinoIcon})
+                                .addTo(map)
+                                .bindPopup(`<b>Destino:</b> ${ruta.destino}`);
+                        }
+                        
+                        // Mostrar paradas si están disponibles
+                        if (ruta.paradas && ruta.paradas.length > 0) {
+                            // Crear icono para las paradas
+                            const paradaIcon = L.divIcon({
+                                className: 'parada-marker',
+                                html: '<i class="bi bi-sign-stop-fill" style="color: #6c757d; font-size: 18px;"></i>',
+                                iconSize: [18, 18],
+                                iconAnchor: [9, 18]
+                            });
+                            
+                            // Añadir marcadores para cada parada
+                            ruta.paradas.forEach(parada => {
+                                if (parada.latitud && parada.longitud) {
+                                    let iconoParada = paradaIcon;
+                                    
+                                    // Usar icono diferente para paradas accesibles
+                                    if (parada.accesibilidad && (parada.accesibilidad.rampa || parada.accesibilidad.semaforo_sonoro)) {
+                                        iconoParada = L.divIcon({
+                                            className: 'parada-accesible-marker',
+                                            html: '<i class="bi bi-sign-stop-fill" style="color: #198754; font-size: 18px;"></i>',
+                                            iconSize: [18, 18],
+                                            iconAnchor: [9, 18]
+                                        });
+                                    }
+                                    
+                                    L.marker([parada.latitud, parada.longitud], {icon: iconoParada})
+                                        .addTo(map)
+                                        .bindPopup(`
+                                            <b>${parada.nombre}</b><br>
+                                            ${parada.direccion}<br>
+                                            ${parada.accesibilidad.rampa ? '<span class="badge bg-success">Rampa</span> ' : ''}
+                                            ${parada.accesibilidad.semaforo_sonoro ? '<span class="badge bg-info">Semáforo sonoro</span>' : ''}
+                                        `);
+                                }
+                            });
+                        }
+                    } else {
+                        // Si no hay coordenadas, mostrar mensaje
+                        mapContainer.style.display = 'none';
+                        noMapMessage.classList.remove('d-none');
+                    }
+                } else {
+                    console.error('Error al cargar los datos de la ruta:', data);
+                    mapContainer.style.display = 'none';
+                    noMapMessage.classList.remove('d-none');
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar los datos de la ruta:', error);
+                mapContainer.style.display = 'none';
+                noMapMessage.classList.remove('d-none');
+            });
     });
 </script>
 {% endblock %}

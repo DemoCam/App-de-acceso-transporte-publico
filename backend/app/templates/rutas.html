@@ -28,6 +28,29 @@
                 </button>
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="filtro-rampa" value="rampa">
+                <label class="form-check-label" for="filtro-rampa">Con rampa</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="filtro-audio" value="audio">
+                <label class="form-check-label" for="filtro-audio">Con audio</label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mapa de rutas -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">Mapa de Rutas</h2>
+        </div>
+        <div class="card-body">
+            <div id="mapa-rutas" style="height: 400px;">
+                <!-- El mapa se cargará aquí con JavaScript -->
+                <p class="text-center text-muted py-5">Cargando mapa de rutas...</p>
+            </div>
+        </div>
     </div>
     
     <!-- Listado de rutas -->
@@ -94,8 +117,112 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar el mapa centrado en Cali
+    const mapCenter = [3.4516, -76.5320]; // Coordenadas de Cali
+    const map = L.map('mapa-rutas').setView(mapCenter, 13);
+    
+    // Añadir capa base de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Objeto para almacenar las líneas de ruta
+    let rutasLayer = L.layerGroup().addTo(map);
+    let rutasData = [];
+    
+    // Función para cargar las rutas desde la API
+    function cargarRutas() {
+        // Limpiar capas existentes
+        rutasLayer.clearLayers();
+        
+        // Obtener las rutas desde la API
+        fetch('/api/rutas')
+            .then(response => response.json())
+            .then(datos => {
+                if (datos.status === 'success') {
+                    rutasData = datos.data;
+                    
+                    // Dibujar cada ruta en el mapa
+                    rutasData.forEach(ruta => {
+                        if (ruta.coordenadas && ruta.coordenadas.length > 1) {
+                            const polyline = L.polyline(ruta.coordenadas, {
+                                color: getRandomColor(),
+                                weight: 5,
+                                opacity: 0.7
+                            });
+                            
+                            // Añadir popup con información de la ruta
+                            polyline.bindPopup(`
+                                <div>
+                                    <h5>Ruta ${ruta.numero}</h5>
+                                    <p><strong>${ruta.nombre}</strong></p>
+                                    <p>De ${ruta.origen} a ${ruta.destino}</p>
+                                    <p>Horario: ${ruta.hora_inicio} - ${ruta.hora_fin}</p>
+                                    <a href="/rutas/${ruta.id}" class="btn btn-sm btn-primary">Ver detalles</a>
+                                </div>
+                            `);
+                            
+                            // Guardar datos de accesibilidad para filtrado
+                            polyline.rutaId = ruta.id;
+                            polyline.tieneRampa = ruta.accesibilidad.tiene_rampa;
+                            polyline.tieneAudio = ruta.accesibilidad.tiene_audio;
+                            polyline.rutaNumero = ruta.numero;
+                            polyline.rutaNombre = ruta.nombre;
+                            
+                            // Añadir a la capa de rutas
+                            rutasLayer.addLayer(polyline);
+                        }
+                    });
+                    
+                    // Si no hay coordenadas en las rutas, mostrar mensaje
+                    let rutasConCoordenadas = rutasData.filter(ruta => ruta.coordenadas && ruta.coordenadas.length > 1);
+                    if (rutasConCoordenadas.length === 0) {
+                        // Eliminar spinner/mensaje de carga primero
+                        const mapContainer = document.getElementById('mapa-rutas');
+                        while (mapContainer.firstChild) {
+                            mapContainer.firstChild.remove();
+                        }
+                        
+                        // Añadir mensaje de que no hay rutas trazadas
+                        mapContainer.innerHTML = `
+                            <div class="position-absolute top-50 start-50 translate-middle bg-white p-3 rounded shadow-sm">
+                                <div class="alert alert-info mb-0">
+                                    <i class="bi bi-info-circle me-2"></i> No hay rutas con trazados disponibles en el mapa.
+                                    <br>Los administradores deben dibujar los trazados de ruta.
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    console.error('Error al cargar las rutas:', datos);
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar las rutas:', error);
+                document.getElementById('mapa-rutas').innerHTML = `
+                    <div class="alert alert-danger">
+                        Error al cargar el mapa de rutas. Por favor, intente nuevamente.
+                    </div>
+                `;
+            });
+    }
+    
+    // Función para obtener un color aleatorio para las líneas
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+    
     // Función para filtrar rutas
     document.getElementById('btn-buscar').addEventListener('click', filtrarRutas);
     document.getElementById('buscar-ruta').addEventListener('keyup', function(e) {
@@ -103,6 +230,10 @@ document.addEventListener('DOMContentLoaded', function() {
             filtrarRutas();
         }
     });
+    
+    // Eventos para filtros de accesibilidad
+    document.getElementById('filtro-rampa').addEventListener('change', aplicarFiltros);
+    document.getElementById('filtro-audio').addEventListener('change', aplicarFiltros);
     
     function filtrarRutas() {
         const busqueda = document.getElementById('buscar-ruta').value.toLowerCase();
@@ -118,7 +249,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 columna.style.display = 'none';
             }
         });
+        
+        // Aplicar el mismo filtro al mapa
+        aplicarFiltros();
     }
+    
+    // Aplicar filtros al mapa
+    function aplicarFiltros() {
+        const busqueda = document.getElementById('buscar-ruta').value.toLowerCase();
+        const filtroRampa = document.getElementById('filtro-rampa').checked;
+        const filtroAudio = document.getElementById('filtro-audio').checked;
+        
+        rutasLayer.eachLayer(layer => {
+            // Solo aplicar a líneas (polylines)
+            if (layer instanceof L.Polyline) {
+                const coincideTexto = layer.rutaNumero.toLowerCase().includes(busqueda) || 
+                                     layer.rutaNombre.toLowerCase().includes(busqueda);
+                const coincideRampa = !filtroRampa || layer.tieneRampa;
+                const coincideAudio = !filtroAudio || layer.tieneAudio;
+                
+                if (coincideTexto && coincideRampa && coincideAudio) {
+                    layer.setStyle({ opacity: 0.7 });
+                    layer.options.interactive = true;
+                } else {
+                    layer.setStyle({ opacity: 0.2 });
+                    layer.options.interactive = false;
+                }
+            }
+        });
+    }
+    
+    // Cargar las rutas al iniciar
+    cargarRutas();
 });
 </script>
 {% endblock %}
