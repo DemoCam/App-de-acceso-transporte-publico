@@ -201,19 +201,20 @@ body.using-keyboard textarea:focus {
 /* Estilos para el panel flotante de accesibilidad */
 .accessibility-tools-panel {
     position: fixed;
-    bottom: 20px;
+    bottom: 110px; /* Posicionado encima del botón del asistente de voz */
     right: 20px;
-    z-index: 1000;
+    z-index: 1001; /* Superior al del asistente de voz (1000) */
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    pointer-events: auto; /* Asegurar que capture eventos */
 }
 
 .accessibility-toggle-btn {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: #0d6efd;
+    background-color: #6c757d; /* Cambiado a gris para diferenciarlo del asistente */
     color: #fff;
     border: none;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -232,7 +233,7 @@ body.using-keyboard textarea:focus {
 
 .accessibility-tools-content {
     position: absolute;
-    bottom: 60px;
+    bottom: 60px; /* Panel aparece encima del botón de accesibilidad */
     right: 0;
     background-color: #fff;
     border-radius: 8px;
@@ -240,6 +241,9 @@ body.using-keyboard textarea:focus {
     padding: 15px;
     width: 220px;
     display: none;
+    z-index: 1002; /* Superior al del panel y botones */
+    pointer-events: auto; /* Asegurar que capture eventos */
+    cursor: default; /* Evitar cursor de puntero en todo el panel */
 }
 
 body.high-contrast .accessibility-tools-content {

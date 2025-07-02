@@ -43,24 +43,34 @@ function setupAccessibilityButtons() {
         }
     }
     
-    // Botón para silenciar asistente de voz
+    // Botón para silenciar asistente de voz en la barra de navegación
     const voiceMuteButton = document.getElementById('toggle-voice-mute');
     if (voiceMuteButton) {
-        voiceMuteButton.addEventListener('click', function() {
-            // Verificar si la función toggleMute existe (asistente-voz-fixed.js)
+        // Eliminar cualquier listener previo
+        voiceMuteButton.removeEventListener('click', handleNavbarMuteToggle);
+        
+        // Función para manejar el clic
+        function handleNavbarMuteToggle(e) {
+            e.preventDefault();
+            
+            // Verificar si la función toggleMute existe
             if (typeof toggleMute === 'function') {
-                toggleMute();
-                
-                // Actualizar el ícono del botón de silencio en la navbar
-                updateNavbarMuteIcon();
+                toggleMute(); // Esta función ahora maneja toda la actualización visual
             } else {
                 console.warn('La función toggleMute no está disponible');
-                alert('El asistente de voz no está disponible en este navegador.');
+                alert('El asistente de voz no está disponible. Intenta actualizar la página.');
             }
-        });
+        }
         
-        // Inicializar estado del botón según preferencias guardadas
-        updateNavbarMuteIcon();
+        // Agregar nuevo listener
+        voiceMuteButton.addEventListener('click', handleNavbarMuteToggle);
+        
+        // Inicializar estado del botón
+        if (typeof updateMuteVisualState === 'function') {
+            updateMuteVisualState();
+        } else {
+            updateNavbarMuteIcon(); // Función local como fallback
+        }
     }
 }
 
@@ -214,25 +224,37 @@ function setupAccessibilityFloatingPanel() {
     
     if (!toggleBtn || !toolsContent) return;
     
-    // Configurar el botón para mostrar/ocultar el panel
-    toggleBtn.addEventListener('click', function() {
-        toolsContent.classList.toggle('show');
-        const isExpanded = toolsContent.classList.contains('show');
-        toggleBtn.setAttribute('aria-expanded', isExpanded);
-        
-        // Anunciar para lectores de pantalla
-        if (isExpanded) {
-            announceForScreenReader('Panel de herramientas de accesibilidad abierto');
-        } else {
-            announceForScreenReader('Panel de herramientas de accesibilidad cerrado');
-        }
-    });
+    // Eliminar cualquier listener previo para evitar duplicados (por si acaso)
+    toggleBtn.removeEventListener('click', toggleAccessibilityPanel);
     
-    // Cerrar el panel al hacer clic en cualquier otra parte
-    document.addEventListener('click', function(e) {
-        if (!toolsContent.contains(e.target) && e.target !== toggleBtn) {
+    // Función separada para el manejo del panel
+    function toggleAccessibilityPanel(e) {
+        e.preventDefault();
+        e.stopPropagation(); // Evitar propagación
+        
+        // Si el panel está visible, ocultarlo; si no, mostrarlo
+        if (toolsContent.classList.contains('show')) {
             toolsContent.classList.remove('show');
-            toggleBtn.setAttribute('aria-expanded', false);
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            announceForScreenReader('Panel de herramientas de accesibilidad cerrado');
+        } else {
+            toolsContent.classList.add('show');
+            toggleBtn.setAttribute('aria-expanded', 'true');
+            announceForScreenReader('Panel de herramientas de accesibilidad abierto');
+        }
+    }
+    
+    // Agregar listener al botón con la función separada
+    toggleBtn.addEventListener('click', toggleAccessibilityPanel);
+    
+    // Mejorar el manejo de clics fuera del panel
+    document.addEventListener('click', function(e) {
+        // Solo actuar si el panel está visible y se hace clic fuera
+        if (toolsContent.classList.contains('show') && 
+            !toolsContent.contains(e.target) && 
+            e.target !== toggleBtn) {
+            toolsContent.classList.remove('show');
+            toggleBtn.setAttribute('aria-expanded', 'false');
         }
     });
     
@@ -255,15 +277,32 @@ function setupAccessibilityFloatingPanel() {
     
     // Botón de asistente de voz
     if (voiceToggleBtn) {
-        voiceToggleBtn.addEventListener('click', function() {
+        // Eliminar listeners previos
+        voiceToggleBtn.removeEventListener('click', handleVoiceToggle);
+        
+        // Función para manejar el clic en el botón de silenciar
+        function handleVoiceToggle(e) {
+            e.preventDefault();
+            e.stopPropagation(); // Evitar que el clic cierre el panel
+            
             if (typeof toggleMute === 'function') {
                 toggleMute();
-                updateVoiceToggleState();
+                // La actualización visual se maneja dentro de toggleMute
+            } else {
+                console.warn('La función toggleMute no está disponible');
+                alert('No se puede cambiar el estado del asistente de voz. Intenta actualizar la página.');
             }
-        });
+        }
         
-        // Inicializar estado
-        updateVoiceToggleState();
+        // Agregar nuevo listener
+        voiceToggleBtn.addEventListener('click', handleVoiceToggle);
+        
+        // Actualizar estado visual inicial
+        if (typeof updateMuteVisualState === 'function') {
+            updateMuteVisualState();
+        } else {
+            updateVoiceToggleState(); // Función local como fallback
+        }
     }
 }
 

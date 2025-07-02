@@ -58,6 +58,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Añadir botón y configurar interfaz
         setupVoiceAssistant();
         
+        // Configurar atajos de teclado y preferencias de accesibilidad
+        setupKeyboardShortcuts();
+        setupAccessibilityPreferences();
+        
         // Crear un indicador visual para permitir la descripción automática
         const autoDescribeIndicator = document.createElement('div');
         autoDescribeIndicator.className = 'auto-describe-indicator';
@@ -90,8 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 10000);
         
         // Opcional: describir automáticamente la página para usuarios que tengan habilitada la opción
-        const shouldAutoDescribe = localStorage.getItem('autoDescribePage') === 'true';
-        if (shouldAutoDescribe) {
+        if (typeof shouldAutoDescribePage === 'function' && shouldAutoDescribePage()) {
             setTimeout(describeCurrentPage, 1500);
         }
     }
@@ -495,6 +498,15 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {string} text - El texto a convertir y reproducir
      */
     function speakText(text) {
+        // Mostrar el mensaje visualmente siempre
+        showVoiceOutput(text);
+        
+        // Verificar si el asistente está silenciado usando la función global
+        if (typeof isVoiceAssistantMuted === 'function' && isVoiceAssistantMuted()) {
+            console.log('Asistente de voz silenciado. Mensaje:', text);
+            return; // No reproducir voz si está silenciado
+        }
+        
         if (speechSynthesis) {
             // Detener cualquier voz en reproducción
             speechSynthesis.cancel();
@@ -892,7 +904,7 @@ document.addEventListener('DOMContentLoaded', function() {
         prefsPanel.style.backgroundColor = 'white';
         prefsPanel.style.boxShadow = '0 0 15px rgba(0,0,0,0.2)';
         prefsPanel.style.borderRadius = '8px';
-        prefsPanel.style.zIndex = '999';
+        prefsPanel.style.zIndex = '990';  // Z-index menor que el botón de micrófono (1000)
         prefsPanel.style.display = 'none';
         
         // Contenido del panel
@@ -915,11 +927,24 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Cargar preferencia guardada
         const checkbox = prefsPanel.querySelector('#autoDescribePages');
-        checkbox.checked = localStorage.getItem('autoDescribePage') === 'true';
+        if (typeof shouldAutoDescribePage === 'function') {
+            checkbox.checked = shouldAutoDescribePage();
+        } else {
+            // Fallback si la función global no está disponible
+            checkbox.checked = localStorage.getItem('autoDescribePage') === 'true';
+        }
         
         // Guardar preferencia al cambiar
         checkbox.addEventListener('change', function() {
-            localStorage.setItem('autoDescribePage', this.checked);
+            // Usar la función global si está disponible
+            if (typeof saveAccessibilityPrefs === 'function') {
+                saveAccessibilityPrefs(this.checked);
+            } else {
+                // Fallback por si no está disponible
+                window.voiceAssistant = window.voiceAssistant || {};
+                window.voiceAssistant.autoDescribe = this.checked;
+                localStorage.setItem('autoDescribePage', this.checked);
+            }
         });
         
         // Mostrar/ocultar panel
@@ -934,7 +959,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Inicializar atajos de teclado y preferencias
-    setupKeyboardShortcuts();
-    setupAccessibilityPreferences();
+    /**
+     * Actualiza el estado visual del botón de silencio interno
+     */
+    function updateMuteButtonState() {
+        // Este código actualizaría el botón de silencio si existiera en la interfaz
+        // Ahora usamos la función global updateMuteVisualState
+        if (typeof updateMuteVisualState === 'function') {
+            updateMuteVisualState();
+        }
+    }
 });
