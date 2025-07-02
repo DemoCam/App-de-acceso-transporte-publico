@@ -25,7 +25,8 @@
                         <option value="usuario" {% if request.args.get('rol') == 'usuario' %}selected{% endif %}>Usuario</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Filtrar</button>
+                <button type="submit" class="btn btn-primary mr-2">Filtrar</button>
+                <a href="{{ url_for('admin.gestionar_usuarios') }}" class="btn btn-secondary">Limpiar filtros</a>
             </form>
         </div>
     </div>
@@ -33,6 +34,16 @@
     <a href="{{ url_for('admin.crear_usuario') }}" class="btn btn-success mb-3">
         <span class="fas fa-plus"></span> Crear Nuevo Usuario
     </a>
+
+    {% if request.args.get('q') or request.args.get('rol') %}
+    <div class="alert alert-info">
+        Mostrando resultados 
+        {% if request.args.get('q') %}para la búsqueda: <strong>"{{ request.args.get('q') }}"</strong>{% endif %}
+        {% if request.args.get('q') and request.args.get('rol') %} y {% endif %}
+        {% if request.args.get('rol') %}con rol: <strong>{{ request.args.get('rol') }}</strong>{% endif %}
+        <a href="{{ url_for('admin.gestionar_usuarios') }}" class="btn btn-sm btn-outline-secondary ml-2">Limpiar filtros</a>
+    </div>
+    {% endif %}
 
     {% if usuarios.items %}
     <div class="table-responsive">

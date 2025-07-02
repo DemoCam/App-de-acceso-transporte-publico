@@ -340,9 +340,35 @@ def eliminar_ruta_parada(ruta_id, parada_id):
 @login_required
 @admin_required
 def gestionar_usuarios():
-    """Listar todos los usuarios"""
+    """Listar todos los usuarios con filtros y búsqueda"""
     page = request.args.get('page', 1, type=int)
-    usuarios = Usuario.query.order_by(Usuario.username).paginate(page=page, per_page=10)
+    
+    # Obtener parámetros de búsqueda y filtro
+    busqueda = request.args.get('q', '')
+    rol_filtro = request.args.get('rol', '')
+    
+    # Consulta base
+    query = Usuario.query
+    
+    # Aplicar filtros si existen
+    if busqueda:
+        # Búsqueda por nombre de usuario o email
+        query = query.filter(
+            db.or_(
+                Usuario.username.ilike(f'%{busqueda}%'),
+                Usuario.email.ilike(f'%{busqueda}%'),
+                Usuario.nombre.ilike(f'%{busqueda}%'),
+                Usuario.apellido.ilike(f'%{busqueda}%')
+            )
+        )
+    
+    if rol_filtro:
+        # Filtrar por rol (admin o usuario)
+        query = query.filter(Usuario.rol == rol_filtro)
+    
+    # Ordenar y paginar resultados
+    usuarios = query.order_by(Usuario.username).paginate(page=page, per_page=10)
+    
     return render_template('admin/usuarios/index.html', usuarios=usuarios)
 
 @admin.route('/usuarios/nuevo', methods=['GET', 'POST'])
@@ -352,23 +378,29 @@ def crear_usuario():
     """Crear un nuevo usuario"""
     form = UsuarioForm()
     if form.validate_on_submit():
+        # Creamos el usuario con los datos del formulario
         usuario = Usuario(
             username=form.username.data,
             email=form.email.data,
             nombre=form.nombre.data,
             apellido=form.apellido.data,
-            rol=form.role.data,
+            rol=form.role.data,  # Esto asigna el valor del enum (admin, user, guest)
             activo=form.is_active.data
         )
+        # Establecemos la contraseña
         usuario.set_password(form.password.data)
+        
+        # Verificación para depurar
+        print(f"Creando usuario: {usuario.username}, Rol: {usuario.rol}, Activo: {usuario.activo}")
         
         try:
             db.session.add(usuario)
             db.session.commit()
             flash('Usuario creado exitosamente.', 'success')
             return redirect(url_for('admin.gestionar_usuarios'))
-        except IntegrityError:
+        except IntegrityError as e:
             db.session.rollback()
+            print(f"Error al crear usuario: {str(e)}")
             flash('Error: El nombre de usuario o email ya existe.', 'danger')
     
     return render_template('admin/usuarios/form.html', 
@@ -391,7 +423,9 @@ def editar_usuario(id):
     
     # No requerir contraseña al editar
     form.password.validators = []
+    form.password2.validators = []
     form.password.render_kw = {'placeholder': 'Dejar vacío para mantener la contraseña actual'}
+    form.password2.render_kw = {'placeholder': 'Dejar vacío para mantener la contraseña actual'}
     
     if form.validate_on_submit():
         usuario.username = form.username.data
@@ -401,16 +435,21 @@ def editar_usuario(id):
         usuario.rol = form.role.data
         usuario.activo = form.is_active.data
         
+        # Verificación para depurar
+        print(f"Actualizando usuario: {usuario.username}, Rol: {usuario.rol}, Activo: {usuario.activo}")
+        
         # Actualizar contraseña solo si se proporcionó una nueva
         if form.password.data:
             usuario.set_password(form.password.data)
+            print(f"Contraseña actualizada para: {usuario.username}")
         
         try:
             db.session.commit()
             flash('Usuario actualizado exitosamente.', 'success')
             return redirect(url_for('admin.gestionar_usuarios'))
-        except IntegrityError:
+        except IntegrityError as e:
             db.session.rollback()
+            print(f"Error al actualizar usuario: {str(e)}")
             flash('Error: El nombre de usuario o email ya existe.', 'danger')
     
     return render_template('admin/usuarios/form.html', 

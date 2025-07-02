@@ -26,11 +26,15 @@ class Usuario(UserMixin, db.Model):
     
     def set_password(self, password):
         """Genera un hash seguro para la contraseña del usuario"""
-        self.password_hash = generate_password_hash(password)
+        # Use a consistent method to avoid issues - pbkdf2:sha256 is more widely compatible
+        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
+        print(f"Hash generado para {self.username}: {self.password_hash}")
     
     def check_password(self, password):
         """Verifica que la contraseña ingresada corresponda con el hash guardado"""
-        return check_password_hash(self.password_hash, password)
+        result = check_password_hash(self.password_hash, password)
+        print(f"Verificación de contraseña para {self.username}: {result}")
+        return result
     
     def is_admin(self):
         """Verifica si el usuario tiene rol de administrador"""

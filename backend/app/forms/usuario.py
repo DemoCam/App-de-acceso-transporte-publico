@@ -30,11 +30,11 @@ class UsuarioForm(FlaskForm):
         DataRequired(),
         EqualTo('password', message='Las contraseñas deben coincidir')
     ])
+    # Usamos 'role' en el formulario pero lo asignamos a 'rol' en el controlador
     role = SelectField('Rol', choices=[
-        (Role.ADMIN, 'Administrador'),
-        (Role.USER, 'Usuario'),
-        (Role.GUEST, 'Invitado')
+        (Role.ADMIN, 'Administrador'),  # 'admin'
+        (Role.USER, 'Usuario'),         # 'user'
+        (Role.GUEST, 'Invitado')        # 'guest'
     ])
     is_active = BooleanField('Usuario Activo', default=True)
-    # Nota: Aunque usamos is_active en el formulario, este se asigna a usuario.activo en el controlador
     submit = SubmitField('Guardar')

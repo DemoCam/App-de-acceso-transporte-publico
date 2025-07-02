@@ -18,13 +18,24 @@ def login():
         # Buscar usuario por nombre de usuario
         usuario = Usuario.query.filter_by(username=form.username.data).first()
         
-        # Verificar que el usuario existe y la contraseña es correcta
-        if usuario is None or not usuario.check_password(form.password.data):
+        # Verificación detallada para depuración
+        if usuario is None:
+            print(f"Usuario no encontrado: {form.username.data}")
+            flash('Nombre de usuario o contraseña incorrectos.', 'danger')
+            return redirect(url_for('auth.login'))
+        
+        # Imprimir información del usuario para depurar
+        print(f"Intento de login para: {usuario.username}, Rol: {usuario.rol}, Activo: {usuario.activo}")
+        
+        # Verificar que la contraseña es correcta
+        if not usuario.check_password(form.password.data):
+            print(f"Contraseña incorrecta para: {usuario.username}")
             flash('Nombre de usuario o contraseña incorrectos.', 'danger')
             return redirect(url_for('auth.login'))
         
         # Verificar que el usuario está activo
         if not usuario.activo:
+            print(f"Usuario inactivo: {usuario.username}")
             flash('Esta cuenta ha sido desactivada. Contacta al administrador.', 'warning')
             return redirect(url_for('auth.login'))
         
