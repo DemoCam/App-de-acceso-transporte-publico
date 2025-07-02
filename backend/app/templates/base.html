@@ -19,7 +19,7 @@
     
     <!-- Scripts para accesibilidad -->
     <script src="{{ url_for('static', filename='js/accesibilidad.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/asistente-voz-fixed.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/asistente-voz-nuevo.js') }}" defer></script>
     
     {% block styles %}{% endblock %}
 </head>
@@ -62,6 +62,12 @@
                         <a class="nav-link {% if request.path == url_for('main.ayuda') %}active{% endif %}" 
                            href="{{ url_for('main.ayuda') }}">
                             <i class="bi bi-question-circle me-1"></i>Ayuda
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('main.asistente_voz') %}active{% endif %}" 
+                           href="{{ url_for('main.asistente_voz') }}">
+                            <i class="bi bi-mic me-1"></i>Asistente de Voz
                         </a>
                     </li>
                 </ul>
@@ -147,6 +153,7 @@
                     <h5>Enlaces útiles</h5>
                     <ul class="list-unstyled">
                         <li><a href="{{ url_for('main.ayuda') }}" class="text-white">Ayuda</a></li>
+                        <li><a href="{{ url_for('main.asistente_voz') }}" class="text-white">Asistente de Voz</a></li>
                         <li><a href="#" class="text-white">Contacto</a></li>
                         <li><a href="#" class="text-white">Política de privacidad</a></li>
                     </ul>

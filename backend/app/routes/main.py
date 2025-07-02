@@ -68,3 +68,8 @@ def mio_test():
     paradas = mio_service.obtener_paradas()
     
     return render_template('mio_test.html', rutas=rutas, paradas=paradas)
+
+@main.route('/asistente-voz')
+def asistente_voz():
+    """Página de documentación del asistente de voz"""
+    return render_template('asistente_voz.html')
