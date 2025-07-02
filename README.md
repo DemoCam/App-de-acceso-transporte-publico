@@ -1,6 +1,23 @@
 # 🚍 App de Transporte Accesible – Cali
 
-Aplicación web enfocada en asistir a personas con discapacidad visual en la consulta y uso del transporte público en la ciudad de Cali. Proporciona información sobre rutas, paradas, y características de accesibilidad con una interfaz especialmente diseñada para ser compatible con lectores de pantalla y otras tecnologías asistivas.
+Aplicación web enfocada en asistir a personas con discapacidad visual en la consulta y uso del transpo## 📚 Documentación
+
+La documentación completa del proyecto incluye:
+
+- **Manual de Usuario**: Guía detallada para usuarios finales que explica cómo utilizar todas las funcionalidades de la aplicación.
+- **Manual de Instalación**: Instrucciones paso a paso para instalar y configurar la aplicación en diferentes entornos.
+- **Documentación de la API**: Referencia técnica para desarrolladores que quieran integrar servicios con la API.
+- **Manual de Accesibilidad**: Guía específica sobre las características de accesibilidad y su uso.
+- **Solución de problemas**: Guía para resolver problemas comunes.
+
+Toda la documentación está disponible en la carpeta `docs/` del proyecto. Para generar un paquete completo de documentación descargable:
+
+```bash
+cd backend
+python generate_docs.py
+```
+
+El paquete generado incluirá todos los manuales en formato Markdown y estará disponible en la carpeta `dist/` y también para descarga desde la aplicación web en la sección de ayuda.la ciudad de Cali. Proporciona información sobre rutas, paradas, y características de accesibilidad con una interfaz especialmente diseñada para ser compatible con lectores de pantalla y otras tecnologías asistivas.
 
 ## 👥 Equipo de desarrollo
 
@@ -111,9 +128,11 @@ git push origin feature/nombre-funcionalidad
 - [x] Implementación del panel de administración
 - [x] Funcionalidades de accesibilidad (asistente de voz, alto contraste)
 - [x] Consulta de rutas y paradas con filtros
+- [x] Documentación completa (manual de usuario, API, etc.)
+- [x] Asistente de voz mejorado y robusto
+- [x] Optimización para lectores de pantalla
 - [ ] Pruebas de usabilidad con usuarios
-- [ ] Optimización para dispositivos móviles
-- [ ] Documentación completa de la API
+- [ ] Optimización completa para dispositivos móviles
 
 ## 🛠️ Solución de problemas comunes
 
@@ -128,7 +147,36 @@ cd backend
 python fix_sqlalchemy.py
 ```
 
-## 📄 Licencia
+Si el asistente de voz no funciona correctamente, verifique:
+```bash
+# Navegador compatible (Chrome, Edge o Safari)
+# Permisos de micrófono concedidos
+# Conexión a internet activa (para reconocimiento de voz)
+```
+
+Para reiniciar la configuración de la base de datos completamente:
+```bash
+cd backend
+python init_db.py
+```
+
+## � Documentación
+
+La documentación completa del proyecto incluye:
+
+- **Manual de Usuario**: Guía detallada para usuarios finales que explica cómo utilizar todas las funcionalidades de la aplicación.
+- **Manual de Instalación**: Instrucciones paso a paso para instalar y configurar la aplicación en diferentes entornos.
+- **Documentación de la API**: Referencia técnica para desarrolladores que quieran integrar servicios con la API.
+- **Manual de Accesibilidad**: Guía específica sobre las características de accesibilidad y su uso.
+
+Toda la documentación está disponible en la carpeta `docs/` y se puede generar un paquete completo con:
+
+```bash
+cd backend
+python generate_docs.py
+```
+
+## �📄 Licencia
 
 Este proyecto está bajo la licencia MIT. Ver el archivo LICENSE para más detalles.
 
@@ -136,3 +184,4 @@ Este proyecto está bajo la licencia MIT. Ver el archivo LICENSE para más detal
 
 - [Repositorio GitHub](https://github.com/DemoCam/App-de-acceso-transporte-publico.git)
 - [Documentación](docs/)
+- [Reportar Issues](https://github.com/DemoCam/App-de-acceso-transporte-publico/issues)
