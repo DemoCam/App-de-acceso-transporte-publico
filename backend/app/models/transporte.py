@@ -14,17 +14,38 @@ class Ruta(db.Model):
     hora_fin = db.Column(db.Time, nullable=False)
     frecuencia_minutos = db.Column(db.Integer, default=15)
     descripcion = db.Column(db.Text)
+    activa = db.Column(db.Boolean, default=True)
+    # Coordenadas para el trazado de la ruta (formato JSON)
+    coordenadas = db.Column(db.Text, nullable=True)  # Almacenará un array JSON de coordenadas [lat, lng]
+    # Características de accesibilidad
+    tiene_rampa = db.Column(db.Boolean, default=False)
+    tiene_audio = db.Column(db.Boolean, default=False)
+    tiene_espacio_silla = db.Column(db.Boolean, default=False)
+    tiene_indicador_visual = db.Column(db.Boolean, default=False)
     
-    # Relación con paradas (muchos a muchos)
-    paradas = db.relationship('Parada', 
-                             secondary='ruta_parada',
-                             backref=db.backref('rutas', lazy='dynamic'),
-                             lazy='dynamic')
+    # Relación con paradas a través de RutaParada
+    paradas = db.relationship(
+        'Parada',
+        secondary='ruta_parada',
+        backref=db.backref('rutas', lazy='dynamic'),
+        lazy='dynamic',
+        viewonly=True  # Usamos viewonly porque ahora gestionamos la relación a través de RutaParada
+    )
     
     def __repr__(self):
         return f'<Ruta {self.numero}: {self.origen} - {self.destino}>'
     
     def to_dict(self, include_paradas=False):
+        import json
+        
+        # Parse coordenadas from JSON string to list if present
+        coordenadas_lista = []
+        if self.coordenadas:
+            try:
+                coordenadas_lista = json.loads(self.coordenadas)
+            except (json.JSONDecodeError, TypeError):
+                coordenadas_lista = []  # Si hay error en el formato, devolver lista vacía
+        
         data = {
             'id': self.id,
             'numero': self.numero,
@@ -34,13 +55,26 @@ class Ruta(db.Model):
             'hora_inicio': self.hora_inicio.strftime('%H:%M'),
             'hora_fin': self.hora_fin.strftime('%H:%M'),
             'frecuencia_minutos': self.frecuencia_minutos,
-            'descripcion': self.descripcion
+            'descripcion': self.descripcion,
+            'activa': self.activa,
+            'coordenadas': coordenadas_lista,
+            'accesibilidad': {
+                'tiene_rampa': self.tiene_rampa,
+                'tiene_audio': self.tiene_audio,
+                'tiene_espacio_silla': self.tiene_espacio_silla,
+                'tiene_indicador_visual': self.tiene_indicador_visual
+            }
         }
         
         if include_paradas:
             data['paradas'] = [parada.to_dict() for parada in self.paradas]
         
         return data
+        
+    @property
+    def horario(self):
+        """Devuelve una representación formateada del horario de la ruta"""
+        return f"{self.hora_inicio.strftime('%H:%M')} - {self.hora_fin.strftime('%H:%M')}"
 
 class Parada(db.Model):
     """Modelo para las paradas de transporte público"""
@@ -74,10 +108,17 @@ class Parada(db.Model):
             'descripcion': self.descripcion
         }
 
-# Tabla de relación muchos a muchos entre rutas y paradas
-ruta_parada = db.Table('ruta_parada',
-    db.Column('ruta_id', db.Integer, db.ForeignKey('rutas.id'), primary_key=True),
-    db.Column('parada_id', db.Integer, db.ForeignKey('paradas.id'), primary_key=True),
-    db.Column('orden', db.Integer, nullable=False),
-    db.Column('tiempo_estimado', db.Integer, nullable=True)  # Tiempo estimado en minutos desde origen
-)
+# Modelo de asociación entre rutas y paradas
+class RutaParada(db.Model):
+    """Modelo para la relación entre rutas y paradas, con atributos adicionales"""
+    __tablename__ = 'ruta_parada'
+    
+    # Clave primaria compuesta
+    ruta_id = db.Column(db.Integer, db.ForeignKey('rutas.id'), primary_key=True)
+    parada_id = db.Column(db.Integer, db.ForeignKey('paradas.id'), primary_key=True)
+    orden = db.Column(db.Integer, nullable=False)
+    tiempo_estimado = db.Column(db.Integer, nullable=True)  # Tiempo estimado en minutos desde origen
+    
+    # Relaciones para acceder fácilmente a los objetos relacionados
+    ruta = db.relationship('Ruta', backref=db.backref('ruta_paradas', cascade='all, delete-orphan'))
+    parada = db.relationship('Parada', backref=db.backref('ruta_paradas', cascade='all, delete-orphan'))

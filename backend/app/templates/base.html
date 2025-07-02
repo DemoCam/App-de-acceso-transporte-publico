@@ -3,111 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ title }}{% endblock %}</title>
+    <meta name="description" content="Sistema de transporte accesible para la ciudad de Cali">
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>{% block title %}Transporte Accesible Cali{% endblock %}</title>
     
-    <!-- Estilos personalizados -->
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
     <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
     
-    <!-- Meta tags para accesibilidad -->
-    <meta name="description" content="App de asistencia para uso del transporte público en Cali para personas con discapacidad visual">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     
-    {% block extra_css %}{% endblock %}
+    <!-- Scripts para accesibilidad -->
+    <script src="{{ url_for('static', filename='js/asistente-voice-functions.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/accesibilidad.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/asistente-voz-nuevo.js') }}" defer></script>
+    
+    {% block styles %}{% endblock %}
 </head>
 <body>
-    <!-- Barra de navegación accesible -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <!-- Skip to main content para accesibilidad -->
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+    
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary" aria-label="Navegación principal">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <span class="visually-hidden">Inicio - </span>Transporte Accesible Cali
+                <i class="bi bi-bus-front me-2"></i>Transporte Accesible Cali
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-                    data-bs-target="#navbarMain" aria-controls="navbarMain" 
-                    aria-expanded="false" aria-label="Mostrar menú de navegación">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" 
+                    aria-controls="navbarMain" aria-expanded="false" aria-label="Alternar navegación">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarMain">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}" aria-current="page">Inicio</a>
+                        <a class="nav-link {% if request.path == url_for('main.index') %}active{% endif %}" 
+                           href="{{ url_for('main.index') }}" aria-current="page">
+                            <i class="bi bi-house me-1"></i>Inicio
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.rutas') }}">Consultar Rutas</a>
+                        <a class="nav-link {% if request.path == url_for('main.rutas') %}active{% endif %}" 
+                           href="{{ url_for('main.rutas') }}">
+                            <i class="bi bi-signpost me-1"></i>Rutas
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.paradas') }}">Paradas Cercanas</a>
+                        <a class="nav-link {% if request.path == url_for('main.paradas') %}active{% endif %}" 
+                           href="{{ url_for('main.paradas') }}">
+                            <i class="bi bi-geo-alt me-1"></i>Paradas
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.ayuda') }}">Ayuda</a>
+                        <a class="nav-link {% if request.path == url_for('main.ayuda') %}active{% endif %}" 
+                           href="{{ url_for('main.ayuda') }}">
+                            <i class="bi bi-question-circle me-1"></i>Ayuda
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('main.asistente_voz') %}active{% endif %}" 
+                           href="{{ url_for('main.asistente_voz') }}">
+                            <i class="bi bi-mic me-1"></i>Asistente de Voz
+                        </a>
                     </li>
                 </ul>
-                <!-- Botón de activación de voz -->
-                <button id="btnActivarVoz" class="btn btn-outline-light ms-2" 
-                        aria-label="Activar asistente de voz">
-                    <i class="bi bi-mic-fill"></i> Voz
-                </button>
+                
+                <!-- Botones de accesibilidad -->
+                <div class="d-flex me-3">
+                    <button id="toggle-high-contrast" class="btn btn-sm btn-outline-light me-2" 
+                            title="Alternar alto contraste" aria-label="Alternar modo alto contraste">
+                        <i class="bi bi-circle-half"></i>
+                    </button>
+                    <button id="toggle-font-size" class="btn btn-sm btn-outline-light me-2" 
+                            title="Aumentar tamaño de texto" aria-label="Aumentar tamaño de texto">
+                        <i class="bi bi-type"></i>
+                    </button>
+                    <button id="toggle-voice-mute" class="btn btn-sm btn-outline-light" 
+                            title="Silenciar asistente de voz" aria-label="Alternar silencio del asistente de voz">
+                        <i class="bi bi-volume-up"></i>
+                    </button>
+                </div>
+                
+                <!-- Menú de usuario -->
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i>{{ current_user.get_full_name() }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('auth.perfil') }}">
+                                    <i class="bi bi-person me-2"></i>Mi perfil
+                                </a>
+                            </li>
+                            {% if current_user.is_admin() %}
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('admin.index') }}">
+                                    <i class="bi bi-gear me-2"></i>Administración
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('auth.login') %}active{% endif %}" 
+                           href="{{ url_for('auth.login') }}">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('auth.register') %}active{% endif %}" 
+                           href="{{ url_for('auth.register') }}">
+                            <i class="bi bi-person-plus me-1"></i>Registrarse
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </nav>
-
-    <!-- Alerta de cookies para accesibilidad (opcional) -->
-    <div class="alert alert-info alert-dismissible fade show" role="alert" id="alertAccesibilidad">
-        <div class="container">
-            <p>Este sitio está optimizado para personas con discapacidad visual. Presiona la tecla ALT+V para activar el asistente de voz.</p>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-    </div>
-
+    
     <!-- Contenido principal -->
-    <main id="contenido-principal">
-        <div class="container py-4">
-            {% block content %}{% endblock %}
-        </div>
+    <main id="main-content" class="container py-4">
+        {% block content %}{% endblock %}
     </main>
-
+    
     <!-- Pie de página -->
-    <footer class="bg-dark text-white py-4 mt-5">
+    <footer class="footer mt-auto py-3 bg-dark text-white">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5>App de Transporte Accesible - Cali</h5>
-                    <p>Una iniciativa para hacer el transporte público más accesible para todos.</p>
+                    <h5>Transporte Accesible Cali</h5>
+                    <p>Sistema de información para el acceso al transporte público en la ciudad de Cali, Colombia.</p>
                 </div>
                 <div class="col-md-3">
-                    <h5>Enlaces</h5>
+                    <h5>Enlaces útiles</h5>
                     <ul class="list-unstyled">
-                        <li><a href="{{ url_for('main.index') }}" class="text-white">Inicio</a></li>
                         <li><a href="{{ url_for('main.ayuda') }}" class="text-white">Ayuda</a></li>
+                        <li><a href="{{ url_for('main.asistente_voz') }}" class="text-white">Asistente de Voz</a></li>
                         <li><a href="#" class="text-white">Contacto</a></li>
+                        <li><a href="#" class="text-white">Política de privacidad</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
-                    <h5>Accesibilidad</h5>
-                    <button id="btnAumentarTexto" class="btn btn-sm btn-outline-light mb-1">
-                        Aumentar texto
-                    </button>
-                    <button id="btnReducirTexto" class="btn btn-sm btn-outline-light mb-1">
-                        Reducir texto
-                    </button>
-                    <button id="btnAltoContraste" class="btn btn-sm btn-outline-light">
-                        Alto contraste
-                    </button>
+                    <h5>Síguenos</h5>
+                    <div class="social-links">
+                        <a href="#" class="text-white me-2" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white me-2" aria-label="Twitter"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-white" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                    </div>
                 </div>
             </div>
-            <hr>
-            <p class="text-center mb-0">&copy; 2025 - App de Transporte Accesible Cali</p>
+            <div class="row mt-3">
+                <div class="col text-center">
+                    <p class="mb-0">&copy; 2025 Transporte Accesible Cali. Todos los derechos reservados.</p>
+                </div>
+            </div>
         </div>
     </footer>
-
-    <!-- JavaScript de Bootstrap y dependencias -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- JavaScript personalizado -->
-    <script src="{{ url_for('static', filename='js/accesibilidad.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/asistente-voz.js') }}"></script>
+    <!-- Panel flotante de herramientas de accesibilidad -->
+    <div class="accessibility-tools-panel">
+        <button class="accessibility-toggle-btn" aria-label="Mostrar herramientas de accesibilidad" id="accessibility-toggle">
+            <i class="bi bi-universal-access"></i>
+        </button>
+        <div class="accessibility-tools-content" id="accessibility-tools-content">
+            <h2 class="h5">Herramientas de accesibilidad</h2>
+            <div class="accessibility-tool-buttons">
+                <button id="accessibility-contrast" class="btn btn-sm btn-outline-primary mb-2 w-100" 
+                        title="Alternar alto contraste" aria-label="Alternar modo alto contraste">
+                    <i class="bi bi-circle-half me-2"></i> Alto contraste
+                </button>
+                <button id="accessibility-text-increase" class="btn btn-sm btn-outline-primary mb-2 w-100" 
+                        title="Aumentar tamaño de texto" aria-label="Aumentar tamaño de texto">
+                    <i class="bi bi-type me-2"></i> Aumentar texto
+                </button>
+                <button id="accessibility-voice-toggle" class="btn btn-sm btn-outline-primary mb-2 w-100" 
+                        title="Silenciar asistente de voz" aria-label="Alternar silencio del asistente de voz">
+                    <i class="bi bi-volume-up me-2"></i> <span id="voice-toggle-text">Silenciar voz</span>
+                </button>
+            </div>
+        </div>
+    </div>
     
-    {% block extra_js %}{% endblock %}
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts adicionales por página -->
+    {% block scripts %}{% endblock %}
 </body>
 </html>

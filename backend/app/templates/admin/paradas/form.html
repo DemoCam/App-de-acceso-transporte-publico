@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% from "_form_helpers.html" import render_field %}
+
+{% block title %}{{ legend }} - Panel de Administración{% endblock %}
+
+{% block content %}
+<main id="main-content" class="container mt-4">
+    <h1 class="mb-4">{{ legend }}</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <fieldset>
+                    <legend class="sr-only">{{ legend }}</legend>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.nombre, class="form-control", placeholder="Ej: Universidades") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.direccion, class="form-control", placeholder="Ej: Calle Principal #123") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.latitud, class="form-control", placeholder="Ej: 3.3744") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.longitud, class="form-control", placeholder="Ej: -76.5302") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ render_field(form.tipo, class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check mt-3">
+                                {{ form.tiene_rampa(class="form-check-input") }}
+                                <label class="form-check-label" for="{{ form.tiene_rampa.id }}">
+                                    Tiene rampa de acceso
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mt-3">
+                                {{ form.tiene_semaforo_sonoro(class="form-check-input") }}
+                                <label class="form-check-label" for="{{ form.tiene_semaforo_sonoro.id }}">
+                                    Tiene semáforo sonoro
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            {{ render_field(form.descripcion, class="form-control", rows=4, placeholder="Descripción detallada de la parada...") }}
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">{{ submit_text|default('Guardar') }}</button>
+                    <a href="{{ url_for('admin.gestionar_paradas') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

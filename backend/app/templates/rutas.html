@@ -1,536 +1,405 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}Rutas de Transporte - {{ super() }}{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Consulta de Rutas</h1>
-
-<div class="row mb-4">
-    <div class="col-md-8">
-        <div class="input-group">
-            <input type="text" id="buscarRuta" class="form-control form-control-lg" 
-                   placeholder="Buscar ruta por número o destino..." 
-                   aria-label="Buscar ruta" aria-describedby="btnBuscarRuta">
-            <button class="btn btn-primary" type="button" id="btnBuscarRuta">
-                <i class="bi bi-search"></i> Buscar
-            </button>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <button id="btnBuscarVoz" class="btn btn-outline-primary btn-lg w-100">
-            <i class="bi bi-mic"></i> Buscar por voz
-        </button>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header">
-        <h2 class="h5 mb-0">Rutas disponibles</h2>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover" id="tablaRutas">
-                <caption>Lista de rutas de transporte público</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Número</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Origen - Destino</th>
-                        <th scope="col">Horario</th>
-                        <th scope="col">Frecuencia</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="rutasResultados">
-                    <tr>
-                        <td colspan="6" class="text-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Cargando...</span>
-                            </div>
-                            <p>Cargando rutas...</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para detalles de ruta -->
-<div class="modal fade" id="modalDetalleRuta" tabindex="-1" aria-labelledby="modalDetalleRutaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalDetalleRutaLabel">Detalles de la Ruta</h3>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+<div class="container py-4">
+    <h1 class="mb-4">Rutas de Transporte Público</h1>
+    
+    <!-- Mensaje Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Filtro y búsqueda -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" class="form-control" id="buscar-ruta" placeholder="Buscar rutas..." aria-label="Buscar rutas">
+                <button class="btn btn-primary" type="button" id="btn-buscar">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
             </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-5" id="detalleRutaContenido">
-                        <!-- Contenido dinámico de información de la ruta -->
+        </div>
+        <div class="col-md-6">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="filtro-rampa" value="rampa">
+                <label class="form-check-label" for="filtro-rampa">Con rampa</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="filtro-audio" value="audio">
+                <label class="form-check-label" for="filtro-audio">Con audio</label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mapa de rutas -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">Mapa de Rutas</h2>
+        </div>
+        <div class="card-body">
+            <div id="mapa-rutas" style="height: 400px;">
+                <!-- El mapa se cargará aquí con JavaScript -->
+                <p class="text-center text-muted py-5">Cargando mapa de rutas...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Listado de rutas -->
+    {% if rutas %}
+    <div class="row row-cols-1 row-cols-md-3 g-4" id="lista-rutas">
+        {% for ruta in rutas %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Ruta {{ ruta.numero }}</h2>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title h5">{{ ruta.nombre }}</h3>
+                    <p class="card-text">
+                        <strong><i class="bi bi-geo-alt-fill text-danger"></i> Origen:</strong> {{ ruta.origen }}<br>
+                        <strong><i class="bi bi-geo-alt text-success"></i> Destino:</strong> {{ ruta.destino }}<br>
+                        <strong><i class="bi bi-clock"></i> Horario:</strong> {{ ruta.hora_inicio.strftime('%H:%M') }} - {{ ruta.hora_fin.strftime('%H:%M') }}<br>
+                        <strong><i class="bi bi-arrow-repeat"></i> Frecuencia:</strong> Cada {{ ruta.frecuencia_minutos }} minutos
+                    </p>
+                    {% if ruta.descripcion %}
+                    <div class="mt-3">
+                        <p class="card-text">{{ ruta.descripcion }}</p>
                     </div>
-                    <div class="col-md-7">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="h5 mb-0">Recorrido de la ruta</h4>
-                            </div>
-                            <div class="card-body p-0">
-                                <div id="mapaRuta" style="height: 400px; background-color: #f0f0f0;">
-                                    <p class="text-center py-5">
-                                        El mapa se cargará al seleccionar una ruta.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('main.detalle_ruta', ruta_id=ruta.id) }}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-info-circle"></i> Ver detalles
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        No se encontraron rutas disponibles.
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal de detalles de ruta (cargado por AJAX) -->
+<div class="modal fade" id="modalDetalleRuta" tabindex="-1" aria-labelledby="modalDetalleRutaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalDetalleRutaLabel">Detalles de la Ruta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="contenidoModalRuta">
+                <!-- Contenido cargado dinámicamente -->
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="btnLeerRuta">
-                    <i class="bi bi-volume-up"></i> Leer información
-                </button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-   crossorigin=""/>
-<style>
-    /* Estilos para la búsqueda por voz */
-    #btnBuscarVoz:focus {
-        outline: 2px solid #007bff;
-    }
-    
-    /* Estilos para el mapa de ruta */
-    #mapaRuta {
-        border: 1px solid #ddd;
-    }
-    
-    .table-responsive {
-        max-height: 300px;
-        overflow-y: auto;
-    }
-    
-    @media (max-width: 768px) {
-        #mapaRuta {
-            height: 250px !important;
-        }
-        
-        /* Ajustar orden de elementos en móvil */
-        .modal-body .row {
-            flex-direction: column-reverse;
-        }
-        
-        .modal-body .col-md-5,
-        .modal-body .col-md-7 {
-            width: 100%;
-        }
-    }
-    
-    /* Mejoras de accesibilidad */
-    .table {
-        margin-bottom: 0;
-    }
-    
-    .alert-info {
-        background-color: #e8f4f8;
-        border-color: #bee5eb;
-    }
-</style>
-{% endblock %}
+{% block scripts %}
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-{% block extra_js %}
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-   crossorigin=""></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar el mapa centrado en Cali
+    const mapCenter = [3.4516, -76.5320]; // Coordenadas de Cali
+    const map = L.map('mapa-rutas').setView(mapCenter, 13);
+    
+    // Añadir capa base de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Objeto para almacenar las líneas de ruta
+    let rutasLayer = L.layerGroup().addTo(map);
+    let rutasData = [];
+    
     // Función para cargar las rutas desde la API
-    async function cargarRutas() {
-        try {
-            const response = await fetch('/api/rutas');
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                mostrarRutas(data.rutas);
-            } else {
-                throw new Error('Error al cargar las rutas');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('rutasResultados').innerHTML = `
-                <tr>
-                    <td colspan="6" class="text-center text-danger">
-                        <p>Error al cargar las rutas. Intente nuevamente más tarde.</p>
-                    </td>
-                </tr>
-            `;
-        }
-    }
-    
-    // Función para mostrar las rutas en la tabla
-    function mostrarRutas(rutas) {
-        const tbody = document.getElementById('rutasResultados');
+    function cargarRutas() {
+        // Limpiar capas existentes
+        rutasLayer.clearLayers();
         
-        if (rutas.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="text-center">
-                        <p>No se encontraron rutas disponibles.</p>
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-        
-        tbody.innerHTML = rutas.map(ruta => `
-            <tr>
-                <td>${ruta.numero}</td>
-                <td>${ruta.nombre}</td>
-                <td>${ruta.origen} - ${ruta.destino}</td>
-                <td>${ruta.hora_inicio} - ${ruta.hora_fin}</td>
-                <td>Cada ${ruta.frecuencia_minutos} min</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-info ver-ruta" 
-                            data-ruta-id="${ruta.id}" 
-                            aria-label="Ver detalles de la ruta ${ruta.numero}">
-                        Ver detalles
-                    </button>
-                </td>
-            </tr>
-        `).join('');
-        
-        // Agregar eventos a los botones de detalle
-        document.querySelectorAll('.ver-ruta').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const rutaId = this.getAttribute('data-ruta-id');
-                mostrarDetalleRuta(rutaId);
-            });
-        });
-    }
-    
-    // Variable global para el mapa de rutas
-    let rutaMap = null;
-    
-    // Función para mostrar el detalle de una ruta
-    async function mostrarDetalleRuta(rutaId) {
-        try {
-            const response = await fetch(`/api/rutas/${rutaId}`);
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                const ruta = data.ruta;
-                const modal = document.getElementById('detalleRutaContenido');
-                
-                // Construir HTML para la información general de la ruta
-                let html = `
-                    <h4 class="mb-3">Ruta ${ruta.numero}: ${ruta.nombre}</h4>
-                    <div class="alert alert-info">
-                        <div class="mb-1"><strong>De:</strong> ${ruta.origen}</div> 
-                        <div><strong>A:</strong> ${ruta.destino}</div>
-                    </div>
-                    <div class="mb-3">
-                        <div><i class="bi bi-clock"></i> <strong>Horario:</strong> ${ruta.hora_inicio} a ${ruta.hora_fin}</div>
-                        <div><i class="bi bi-alarm"></i> <strong>Frecuencia:</strong> Cada ${ruta.frecuencia_minutos} minutos</div>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Descripción:</strong><br>
-                        ${ruta.descripcion || 'No disponible'}
-                    </div>
-                `;
-                
-                // Si hay paradas disponibles
-                if (ruta.paradas && ruta.paradas.length > 0) {
-                    html += `
-                        <h5 class="mt-3">Paradas en esta ruta:</h5>
-                        <div class="table-responsive">
-                            <table class="table table-sm table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Orden</th>
-                                        <th>Nombre</th>
-                                        <th>Accesibilidad</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                    `;
+        // Obtener las rutas desde la API
+        fetch('/api/rutas')
+            .then(response => response.json())
+            .then(datos => {
+                if (datos.status === 'success') {
+                    rutasData = datos.data;
                     
-                    ruta.paradas.forEach(parada => {
-                        html += `
-                            <tr>
-                                <td>${parada.orden || '-'}</td>
-                                <td>
-                                    <strong>${parada.nombre}</strong>
-                                    <div><small>${parada.direccion}</small></div>
-                                </td>
-                                <td>
-                                    ${parada.accesibilidad.rampa ? 
-                                      '<div><i class="bi bi-wheelchair"></i> Rampa</div>' : ''}
-                                    ${parada.accesibilidad.semaforo_sonoro ? 
-                                      '<div><i class="bi bi-volume-up"></i> Semáforo sonoro</div>' : ''}
-                                    ${!parada.accesibilidad.rampa && !parada.accesibilidad.semaforo_sonoro ? 
-                                      '<span class="text-muted">Estándar</span>' : ''}
-                                </td>
-                            </tr>
-                        `;
+                    // Dibujar cada ruta en el mapa
+                    rutasData.forEach(ruta => {
+                        if (ruta.coordenadas && ruta.coordenadas.length > 1) {
+                            const polyline = L.polyline(ruta.coordenadas, {
+                                color: getRandomColor(),
+                                weight: 5,
+                                opacity: 0.7
+                            });
+                            
+                            // Añadir popup con información de la ruta
+                            polyline.bindPopup(`
+                                <div>
+                                    <h5>Ruta ${ruta.numero}</h5>
+                                    <p><strong>${ruta.nombre}</strong></p>
+                                    <p>De ${ruta.origen} a ${ruta.destino}</p>
+                                    <p>Horario: ${ruta.hora_inicio} - ${ruta.hora_fin}</p>
+                                    <a href="/rutas/${ruta.id}" class="btn btn-sm btn-primary">Ver detalles</a>
+                                </div>
+                            `);
+                            
+                            // Guardar datos de accesibilidad para filtrado
+                            polyline.rutaId = ruta.id;
+                            polyline.tieneRampa = ruta.accesibilidad.tiene_rampa;
+                            polyline.tieneAudio = ruta.accesibilidad.tiene_audio;
+                            polyline.rutaNumero = ruta.numero;
+                            polyline.rutaNombre = ruta.nombre;
+                            
+                            // Añadir a la capa de rutas
+                            rutasLayer.addLayer(polyline);
+                        }
                     });
                     
-                    html += `
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="alert alert-warning">
-                            No hay información disponible sobre las paradas en esta ruta.
-                        </div>
-                    `;
-                }
-                
-                modal.innerHTML = html;
-                
-                // Mostrar el modal
-                const modalRuta = new bootstrap.Modal(document.getElementById('modalDetalleRuta'));
-                modalRuta.show();
-                
-                // Una vez que se muestre el modal, inicializar el mapa
-                document.getElementById('modalDetalleRuta').addEventListener('shown.bs.modal', function () {
-                    inicializarMapaRuta(ruta);
-                    
-                    // Configurar el botón de lectura
-                    document.getElementById('btnLeerRuta').onclick = function() {
-                        const infoRuta = `Ruta ${ruta.numero}: ${ruta.nombre}. 
-                                         De ${ruta.origen} a ${ruta.destino}. 
-                                         Horario de ${ruta.hora_inicio} a ${ruta.hora_fin}. 
-                                         Frecuencia cada ${ruta.frecuencia_minutos} minutos. 
-                                         ${ruta.paradas ? 'Esta ruta tiene ' + ruta.paradas.length + ' paradas.' : ''}`;
-                        
-                        if (typeof anunciarMensaje === 'function') {
-                            anunciarMensaje(infoRuta);
+                    // Si no hay coordenadas en las rutas, mostrar mensaje
+                    let rutasConCoordenadas = rutasData.filter(ruta => ruta.coordenadas && ruta.coordenadas.length > 1);
+                    if (rutasConCoordenadas.length === 0) {
+                        // Eliminar spinner/mensaje de carga primero
+                        const mapContainer = document.getElementById('mapa-rutas');
+                        while (mapContainer.firstChild) {
+                            mapContainer.firstChild.remove();
                         }
-                    };
-                }, {once: true});
-            }
-        } catch (error) {
-            console.error('Error al cargar detalles:', error);
-            alert('Error al cargar los detalles de la ruta. Intente nuevamente.');
-        }
+                        
+                        // Añadir mensaje de que no hay rutas trazadas
+                        mapContainer.innerHTML = `
+                            <div class="position-absolute top-50 start-50 translate-middle bg-white p-3 rounded shadow-sm">
+                                <div class="alert alert-info mb-0">
+                                    <i class="bi bi-info-circle me-2"></i> No hay rutas con trazados disponibles en el mapa.
+                                    <br>Los administradores deben dibujar los trazados de ruta.
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    console.error('Error al cargar las rutas:', datos);
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar las rutas:', error);
+                document.getElementById('mapa-rutas').innerHTML = `
+                    <div class="alert alert-danger">
+                        Error al cargar el mapa de rutas. Por favor, intente nuevamente.
+                    </div>
+                `;
+            });
     }
     
-    // Función para inicializar el mapa con la ruta
-    function inicializarMapaRuta(ruta) {
-        // Si ya existe un mapa, lo limpiamos
-        if (rutaMap) {
-            rutaMap.remove();
+    // Función para obtener un color aleatorio para las líneas
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+    
+    // Función para filtrar rutas
+    document.getElementById('btn-buscar').addEventListener('click', filtrarRutas);
+    document.getElementById('buscar-ruta').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            filtrarRutas();
+        }
+    });
+    
+    // Escuchar el evento personalizado smart-search para búsqueda por voz mejorada
+    document.getElementById('buscar-ruta').addEventListener('smart-search', function(e) {
+        if (e.detail && e.detail.type === 'ruta') {
+            // El comando de voz se ha normalizado, solo filtrar
+            filtrarRutas();
+        }
+    });
+    
+    // Eventos para filtros de accesibilidad
+    document.getElementById('filtro-rampa').addEventListener('change', aplicarFiltros);
+    document.getElementById('filtro-audio').addEventListener('change', aplicarFiltros);
+    
+    function filtrarRutas() {
+        let busqueda = document.getElementById('buscar-ruta').value.toLowerCase().trim();
+        const tarjetas = document.querySelectorAll('#lista-rutas .card');
+        
+        // MEJORA: Normalización mejorada de la búsqueda
+        busqueda = busqueda.replace(/\s+/g, ' '); // Normalizar espacios múltiples
+        
+        // Eliminar palabras comunes de comandos de voz
+        const palabrasComunes = ['buscar', 'la', 'ruta', 'encontrar', 'mostrar'];
+        palabrasComunes.forEach(palabra => {
+            busqueda = busqueda.replace(new RegExp('\\b' + palabra + '\\b', 'gi'), '');
+        });
+        
+        busqueda = busqueda.trim();
+        
+        // MEJORA: Eliminar cualquier punto al final (problema común de reconocimiento de voz)
+        busqueda = busqueda.replace(/\.+$/, '');
+        
+        // Normalizar patrones como "A 15", "A-15", "A.15" -> "A15"
+        const rutaPattern = /([a-z])\s*[-\.]\s*(\d+)/gi;
+        busqueda = busqueda.replace(rutaPattern, '$1$2');
+        
+        // También normalizar "A 15" -> "A15"
+        const espacioPattern = /([a-z])\s+(\d+)/gi;
+        busqueda = busqueda.replace(espacioPattern, '$1$2');
+        
+        console.log("Término de búsqueda normalizado:", busqueda);
+        
+        // MEJORA: Variables para seguimiento de coincidencias
+        let encontrados = 0;
+        let sugerencias = [];
+        
+        tarjetas.forEach(tarjeta => {
+            const textoTarjeta = tarjeta.textContent.toLowerCase();
+            const columna = tarjeta.closest('.col');
+            
+            // Normalizar también el texto de la tarjeta para la comparación
+            let textoNormalizado = textoTarjeta;
+            textoNormalizado = textoNormalizado.replace(rutaPattern, '$1$2');
+            textoNormalizado = textoNormalizado.replace(espacioPattern, '$1$2');
+            
+            // MEJORA: Búsqueda más flexible que permite coincidencias parciales
+            if (busqueda === '' || textoNormalizado.includes(busqueda)) {
+                columna.style.display = '';
+                encontrados++;
+            } else {
+                // Si no hay coincidencia exacta, verificar si hay coincidencia parcial
+                // que podría ser útil como sugerencia
+                if (busqueda.length > 1 && 
+                    (textoNormalizado.includes(busqueda.substring(0, busqueda.length-1)) || // Buscar sin el último carácter
+                     busqueda.includes(textoNormalizado.substring(0, 3)))) { // O si la búsqueda contiene el inicio del texto
+                    // Almacenar como sugerencia pero mantener oculto por ahora
+                    sugerencias.push({
+                        texto: tarjeta.querySelector('.card-title')?.textContent.trim() || textoTarjeta,
+                        elemento: columna
+                    });
+                }
+                columna.style.display = 'none';
+            }
+        });
+        
+        // MEJORA: Mensaje mejorado cuando no hay resultados o hay sugerencias
+        const mensajeDiv = document.getElementById('mensaje-resultados') || 
+                          document.createElement('div');
+        
+        if (!document.getElementById('mensaje-resultados')) {
+            mensajeDiv.id = 'mensaje-resultados';
+            mensajeDiv.className = 'alert mt-3';
+            document.querySelector('#lista-rutas').before(mensajeDiv);
         }
         
-        // Inicializar el mapa
-        rutaMap = L.map('mapaRuta').setView([3.4516, -76.5320], 13); // Coordenadas de Cali
+        if (encontrados === 0 && busqueda !== '') {
+            if (sugerencias.length > 0) {
+                // Mostrar sugerencias si hay coincidencias parciales
+                mensajeDiv.className = 'alert alert-info mt-3';
+                let sugerenciasHTML = `<p>No se encontraron rutas para "<strong>${busqueda}</strong>". ¿Quizás buscabas alguna de estas?</p>`;
+                sugerenciasHTML += '<ul class="list-group list-group-flush mb-0 mt-2">';
+                
+                // Mostrar hasta 3 sugerencias
+                const maxSugerencias = Math.min(3, sugerencias.length);
+                for (let i = 0; i < maxSugerencias; i++) {
+                    sugerenciasHTML += `<li class="list-group-item py-1 px-2 border-0">
+                        <a href="#" class="sugerencia-link" data-sugerencia="${sugerencias[i].texto}">${sugerencias[i].texto}</a>
+                    </li>`;
+                }
+                sugerenciasHTML += '</ul>';
+                
+                mensajeDiv.innerHTML = sugerenciasHTML;
+                
+                // Añadir eventos a los enlaces de sugerencias
+                setTimeout(() => {
+                    document.querySelectorAll('.sugerencia-link').forEach(link => {
+                        link.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            document.getElementById('buscar-ruta').value = this.dataset.sugerencia;
+                            filtrarRutas();
+                        });
+                    });
+                }, 100);
+            } else {
+                // Mensaje estándar si no hay sugerencias
+                mensajeDiv.className = 'alert alert-warning mt-3';
+                mensajeDiv.innerHTML = `No se encontraron rutas para "<strong>${busqueda}</strong>". <br>Intente con otro término o verifique el formato (ejemplo: A15).`;
+            }
+            mensajeDiv.style.display = 'block';
+        } else {
+            mensajeDiv.style.display = 'none';
+        }
         
-        // Añadir capa base de OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(rutaMap);
+        // MEJORA: Si no hubo resultados pero sí hay sugerencias, mostrar la primera sugerencia
+        if (encontrados === 0 && sugerencias.length > 0 && busqueda.length > 2) {
+            // Opcional: Mostrar automáticamente la primera sugerencia
+            // (Esto es útil especialmente para búsquedas por voz)
+            if (document.referrer.includes('smart-search')) {
+                sugerencias[0].elemento.style.display = ''; // Mostrar la primera sugerencia
+                encontrados = 1;
+                
+                // Notificar al usuario
+                const audioFeedback = new SpeechSynthesisUtterance(
+                    `No se encontró la ruta exacta ${busqueda}, pero aquí hay una sugerencia similar.`
+                );
+                audioFeedback.lang = 'es-ES';
+                speechSynthesis.speak(audioFeedback);
+            }
+        }
         
-        // Si la ruta tiene paradas, las mostramos en el mapa
-        if (ruta.paradas && ruta.paradas.length > 0) {
-            // Crear un grupo para todos los marcadores
-            const markersGroup = L.featureGroup();
-            
-            // Crear iconos personalizados para diferentes tipos de paradas
-            const iconoParada = L.icon({
-                iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
-                shadowSize: [41, 41]
-            });
-            
-            // Array para almacenar las coordenadas para la línea de ruta
-            const puntosRuta = [];
-            
-            // Añadir marcadores para cada parada
-            ruta.paradas.forEach((parada, index) => {
-                // Añadir al array de puntos de la ruta
-                puntosRuta.push([parada.latitud, parada.longitud]);
+        // Aplicar el mismo filtro al mapa
+        aplicarFiltros();
+    }
+    
+    // Aplicar filtros al mapa
+    function aplicarFiltros() {
+        const busqueda = document.getElementById('buscar-ruta').value.toLowerCase();
+        const filtroRampa = document.getElementById('filtro-rampa').checked;
+        const filtroAudio = document.getElementById('filtro-audio').checked;
+        
+        rutasLayer.eachLayer(layer => {
+            // Solo aplicar a líneas (polylines)
+            if (layer instanceof L.Polyline) {
+                const coincideTexto = layer.rutaNumero.toLowerCase().includes(busqueda) || 
+                                     layer.rutaNombre.toLowerCase().includes(busqueda);
+                const coincideRampa = !filtroRampa || layer.tieneRampa;
+                const coincideAudio = !filtroAudio || layer.tieneAudio;
                 
-                // Crear el marcador
-                const marker = L.marker([parada.latitud, parada.longitud], {
-                    icon: iconoParada,
-                    title: `${index + 1}. ${parada.nombre}`
-                }).addTo(rutaMap);
-                
-                // Contenido del popup
-                marker.bindPopup(`
-                    <strong>${parada.orden ? `${parada.orden}. ` : ''}${parada.nombre}</strong><br>
-                    ${parada.direccion || ''}<br>
-                    ${parada.tiempo_estimado ? `<strong>Tiempo estimado:</strong> ${parada.tiempo_estimado} min<br>` : ''}
-                    <div class="mt-2">
-                        <strong>Accesibilidad:</strong>
-                        ${parada.accesibilidad.rampa ? '<div><span class="text-success">✓</span> Rampa</div>' : '<div><span class="text-secondary">✗</span> Sin rampa</div>'}
-                        ${parada.accesibilidad.semaforo_sonoro ? '<div><span class="text-success">✓</span> Semáforo sonoro</div>' : '<div><span class="text-secondary">✗</span> Sin semáforo sonoro</div>'}
-                    </div>
-                `);
-                
-                // Añadir al grupo
-                markersGroup.addLayer(marker);
-            });
-            
-            // Crear una línea que conecte las paradas
-            const polyline = L.polyline(puntosRuta, {
-                color: '#3388ff',
-                weight: 4,
-                opacity: 0.7,
-                lineJoin: 'round'
-            }).addTo(rutaMap);
-            
-            // Ajustar el mapa para mostrar todas las paradas
-            try {
-                const bounds = markersGroup.getBounds();
-                rutaMap.fitBounds(bounds, {
-                    padding: [50, 50],
-                    maxZoom: 15
-                });
-            } catch (e) {
-                console.error('Error al ajustar el mapa de ruta:', e);
-                
-                // Si hay error, centrar en la primera parada
-                if (ruta.paradas.length > 0) {
-                    rutaMap.setView([ruta.paradas[0].latitud, ruta.paradas[0].longitud], 13);
+                if (coincideTexto && coincideRampa && coincideAudio) {
+                    layer.setStyle({ opacity: 0.7 });
+                    layer.options.interactive = true;
+                } else {
+                    layer.setStyle({ opacity: 0.2 });
+                    layer.options.interactive = false;
                 }
             }
-        } else {
-            // Si no hay paradas, mostrar mensaje en el mapa
-            document.getElementById('mapaRuta').innerHTML = `
-                <div class="text-center py-5">
-                    <p>No hay información de paradas disponible para esta ruta.</p>
-                </div>
-            `;
-        }
+        });
     }
     
     // Cargar las rutas al iniciar
     cargarRutas();
-    
-    // Manejar el evento de búsqueda
-    document.getElementById('btnBuscarRuta').addEventListener('click', function() {
-        const busqueda = document.getElementById('buscarRuta').value.trim().toLowerCase();
-        // Implementar lógica de filtrado (por ahora filtra en el cliente)
-        // En un futuro, esto podría ser una llamada a la API con parámetros de búsqueda
-        
-        // Cargar rutas primero y luego filtrar
-        cargarRutasFiltradas(busqueda);
-    });
-    
-    // Función para cargar rutas filtradas (simulada)
-    async function cargarRutasFiltradas(busqueda) {
-        try {
-            const response = await fetch('/api/rutas');
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                // Filtrar las rutas en el cliente (esto debería hacerse en el servidor idealmente)
-                const rutasFiltradas = data.rutas.filter(ruta => 
-                    ruta.numero.toLowerCase().includes(busqueda) ||
-                    ruta.nombre.toLowerCase().includes(busqueda) ||
-                    ruta.origen.toLowerCase().includes(busqueda) ||
-                    ruta.destino.toLowerCase().includes(busqueda)
-                );
-                
-                mostrarRutas(rutasFiltradas);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-    
-    // Implementación de búsqueda por voz
-    document.getElementById('btnBuscarVoz').addEventListener('click', function() {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            // Crear instancia de reconocimiento de voz
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            
-            // Configurar el reconocimiento
-            recognition.lang = 'es-ES';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-            
-            // Cambiar el botón para indicar que está escuchando
-            const btnVoz = document.getElementById('btnBuscarVoz');
-            btnVoz.innerHTML = '<i class="bi bi-mic-fill"></i> Escuchando...';
-            btnVoz.classList.add('btn-danger');
-            btnVoz.classList.remove('btn-outline-primary');
-            
-            // Anunciar que se está escuchando
-            if (typeof anunciarMensaje === 'function') {
-                anunciarMensaje('Dime el número o destino de la ruta que deseas buscar');
-            }
-            
-            recognition.start();
-            
-            // Manejar resultados
-            recognition.onresult = function(event) {
-                const resultado = event.results[0][0].transcript.trim();
-                
-                // Colocar el resultado en el campo de búsqueda
-                document.getElementById('buscarRuta').value = resultado;
-                
-                // Anunciar el texto reconocido
-                if (typeof anunciarMensaje === 'function') {
-                    anunciarMensaje(`Buscando: ${resultado}`);
-                }
-                
-                // Ejecutar la búsqueda
-                cargarRutasFiltradas(resultado);
-            };
-            
-            // Restaurar el botón cuando se termine
-            recognition.onend = function() {
-                btnVoz.innerHTML = '<i class="bi bi-mic"></i> Buscar por voz';
-                btnVoz.classList.remove('btn-danger');
-                btnVoz.classList.add('btn-outline-primary');
-            };
-            
-            recognition.onerror = function(event) {
-                console.error('Error en el reconocimiento de voz:', event.error);
-                
-                // Restaurar el botón
-                btnVoz.innerHTML = '<i class="bi bi-mic"></i> Buscar por voz';
-                btnVoz.classList.remove('btn-danger');
-                btnVoz.classList.add('btn-outline-primary');
-                
-                // Anunciar error
-                let mensaje = 'Error en el reconocimiento de voz.';
-                
-                if (event.error === 'no-speech') {
-                    mensaje = 'No se detectó ninguna voz. Intenta de nuevo.';
-                } else if (event.error === 'aborted') {
-                    mensaje = 'Reconocimiento de voz cancelado.';
-                } else if (event.error === 'not-allowed') {
-                    mensaje = 'Permiso de micrófono denegado.';
-                }
-                
-                alert(mensaje);
-                
-                if (typeof anunciarMensaje === 'function') {
-                    anunciarMensaje(mensaje);
-                }
-            };
-        } else {
-            alert('Lo sentimos, tu navegador no soporta el reconocimiento de voz.');
-            
-            if (typeof anunciarMensaje === 'function') {
-                anunciarMensaje('Lo sentimos, tu navegador no soporta el reconocimiento de voz.');
-            }
-        }
-    });
 });
 </script>
 {% endblock %}

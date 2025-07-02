@@ -1,148 +1,277 @@
-/* Estilos personalizados para la App de Transporte Accesible Cali */
+/* Estilos principales para la aplicación de Transporte Accesible Cali */
 
-/* Ajustes generales */
-:root {
-    --primary-color: #007bff;
-    --secondary-color: #6c757d;
-    --success-color: #28a745;
-    --info-color: #17a2b8;
-    --warning-color: #ffc107;
-    --danger-color: #dc3545;
-    --light-color: #f8f9fa;
-    --dark-color: #343a40;
-    
-    --focus-color: #80bdff;
-    --focus-width: 0.25rem;
-}
-
+/* Estilos generales */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: #333;
 }
 
-/* Mejoras de accesibilidad */
-a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:focus {
-    outline: var(--focus-width) solid var(--focus-color);
-    outline-offset: 2px;
-}
-
-/* Para el modo de alto contraste */
-body.high-contrast {
-    background-color: #000;
-    color: #fff;
-}
-
-.high-contrast .navbar {
-    background-color: #000 !important;
-    border-bottom: 1px solid #fff;
-}
-
-.high-contrast .card {
-    background-color: #000;
-    border-color: #fff;
-    color: #fff;
-}
-
-.high-contrast a {
-    color: #ffff00;
-}
-
-.high-contrast .btn-primary {
-    background-color: #ffff00;
-    border-color: #ffff00;
-    color: #000;
-}
-
-.high-contrast .table {
-    color: #fff;
-    border-color: #fff;
-}
-
-.high-contrast .table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: #333;
-}
-
-/* Tamaños de texto para accesibilidad */
-body.text-large {
-    font-size: 1.25rem;
-}
-
-body.text-xl {
-    font-size: 1.5rem;
-}
-
-/* Estilos específicos para la navegación */
-.navbar-brand {
-    font-weight: bold;
-}
-
-/* Estilos para tarjetas en la página de inicio */
-.card {
-    transition: transform 0.3s ease;
-    margin-bottom: 1.5rem;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-/* Estilos para botones de accesibilidad */
-.btn-accessibility {
-    margin-bottom: 0.5rem;
-}
-
-/* Estilo para el botón de voz */
-#btnActivarVoz {
-    position: relative;
-    padding-left: 2.5rem;
-}
-
-#btnActivarVoz::before {
-    content: "";
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-
-/* Estilos para los elementos del mapa */
-#mapaParadas {
-    border-radius: 0 0 0.25rem 0.25rem;
-}
-
-.user-marker {
-    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.3);
-}
-
-/* Skip link para navegación por teclado */
+/* Enlace para saltar al contenido principal (accesibilidad) */
 .skip-link {
     position: absolute;
     top: -40px;
     left: 0;
-    background: var(--primary-color);
-    color: white;
     padding: 8px;
-    z-index: 1050;
-    transition: top 0.3s ease;
+    background-color: #0d6efd;
+    color: white;
+    z-index: 100;
+    transition: top 0.3s;
 }
 
 .skip-link:focus {
     top: 0;
 }
 
-/* Aumentar área para touch en dispositivos móviles */
+/* Estilos de accesibilidad */
+body.high-contrast {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+body.high-contrast .navbar {
+    background-color: #000 !important;
+    border-bottom: 2px solid #fff !important;
+}
+
+body.high-contrast .card {
+    background-color: #222 !important;
+    border: 1px solid #fff !important;
+}
+
+body.high-contrast .list-group-item {
+    background-color: #222 !important;
+    color: #fff !important;
+    border-color: #555 !important;
+}
+
+body.high-contrast a {
+    color: #00ffff !important;
+}
+
+body.high-contrast .btn-primary {
+    background-color: #000080 !important;
+    border-color: #fff !important;
+    color: #fff !important;
+}
+
+body.high-contrast .text-muted {
+    color: #ccc !important;
+}
+
+/* Aumentar tamaño de texto */
+body.large-text {
+    font-size: 120% !important;
+}
+
+body.large-text h1 {
+    font-size: 2.5rem !important;
+}
+
+body.large-text h2 {
+    font-size: 2rem !important;
+}
+
+body.large-text .btn {
+    font-size: 1.1rem !important;
+    padding: 0.6rem 1.2rem !important;
+}
+
+body.large-text .form-control {
+    font-size: 1.1rem !important;
+    height: calc(1.5em + 1rem + 2px) !important;
+}
+
+/* Animaciones suaves */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Animaciones reducidas */
+body.reduce-motion * {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Mejoras de foco para navegación por teclado */
+body.using-keyboard a:focus,
+body.using-keyboard button:focus,
+body.using-keyboard input:focus,
+body.using-keyboard select:focus,
+body.using-keyboard textarea:focus {
+    outline: 3px solid #007bff !important;
+    outline-offset: 2px !important;
+    box-shadow: none !important;
+}
+
+.keyboard-focus {
+    outline: 3px solid #007bff !important;
+    outline-offset: 2px !important;
+}
+
+/* Estilos para el mapa */
+.map-container {
+    min-height: 400px;
+    width: 100%;
+}
+
+/* Mejoras de accesibilidad para formularios */
+.form-control:focus, .form-check-input:focus, .btn:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.5);
+    border-color: #86b7fe;
+}
+
+/* Iconos de accesibilidad */
+.accessibility-icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+/* Añadir un borde a las tablas para mejor visualización */
+.table {
+    border: 1px solid #dee2e6;
+}
+
+/* Estilos para los badges de accesibilidad */
+.badge-accessibility {
+    font-size: 0.85em;
+    padding: 0.35em 0.65em;
+}
+
+/* Estilos para el asistente de voz */
+.voice-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: background-color 0.3s;
+}
+
+.voice-btn:hover {
+    background-color: #0069d9;
+}
+
+.voice-output {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    max-width: 300px;
+    padding: 10px 15px;
+    background-color: rgba(0,0,0,0.7);
+    color: white;
+    border-radius: 10px;
+    z-index: 999;
+}
+
+/* Barra de herramientas de accesibilidad */
+.accessibility-toolbar {
+    position: fixed;
+    top: 150px;
+    right: 0;
+    background-color: #007bff;
+    border-radius: 5px 0 0 5px;
+    padding: 10px 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    z-index: 999;
+}
+
+/* Estilos para el panel flotante de accesibilidad */
+.accessibility-tools-panel {
+    position: fixed;
+    bottom: 110px; /* Posicionado encima del botón del asistente de voz */
+    right: 20px;
+    z-index: 1001; /* Superior al del asistente de voz (1000) */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    pointer-events: auto; /* Asegurar que capture eventos */
+}
+
+.accessibility-toggle-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #6c757d; /* Cambiado a gris para diferenciarlo del asistente */
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.4rem;
+    transition: all 0.3s ease;
+}
+
+.accessibility-toggle-btn:hover, .accessibility-toggle-btn:focus {
+    background-color: #0b5ed7;
+    transform: scale(1.05);
+}
+
+.accessibility-tools-content {
+    position: absolute;
+    bottom: 60px; /* Panel aparece encima del botón de accesibilidad */
+    right: 0;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    width: 220px;
+    display: none;
+    z-index: 1002; /* Superior al del panel y botones */
+    pointer-events: auto; /* Asegurar que capture eventos */
+    cursor: default; /* Evitar cursor de puntero en todo el panel */
+}
+
+body.high-contrast .accessibility-tools-content {
+    background-color: #222;
+    border: 1px solid #fff;
+}
+
+.accessibility-tools-content h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 8px;
+}
+
+.accessibility-tools-content.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive design */
 @media (max-width: 768px) {
-    .nav-link, .btn, .form-control {
-        padding: 0.75rem 1rem;
-    }
-    
-    /* Mayor contraste en textos para móvil */
-    body {
-        font-weight: 500;
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }

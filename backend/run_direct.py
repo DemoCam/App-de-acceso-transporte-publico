@@ -1,26 +1,28 @@
-"""
-Script simplificado para ejecutar la aplicación Flask directamente
-sin depender de variables de entorno.
-"""
 import os
-from dotenv import load_dotenv
+# Establecer la variable de entorno SECRET_KEY directamente antes de importar la app
+os.environ['SECRET_KEY'] = 'clave-super-secreta-definida-en-run-direct-py-2025'
 
-# Cargar variables de entorno
-load_dotenv()
+import sys
+from pathlib import Path
 
-# Importar la aplicación
+# Asegurarse de que la ruta al proyecto esté en sys.path
+project_root = Path(__file__).parent.absolute()
+sys.path.insert(0, str(project_root))
+
 from app import create_app
 
 app = create_app()
 
+# Verificación explícita de la clave secreta
+if not app.secret_key:
+    print("ADVERTENCIA: La clave secreta no está configurada. Configurando una clave por defecto.")
+    app.secret_key = os.urandom(24)
+else:
+    print(f"Clave secreta configurada correctamente. Longitud: {len(app.secret_key)} bytes")
+
+# Verificar la ubicación de las plantillas
+print(f"Directorio de plantillas: {app.template_folder}")
+print(f"Directorios de búsqueda: {app.jinja_loader.searchpath}")
+
 if __name__ == '__main__':
-    # Imprimir información útil
-    print("Iniciando la aplicación...")
-    print(f"URL de base de datos: {app.config.get('SQLALCHEMY_DATABASE_URI', 'No configurada')}")
-    print(f"Blueprints registrados: {[bp.name for bp in app.blueprints.values()]}")
-    print(f"Rutas disponibles:")
-    for rule in app.url_map.iter_rules():
-        print(f"  {rule.endpoint} -> {rule.rule}")
-    
-    # Ejecutar la aplicación
-    app.run(debug=True, port=5000)
+    app.run(debug=True)

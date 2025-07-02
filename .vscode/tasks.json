@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"args": [],
+			"command": "cd backend && python run.py",
+			"group": "build",
+			"isBackground": true,
+			"label": "Ejecutar aplicación Flask",
+			"problemMatcher": [],
+			"type": "shell"
+		}
+	]
+}

@@ -48,6 +48,22 @@ def create_tables(cursor):
     """
     Crea las tablas necesarias para la aplicación
     """
+    # Tabla de usuarios
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS usuarios (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(64) UNIQUE NOT NULL,
+        email VARCHAR(120) UNIQUE NOT NULL,
+        nombre VARCHAR(64) NOT NULL,
+        apellido VARCHAR(64) NOT NULL,
+        password_hash VARCHAR(128) NOT NULL,
+        rol VARCHAR(20) DEFAULT 'usuario',
+        activo BOOLEAN DEFAULT TRUE,
+        fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
+        fecha_ultimo_acceso DATETIME
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    """)
+    
     # Tabla de rutas
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS rutas (
@@ -59,7 +75,12 @@ def create_tables(cursor):
         hora_inicio TIME NOT NULL,
         hora_fin TIME NOT NULL,
         frecuencia_minutos INT DEFAULT 15,
-        descripcion TEXT
+        descripcion TEXT,
+        activa BOOLEAN DEFAULT TRUE,
+        tiene_rampa BOOLEAN DEFAULT FALSE,
+        tiene_audio BOOLEAN DEFAULT FALSE,
+        tiene_espacio_silla BOOLEAN DEFAULT FALSE,
+        tiene_indicador_visual BOOLEAN DEFAULT FALSE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """)
     

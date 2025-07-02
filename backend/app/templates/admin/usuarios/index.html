@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% from "_form_helpers.html" import render_field %}
+
+{% block title %}Gestionar Usuarios - Panel de Administración{% endblock %}
+
+{% block content %}
+<main id="main-content" class="container mt-4">
+    <h1 class="mb-4">Gestionar Usuarios</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Filtros y Búsqueda
+        </div>
+        <div class="card-body">
+            <form method="get" action="{{ url_for('admin.gestionar_usuarios') }}" class="form-inline">
+                <div class="form-group mr-2">
+                    <label for="q" class="sr-only">Buscar</label>
+                    <input type="text" name="q" id="q" class="form-control" placeholder="Buscar por nombre o email" value="{{ request.args.get('q', '') }}">
+                </div>
+                <div class="form-group mr-2">
+                    <label for="rol" class="sr-only">Rol</label>
+                    <select name="rol" id="rol" class="form-control">
+                        <option value="">Todos los roles</option>
+                        <option value="admin" {% if request.args.get('rol') == 'admin' %}selected{% endif %}>Administrador</option>
+                        <option value="usuario" {% if request.args.get('rol') == 'usuario' %}selected{% endif %}>Usuario</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary mr-2">Filtrar</button>
+                <a href="{{ url_for('admin.gestionar_usuarios') }}" class="btn btn-secondary">Limpiar filtros</a>
+            </form>
+        </div>
+    </div>
+
+    <a href="{{ url_for('admin.crear_usuario') }}" class="btn btn-success mb-3">
+        <span class="fas fa-plus"></span> Crear Nuevo Usuario
+    </a>
+
+    {% if request.args.get('q') or request.args.get('rol') %}
+    <div class="alert alert-info">
+        Mostrando resultados 
+        {% if request.args.get('q') %}para la búsqueda: <strong>"{{ request.args.get('q') }}"</strong>{% endif %}
+        {% if request.args.get('q') and request.args.get('rol') %} y {% endif %}
+        {% if request.args.get('rol') %}con rol: <strong>{{ request.args.get('rol') }}</strong>{% endif %}
+        <a href="{{ url_for('admin.gestionar_usuarios') }}" class="btn btn-sm btn-outline-secondary ml-2">Limpiar filtros</a>
+    </div>
+    {% endif %}
+
+    {% if usuarios.items %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <caption class="sr-only">Lista de usuarios registrados en el sistema</caption>
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nombre de Usuario</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Rol</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios.items %}
+                <tr>
+                    <td>{{ usuario.id }}</td>
+                    <td>{{ usuario.username }}</td>
+                    <td>{{ usuario.email }}</td>
+                    <td><span class="badge badge-{{ 'primary' if usuario.rol == 'admin' else 'secondary' }}">{{ usuario.rol }}</span></td>
+                    <td>
+                        <a href="{{ url_for('admin.editar_usuario', id=usuario.id) }}" class="btn btn-sm btn-warning" aria-label="Editar usuario {{ usuario.username }}">
+                            <span class="fas fa-edit"></span> Editar
+                        </a>
+                        <form action="{{ url_for('admin.eliminar_usuario', id=usuario.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a este usuario?');">
+                            <button type="submit" class="btn btn-sm btn-danger" aria-label="Eliminar usuario {{ usuario.username }}">
+                                <span class="fas fa-trash"></span> Eliminar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Navegación de páginas de usuarios">
+        <ul class="pagination">
+            {% if usuarios.has_prev %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('admin.gestionar_usuarios', page=usuarios.prev_num, q=request.args.get('q', ''), rol=request.args.get('rol', '')) }}">Anterior</a></li>
+            {% endif %}
+            {% for page_num in usuarios.iter_pages() %}
+                {% if page_num %}
+                    <li class="page-item {% if usuarios.page == page_num %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('admin.gestionar_usuarios', page=page_num, q=request.args.get('q', ''), rol=request.args.get('rol', '')) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if usuarios.has_next %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('admin.gestionar_usuarios', page=usuarios.next_num, q=request.args.get('q', ''), rol=request.args.get('rol', '')) }}">Siguiente</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    {% else %}
+    <div class="alert alert-info">
+        No se encontraron usuarios.
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

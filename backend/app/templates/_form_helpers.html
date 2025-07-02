@@ -1,0 +1,28 @@
+{% macro render_field(field, label_visible=true) %}
+  <div class="form-group mb-3">
+    {% if label_visible %}
+      {{ field.label(class="form-label") }}
+    {% else %}
+      {{ field.label(class="sr-only") }}
+    {% endif %}
+
+    {% set css_class = 'form-control ' + kwargs.pop('class', '') %}
+    {% if field.errors %}
+      {% set css_class = css_class + ' is-invalid' %}
+    {% endif %}
+
+    {{ field(class=css_class, **kwargs) }}
+
+    {% if field.errors %}
+      <div class="invalid-feedback">
+        {% for error in field.errors %}
+          <span>{{ error }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if field.description %}
+        <small class="form-text text-muted">{{ field.description }}</small>
+    {% endif %}
+  </div>
+{% endmacro %}

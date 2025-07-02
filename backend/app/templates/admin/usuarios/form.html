@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_form_helpers.html" import render_field %}
+
+{% block title %}{{ legend }} - Panel de Administración{% endblock %}
+
+{% block content %}
+<main id="main-content" class="container mt-4">
+    <h1 class="mb-4">{{ legend }}</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <fieldset>
+                    <legend class="sr-only">{{ legend }}</legend>
+                    {{ render_field(form.username, class="form-control", placeholder="Ej: juan.perez") }}
+                    {{ render_field(form.email, class="form-control", placeholder="Ej: juan.perez@example.com") }}
+                    {{ render_field(form.nombre, class="form-control", placeholder="Ej: Juan") }}
+                    {{ render_field(form.apellido, class="form-control", placeholder="Ej: Pérez") }}
+                    {{ render_field(form.role, class="form-control") }}
+                    {{ render_field(form.is_active, class="form-check-input") }}
+                    
+                    {% if not usuario %}
+                        {{ render_field(form.password, class="form-control") }}
+                        {{ render_field(form.password2, class="form-control") }}
+                    {% else %}
+                        {{ render_field(form.password, class="form-control", placeholder="Dejar vacío para mantener la contraseña actual") }}
+                        {{ render_field(form.password2, class="form-control", placeholder="Confirmar nueva contraseña") }}
+                    {% endif %}
+
+                </fieldset>
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
+                    <a href="{{ url_for('admin.gestionar_usuarios') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

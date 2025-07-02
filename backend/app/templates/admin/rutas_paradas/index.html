@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% from "_form_helpers.html" import render_field %}
+
+{% block title %}Gestionar Asociación de Rutas y Paradas - Panel de Administración{% endblock %}
+
+{% block content %}
+<main id="main-content" class="container mt-4">
+    <h1 class="mb-4">Asociación de Rutas y Paradas</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Filtros
+        </div>
+        <div class="card-body">
+            <form method="get" action="{{ url_for('admin.gestionar_rutas_paradas') }}" class="form-inline">
+                <div class="form-group mr-2">
+                    <label for="ruta_id">Filtrar por Ruta</label>
+                    <select name="ruta_id" id="ruta_id" class="form-control" onchange="this.form.submit()">
+                        <option value="">Todas las rutas</option>
+                        {% for ruta in rutas %}
+                            <option value="{{ ruta.id }}" {% if ruta.id|string == request.args.get('ruta_id') %}selected{% endif %}>{{ ruta.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <a href="{{ url_for('admin.crear_ruta_parada') }}" class="btn btn-success mb-3">
+        <span class="fas fa-plus"></span> Nueva Asociación
+    </a>
+
+    {% if rutas_paradas.items %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <caption class="sr-only">Lista de asociaciones entre rutas y paradas</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Ruta</th>
+                    <th scope="col">Parada</th>
+                    <th scope="col">Orden</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rp in rutas_paradas.items %}
+                <tr>
+                    <td>{{ rp.ruta.nombre }}</td>
+                    <td>{{ rp.parada.nombre }}</td>
+                    <td>{{ rp.orden }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.editar_ruta_parada', ruta_id=rp.ruta_id, parada_id=rp.parada_id) }}" class="btn btn-sm btn-warning" aria-label="Editar asociación de la ruta {{ rp.ruta.nombre }} con la parada {{ rp.parada.nombre }}">
+                            <span class="fas fa-edit"></span> Editar
+                        </a>
+                        <form action="{{ url_for('admin.eliminar_ruta_parada', ruta_id=rp.ruta_id, parada_id=rp.parada_id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta asociación?');">
+                            <button type="submit" class="btn btn-sm btn-danger" aria-label="Eliminar asociación de la ruta {{ rp.ruta.nombre }} con la parada {{ rp.parada.nombre }}">
+                                <span class="fas fa-trash"></span> Eliminar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Navegación de páginas de asociaciones">
+        <ul class="pagination">
+            {% if rutas_paradas.has_prev %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('admin.gestionar_rutas_paradas', page=rutas_paradas.prev_num, ruta_id=request.args.get('ruta_id', '')) }}">Anterior</a></li>
+            {% endif %}
+            {% for page_num in rutas_paradas.iter_pages() %}
+                {% if page_num %}
+                    <li class="page-item {% if rutas_paradas.page == page_num %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('admin.gestionar_rutas_paradas', page=page_num, ruta_id=request.args.get('ruta_id', '')) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if rutas_paradas.has_next %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('admin.gestionar_rutas_paradas', page=rutas_paradas.next_num, ruta_id=request.args.get('ruta_id', '')) }}">Siguiente</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    {% else %}
+    <div class="alert alert-info">
+        No se encontraron asociaciones para la ruta seleccionada.
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

@@ -1,61 +1,77 @@
 """
-Script para solucionar el problema de SQLAlchemy
+Script para arreglar la estructura de la base de datos después de cambios en los modelos.
+Útil cuando aparecen errores como "Unknown column" al agregar nuevos campos sin usar migraciones.
 """
-import subprocess
+
+import os
 import sys
-import time
+from app import create_app, db
+from sqlalchemy import text
 
-def run_command(command):
-    """Ejecuta un comando y muestra la salida"""
-    print(f"\n> Ejecutando: {command}")
-    result = subprocess.run(command, shell=True, text=True, capture_output=True)
-    print(result.stdout)
-    if result.stderr:
-        print(f"ERRORES: {result.stderr}")
-    return result.returncode == 0
+# Asegurarse de que la SECRET_KEY esté definida
+os.environ['SECRET_KEY'] = 'clave-super-secreta-definida-en-fix-script'
 
-def main():
-    """Soluciona el problema de SQLAlchemy"""
-    print("=== Solucionador de problemas con SQLAlchemy ===")
-    
-    # 1. Comprobar la versión de pip
-    print("\n1. Comprobando versión de pip...")
-    run_command("pip --version")
-    
-    # 2. Desinstalar paquetes relacionados con SQLAlchemy
-    print("\n2. Desinstalando paquetes conflictivos...")
-    run_command("pip uninstall -y sqlalchemy")
-    run_command("pip uninstall -y flask-sqlalchemy")
-    
-    # 3. Instalar versiones específicas compatibles
-    print("\n3. Instalando versiones compatibles...")
-    run_command("pip install sqlalchemy==1.4.46")
-    run_command("pip install flask-sqlalchemy==2.5.1")
-    
-    # 4. Verificar instalación
-    print("\n4. Verificando instalación...")
-    run_command("pip list | findstr sqlalchemy")
-    
-    # 5. Probar importación
-    print("\n5. Probando importación de SQLAlchemy...")
-    try:
-        import sqlalchemy
-        print(f"SQLAlchemy instalado correctamente, versión: {sqlalchemy.__version__}")
+def add_missing_columns():
+    """
+    Añade las columnas que faltan a la tabla de rutas para solucionar el error
+    'Unknown column' cuando se han añadido nuevos campos al modelo Ruta.
+    """
+    app = create_app()
+    with app.app_context():
+        # Verificamos si las columnas ya existen
+        try:
+            with db.engine.connect() as connection:
+                # Verificar si la columna 'activa' existe
+                result = connection.execute(text("SHOW COLUMNS FROM rutas LIKE 'activa'"))
+                activa_exists = result.fetchone() is not None
+                
+                # Verificar si la columna 'tiene_rampa' existe
+                result = connection.execute(text("SHOW COLUMNS FROM rutas LIKE 'tiene_rampa'"))
+                tiene_rampa_exists = result.fetchone() is not None
+                
+                # Verificar si la columna 'tiene_audio' existe
+                result = connection.execute(text("SHOW COLUMNS FROM rutas LIKE 'tiene_audio'"))
+                tiene_audio_exists = result.fetchone() is not None
+                
+                # Verificar si la columna 'tiene_espacio_silla' existe
+                result = connection.execute(text("SHOW COLUMNS FROM rutas LIKE 'tiene_espacio_silla'"))
+                tiene_espacio_silla_exists = result.fetchone() is not None
+                
+                # Verificar si la columna 'tiene_indicador_visual' existe
+                result = connection.execute(text("SHOW COLUMNS FROM rutas LIKE 'tiene_indicador_visual'"))
+                tiene_indicador_visual_exists = result.fetchone() is not None
+                
+                # Añadir las columnas que faltan
+                if not activa_exists:
+                    print("Añadiendo columna 'activa' a la tabla rutas...")
+                    connection.execute(text("ALTER TABLE rutas ADD COLUMN activa TINYINT(1) DEFAULT 1;"))
+                
+                if not tiene_rampa_exists:
+                    print("Añadiendo columna 'tiene_rampa' a la tabla rutas...")
+                    connection.execute(text("ALTER TABLE rutas ADD COLUMN tiene_rampa TINYINT(1) DEFAULT 0;"))
+                
+                if not tiene_audio_exists:
+                    print("Añadiendo columna 'tiene_audio' a la tabla rutas...")
+                    connection.execute(text("ALTER TABLE rutas ADD COLUMN tiene_audio TINYINT(1) DEFAULT 0;"))
+                
+                if not tiene_espacio_silla_exists:
+                    print("Añadiendo columna 'tiene_espacio_silla' a la tabla rutas...")
+                    connection.execute(text("ALTER TABLE rutas ADD COLUMN tiene_espacio_silla TINYINT(1) DEFAULT 0;"))
+                
+                if not tiene_indicador_visual_exists:
+                    print("Añadiendo columna 'tiene_indicador_visual' a la tabla rutas...")
+                    connection.execute(text("ALTER TABLE rutas ADD COLUMN tiene_indicador_visual TINYINT(1) DEFAULT 0;"))
+                
+                # Confirmar los cambios
+                connection.commit()
+                
+            print("¡Base de datos actualizada con éxito!")
         
-        import flask_sqlalchemy
-        print(f"Flask-SQLAlchemy instalado correctamente")
-        
-        return True
-    except Exception as e:
-        print(f"Error al importar SQLAlchemy: {e}")
-        return False
+        except Exception as e:
+            print(f"Error al actualizar la base de datos: {e}")
+            sys.exit(1)
 
 if __name__ == "__main__":
-    success = main()
-    if success:
-        print("\n✅ Problema resuelto. Ahora puedes ejecutar la aplicación con 'python run_direct.py'")
-    else:
-        print("\n❌ No se pudo resolver el problema automáticamente.")
-    
-    # Mantener la consola abierta
-    input("\nPresiona Enter para salir...")
+    print("Actualizando la estructura de la base de datos...")
+    add_missing_columns()
+    print("Proceso completado.")

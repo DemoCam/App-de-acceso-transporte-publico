@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel de Administración - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <h1 class="h3 mb-4">Panel de Administración</h1>
+    
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <!-- Menú lateral de administración -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Menú de Administración</h2>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('admin.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center active">
+                        <span><i class="bi bi-speedometer2 me-2"></i> Dashboard</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_rutas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-signpost-2 me-2"></i> Gestión de Rutas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_paradas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-geo-alt me-2"></i> Gestión de Paradas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_rutas_paradas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-link-45deg me-2"></i> Rutas y Paradas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_usuarios') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-people me-2"></i> Gestión de Usuarios</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.importar_datos') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-upload me-2"></i> Importar Datos</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('main.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-house me-2"></i> Volver al Inicio</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="col-md-9">
+            <!-- Estadísticas -->
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Rutas</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_rutas }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-signpost-2 fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Paradas</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_paradas }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-geo-alt fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Usuarios</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_usuarios }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-people fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Últimas rutas -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Últimas Rutas</h6>
+                    <a href="{{ url_for('admin.gestionar_rutas') }}" class="btn btn-sm btn-primary">Ver Todas</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Número</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Origen - Destino</th>
+                                    <th scope="col">Horario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ruta in ultimas_rutas %}
+                                <tr>
+                                    <td>{{ ruta.numero }}</td>
+                                    <td>{{ ruta.nombre }}</td>
+                                    <td>{{ ruta.origen }} - {{ ruta.destino }}</td>
+                                    <td>{{ ruta.hora_inicio.strftime('%H:%M') }} - {{ ruta.hora_fin.strftime('%H:%M') }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No hay rutas registradas.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Últimas paradas -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Últimas Paradas</h6>
+                    <a href="{{ url_for('admin.gestionar_paradas') }}" class="btn btn-sm btn-primary">Ver Todas</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Dirección</th>
+                                    <th scope="col">Tipo</th>
+                                    <th scope="col">Accesibilidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for parada in ultimas_paradas %}
+                                <tr>
+                                    <td>{{ parada.nombre }}</td>
+                                    <td>{{ parada.direccion }}</td>
+                                    <td>{{ parada.tipo|title }}</td>
+                                    <td>
+                                        {% if parada.tiene_rampa %}
+                                            <span class="badge bg-success">Rampa</span>
+                                        {% endif %}
+                                        {% if parada.tiene_semaforo_sonoro %}
+                                            <span class="badge bg-info">Semáforo Sonoro</span>
+                                        {% endif %}
+                                        {% if not parada.tiene_rampa and not parada.tiene_semaforo_sonoro %}
+                                            <span class="badge bg-warning">Estándar</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No hay paradas registradas.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

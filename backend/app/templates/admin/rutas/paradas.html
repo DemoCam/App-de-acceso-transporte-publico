@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Paradas de la Ruta {{ ruta.nombre }} - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Paradas de la Ruta {{ ruta.numero }} - {{ ruta.nombre }}</h1>
+        <div>
+            <a href="{{ url_for('admin.gestionar_rutas') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a Rutas
+            </a>
+            <a href="{{ url_for('admin.gestionar_rutas_paradas') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Asociar Parada
+            </a>
+        </div>
+    </div>
+    
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <!-- Menú lateral de administración -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Menú de Administración</h2>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('admin.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-speedometer2 me-2"></i> Dashboard</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_rutas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center active">
+                        <span><i class="bi bi-signpost-2 me-2"></i> Gestión de Rutas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_paradas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-geo-alt me-2"></i> Gestión de Paradas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_rutas_paradas') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-link-45deg me-2"></i> Rutas y Paradas</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('admin.gestionar_usuarios') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-people me-2"></i> Gestión de Usuarios</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{{ url_for('main.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-house me-2"></i> Volver al Inicio</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="col-md-9">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Paradas en esta ruta</h6>
+                </div>
+                <div class="card-body">
+                    {% if paradas %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="paradasTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Orden</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Dirección</th>
+                                    <th scope="col">Accesible</th>
+                                    <th scope="col" style="width: 150px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for parada in paradas %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ parada.nombre }}</td>
+                                    <td>{{ parada.direccion }}</td>
+                                    <td>
+                                        {% if parada.es_accesible %}
+                                        <span class="badge bg-success">Sí</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">No</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% for ruta_parada in parada.ruta_paradas %}
+                                            {% if ruta_parada.ruta_id == ruta.id %}
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('admin.editar_ruta_parada', ruta_id=ruta.id, parada_id=parada.id) }}" 
+                                                   class="btn btn-primary btn-sm" 
+                                                   title="Editar asociación">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <form action="{{ url_for('admin.eliminar_ruta_parada', ruta_id=ruta.id, parada_id=parada.id) }}" method="POST"
+                                                      onsubmit="return confirm('¿Estás seguro de eliminar esta parada de la ruta?');">
+                                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar de la ruta">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No hay paradas asociadas a esta ruta.
+                        <a href="{{ url_for('admin.gestionar_rutas_paradas') }}" class="alert-link">Asociar paradas ahora</a>.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar DataTable para ordenar y filtrar paradas si hay más de 10
+        if (document.getElementById('paradasTable') && document.querySelectorAll('#paradasTable tbody tr').length > 10) {
+            $('#paradasTable').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
+                },
+                order: [[0, 'asc']]
+            });
+        }
+    });
+</script>
+{% endblock %}

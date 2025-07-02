@@ -1,573 +1,610 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}Paradas de Transporte - {{ super() }}{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Paradas Cercanas</h1>
-
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h2 class="h5 mb-0">Tu ubicación</h2>
-            </div>
-            <div class="card-body">
-                <p id="ubicacionActual">Obteniendo ubicación...</p>
-                
-                <button id="btnObtenerUbicacion" class="btn btn-primary">
-                    <i class="bi bi-geo-alt"></i> Actualizar mi ubicación
-                </button>
-                
-                <div class="mt-3">
-                    <label for="direccionBusqueda" class="form-label">O busca una dirección:</label>
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="direccionBusqueda" 
-                               placeholder="Ej: Calle 5 #34-20">
-                        <button class="btn btn-outline-secondary" type="button" id="btnBuscarDireccion">Buscar</button>
-                    </div>
+<div class="container py-4">
+    <h1 class="mb-4">Paradas de Transporte Público</h1>
+    
+    <!-- Mensaje Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Filtro y búsqueda -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="input-group">
+                <input type="text" class="form-control" id="buscar-parada" placeholder="Buscar paradas..." aria-label="Buscar paradas">
+                <button class="btn btn-primary" type="button" id="btn-buscar">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="filtro-rampa" value="rampa">
+                <label class="form-check-label" for="filtro-rampa">Con rampa</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="filtro-semaforo" value="semaforo">
+                <label class="form-check-label" for="filtro-semaforo">Con semáforo sonoro</label>
             </div>
         </div>
     </div>
     
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header">
-                <h2 class="h5 mb-0">Opciones de búsqueda</h2>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <label for="distanciaMaxima" class="form-label">Distancia máxima:</label>
-                    <select class="form-select" id="distanciaMaxima" aria-describedby="distanciaHelp">
-                        <option value="300">300 metros</option>
-                        <option value="500" selected>500 metros</option>
-                        <option value="1000">1 kilómetro</option>
-                        <option value="2000">2 kilómetros</option>
-                    </select>
-                    <div id="distanciaHelp" class="form-text">Distancia máxima para buscar paradas desde tu ubicación</div>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="filtroRuta" class="form-label">Filtrar por ruta (opcional):</label>
-                    <input type="text" class="form-control" id="filtroRuta" placeholder="Ej: T31, P10..." 
-                           aria-describedby="rutaHelp" list="rutasSugeridas">
-                    <datalist id="rutasSugeridas">
-                        <!-- Las opciones se cargarán dinámicamente -->
-                    </datalist>
-                    <div id="rutaHelp" class="form-text">Ingresa el número de la ruta para filtrar resultados</div>
-                </div>
-                
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="filtroAccesibilidad">
-                        <label class="form-check-label" for="filtroAccesibilidad">
-                            Solo paradas con accesibilidad (rampa o semáforo sonoro)
-                        </label>
-                    </div>
-                </div>
-                
-                <button id="btnBuscarParadas" class="btn btn-success w-100 mt-2">
-                    <i class="bi bi-search"></i> Buscar paradas cercanas
-                </button>
+    <!-- Mapa de paradas -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">Mapa de Paradas</h2>
+        </div>
+        <div class="card-body">
+            <div id="mapa-paradas" style="height: 400px;">
+                <!-- El mapa se cargará aquí con JavaScript -->
+                <p class="text-center text-muted py-5">Cargando mapa de paradas...</p>
             </div>
         </div>
     </div>
+    
+    <!-- Listado de paradas -->
+    {% if paradas %}
+    <h2 class="h4 mb-3">Lista de Paradas</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover" id="tabla-paradas">
+            <caption class="sr-only">Lista de paradas de transporte público</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Dirección</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Accesibilidad</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for parada in paradas %}
+                <tr class="fila-parada" 
+                    data-rampa="{{ 'true' if parada.tiene_rampa else 'false' }}"
+                    data-semaforo="{{ 'true' if parada.tiene_semaforo_sonoro else 'false' }}">
+                    <td>{{ parada.nombre }}</td>
+                    <td>{{ parada.direccion }}</td>
+                    <td>{{ parada.tipo|capitalize }}</td>
+                    <td>
+                        {% if parada.tiene_rampa %}
+                            <span class="badge bg-success me-1" title="Tiene rampa">
+                                <i class="bi bi-arrow-up-right"></i> Rampa
+                            </span>
+                        {% endif %}
+                        {% if parada.tiene_semaforo_sonoro %}
+                            <span class="badge bg-info" title="Tiene semáforo sonoro">
+                                <i class="bi bi-volume-up"></i> Semáforo sonoro
+                            </span>
+                        {% endif %}
+                        {% if not parada.tiene_rampa and not parada.tiene_semaforo_sonoro %}
+                            <span class="badge bg-secondary">Estándar</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Acciones para la parada">
+                            <a href="{{ url_for('main.detalle_parada', parada_id=parada.id) }}" class="btn btn-primary" title="Ver detalles">
+                                <i class="bi bi-info-circle"></i> Detalles
+                            </a>
+                            <button type="button" class="btn btn-outline-primary ver-parada" 
+                                    data-id="{{ parada.id }}" data-lat="{{ parada.latitud }}" data-lng="{{ parada.longitud }}">
+                                <i class="bi bi-geo-alt"></i> Ver en mapa
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        No se encontraron paradas disponibles.
+    </div>
+    {% endif %}
 </div>
 
-<!-- Mapa de ubicación (será implementado con Leaflet.js) -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h2 class="h5 mb-0">Mapa de ubicación</h2>
-    </div>
-    <div class="card-body p-0">
-        <div id="mapaParadas" style="height: 400px; background-color: #f0f0f0;">
-            <p class="text-center py-5">
-                El mapa se cargará al obtener tu ubicación.
-            </p>
-        </div>
-    </div>
-</div>
-
-<!-- Lista de paradas cercanas -->
-<div class="card">
-    <div class="card-header">
-        <h2 class="h5 mb-0">Paradas cercanas</h2>
-    </div>
-    <div class="card-body">
-        <div id="paradasCercanas">
-            <p class="text-center">
-                Haz clic en "Buscar paradas cercanas" para ver las paradas próximas a tu ubicación.
-            </p>
+<!-- Modal de detalles de parada -->
+<div class="modal fade" id="modalDetalleParada" tabindex="-1" aria-labelledby="modalDetalleParadaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalDetalleParadaLabel">Detalle de la Parada</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div id="mapa-detalle-parada" style="height: 300px;"></div>
+                <div id="info-detalle-parada" class="mt-3">
+                    <!-- Información cargada dinámicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-   crossorigin=""/>
-<style>
-    /* Estilos personalizados para los marcadores */
-    .parada-terminal .leaflet-marker-icon {
-        filter: hue-rotate(0deg);
-    }
-    
-    .parada-estacion .leaflet-marker-icon {
-        filter: hue-rotate(220deg);
-    }
-    
-    .parada-regular .leaflet-marker-icon {
-        filter: hue-rotate(120deg);
-    }
-    
-    /* Estilos para la lista de paradas */
-    .paradas-lista .list-group-item:focus {
-        outline: 2px solid #007bff;
-    }
-    
-    .rutas-container {
-        max-width: 100%;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-    
-    /* Estilos para el popup del mapa */
-    .popup-parada {
-        max-width: 300px;
-    }
-    
-    .rutas-chip {
-        margin-top: 4px;
-        max-width: 100%;
-        overflow-x: auto;
-        white-space: nowrap;
-        padding-bottom: 4px;
-    }
-    
-    /* Ajustes para accesibilidad */
-    .badge {
-        font-size: 0.9em;
-    }
-    
-    #mapaParadas {
-        border: 1px solid #ddd;
-    }
-    
-    @media (max-width: 768px) {
-        #mapaParadas {
-            height: 300px !important;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-   crossorigin=""></script>
+{% block scripts %}
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let map, userMarker;
-    let userPosition = null;
+    // Inicializar el mapa centrado en Cali
+    const mapCenter = [3.4516, -76.5320]; // Coordenadas de Cali
+    const map = L.map('mapa-paradas').setView(mapCenter, 13);
     
-    // Inicializar el mapa cuando se carga la página
-    function inicializarMapa() {
-        map = L.map('mapaParadas').setView([3.4516, -76.5320], 13); // Coordenadas de Cali
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-        
-        document.getElementById('mapaParadas').innerHTML = '';
-    }
+    // Añadir capa base de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
     
-    // Obtener la ubicación del usuario
-    function obtenerUbicacion() {
-        document.getElementById('ubicacionActual').innerHTML = 'Obteniendo ubicación...';
-        
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    userPosition = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    
-                    document.getElementById('ubicacionActual').innerHTML = 
-                        `Ubicación obtenida: Latitud ${userPosition.lat.toFixed(5)}, Longitud ${userPosition.lng.toFixed(5)}`;
-                    
-                    // Inicializar el mapa si aún no se ha hecho
-                    if (!map) {
-                        inicializarMapa();
-                    }
-                    
-                    // Centrar el mapa en la ubicación del usuario
-                    map.setView([userPosition.lat, userPosition.lng], 16);
-                    
-                    // Agregar marcador de ubicación del usuario
-                    if (userMarker) {
-                        map.removeLayer(userMarker);
-                    }
-                    
-                    userMarker = L.marker([userPosition.lat, userPosition.lng], {
-                        icon: L.divIcon({
-                            className: 'user-marker',
-                            html: '<div style="background-color: #007bff; border-radius: 50%; width: 16px; height: 16px; border: 2px solid white;"></div>',
-                            iconSize: [16, 16],
-                            iconAnchor: [8, 8]
-                        })
-                    }).addTo(map);
-                    
-                    // Anunciar con el asistente de voz
-                    if (typeof anunciarMensaje === 'function') {
-                        anunciarMensaje('Ubicación obtenida. Ya puedes buscar paradas cercanas.');
-                    }
-                },
-                function(error) {
-                    console.error('Error al obtener ubicación:', error);
-                    let mensaje = 'Error al obtener tu ubicación. ';
-                    
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            mensaje += 'Permiso denegado para acceder a tu ubicación.';
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            mensaje += 'La información de ubicación no está disponible.';
-                            break;
-                        case error.TIMEOUT:
-                            mensaje += 'Se agotó el tiempo para obtener tu ubicación.';
-                            break;
-                        default:
-                            mensaje += 'Error desconocido.';
-                    }
-                    
-                    document.getElementById('ubicacionActual').innerHTML = mensaje;
-                    
-                    // Si hay error, inicializar el mapa con vista general de Cali
-                    if (!map) {
-                        inicializarMapa();
-                    }
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
-        } else {
-            document.getElementById('ubicacionActual').innerHTML = 
-                'Tu navegador no soporta geolocalización.';
-            
-            // Inicializar mapa con vista general de Cali
-            if (!map) {
-                inicializarMapa();
-            }
-        }
-    }
+    // Marcadores para las paradas con sus respectivos iconos según accesibilidad
+    let markers = [];
+    let markersLayer = L.layerGroup().addTo(map);
     
-    // Buscar paradas cercanas usando la API
-    async function buscarParadasCercanas() {
-        if (!userPosition) {
-            alert('Primero debes obtener tu ubicación.');
-            if (typeof anunciarMensaje === 'function') {
-                anunciarMensaje('Primero debes obtener tu ubicación.');
-            }
-            return;
-        }
-        
-        const distancia = document.getElementById('distanciaMaxima').value;
-        const soloAccesibles = document.getElementById('filtroAccesibilidad').checked;
-        const rutaFiltro = document.getElementById('filtroRuta').value.trim();
-        
-        document.getElementById('paradasCercanas').innerHTML = `
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Cargando...</span>
-                </div>
-                <p>Buscando paradas cercanas...</p>
-            </div>
-        `;
-        
-        try {
-            // Construir la URL para la API con los parámetros
-            let apiUrl = `/api/paradas/cercanas?lat=${userPosition.lat}&lng=${userPosition.lng}&distancia=${distancia}`;
-            
-            // Añadir parámetro de ruta si se especificó
-            if (rutaFiltro) {
-                apiUrl += `&ruta=${encodeURIComponent(rutaFiltro)}`;
-            }
-            
-            // Llamada real a la API
-            const response = await fetch(apiUrl);
-            
-            if (!response.ok) {
-                throw new Error('Error en la respuesta de la API');
-            }
-            
-            const data = await response.json();
-            
-            if (data.status === 'success' && Array.isArray(data.paradas)) {
-                mostrarParadasCercanas(data.paradas, soloAccesibles, rutaFiltro);
-                
-                let mensaje = `Se encontraron ${data.paradas.length} paradas cercanas`;
-                if (rutaFiltro) {
-                    mensaje += ` para la ruta ${rutaFiltro}`;
-                }
-                
-                if (typeof anunciarMensaje === 'function') {
-                    anunciarMensaje(mensaje);
-                }
-            } else {
-                throw new Error('Formato de respuesta inválido');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('paradasCercanas').innerHTML = `
-                <div class="alert alert-danger">
-                    Error al buscar paradas cercanas. Por favor intenta de nuevo más tarde.
-                </div>
-            `;
-            
-            if (typeof anunciarMensaje === 'function') {
-                anunciarMensaje('Error al buscar paradas cercanas');
-            }
-        }
-    }
+    // Definir iconos personalizados para las paradas
+    const iconoRegular = L.icon({
+        iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-icon.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-shadow.png',
+        shadowSize: [41, 41]
+    });
     
-    // Mostrar las paradas cercanas en el mapa y la lista
-    function mostrarParadasCercanas(paradas, soloAccesibles, rutaFiltro) {
-        // Filtrar por accesibilidad si es necesario
-        if (soloAccesibles) {
-            paradas = paradas.filter(p => 
-                p.accesibilidad.rampa || p.accesibilidad.semaforo_sonoro
-            );
-        }
+    const iconoRampa = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-shadow.png',
+        shadowSize: [41, 41]
+    });
+    
+    const iconoSemaforo = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-shadow.png',
+        shadowSize: [41, 41]
+    });
+    
+    const iconoCompleto = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-shadow.png',
+        shadowSize: [41, 41]
+    });
+    
+    // Función para cargar las paradas desde la API
+    function cargarParadas() {
+        // Limpiar marcadores existentes
+        markersLayer.clearLayers();
+        markers = [];
         
-        // Filtrar por ruta si se especifica
-        if (rutaFiltro) {
-            paradas = paradas.filter(p => 
-                p.rutas && p.rutas.some(ruta => ruta.toLowerCase().includes(rutaFiltro.toLowerCase()))
-            );
-        }
-        
-        // Limpiar marcadores anteriores (excepto el del usuario)
-        map.eachLayer(layer => {
-            if (layer instanceof L.TileLayer) {
-                // Mantener el mapa base
-                return;
-            }
-            if (layer !== userMarker) {
-                map.removeLayer(layer);
-            }
-        });
-        
-        // Añadir de nuevo el marcador del usuario si existe
-        if (userMarker && !map.hasLayer(userMarker)) {
-            userMarker.addTo(map);
-        }
-        
-        // Crear iconos personalizados para diferentes tipos de paradas
-        const iconos = {
-            terminal: L.icon({
-                iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
-                shadowSize: [41, 41],
-                className: 'parada-terminal'
-            }),
-            estación: L.icon({
-                iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
-                shadowSize: [41, 41],
-                className: 'parada-estacion'
-            }),
-            regular: L.icon({
-                iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
-                shadowSize: [41, 41],
-                className: 'parada-regular'
-            })
-        };
-        
-        // Crear un grupo para los marcadores
-        const markersGroup = L.featureGroup();
-        
-        // Mostrar las paradas en el mapa
-        paradas.forEach(parada => {
-            const tipoIcono = parada.tipo in iconos ? parada.tipo : 'regular';
-            const marker = L.marker([parada.latitud, parada.longitud], {
-                title: parada.nombre,
-                icon: iconos[tipoIcono],
-                alt: `Parada: ${parada.nombre}`
-            });
-            
-            marker.bindPopup(`
-                <div class="popup-parada">
-                    <strong>${parada.nombre}</strong><br>
-                    ${parada.direccion}<br>
-                    <div class="mt-2">
-                        <strong>Tipo:</strong> ${parada.tipo.charAt(0).toUpperCase() + parada.tipo.slice(1)}<br>
-                        <strong>Accesibilidad:</strong>
-                        ${parada.accesibilidad.rampa ? '<span class="text-success">✓ Rampa</span><br>' : '<span class="text-secondary">✗ Sin rampa</span><br>'}
-                        ${parada.accesibilidad.semaforo_sonoro ? '<span class="text-success">✓ Semáforo sonoro</span>' : '<span class="text-secondary">✗ Sin semáforo sonoro</span>'}
-                    </div>
-                    <div class="mt-2">
-                        <strong>Rutas:</strong><br>
-                        <div class="rutas-chip">
-                            ${parada.rutas.map(ruta => `<span class="badge bg-info me-1">${ruta}</span>`).join('')}
-                        </div>
-                    </div>
-                    ${parada.distancia ? `<div class="mt-2"><strong>Distancia:</strong> ${parada.distancia} metros</div>` : ''}
-                </div>
-            `);
-            
-            marker.addTo(map);
-            markersGroup.addLayer(marker);
-        });
-        
-        // Si tenemos paradas, ajustar la vista para mostrarlas todas incluyendo la posición del usuario
-        if (paradas.length > 0) {
-            if (userMarker) {
-                markersGroup.addLayer(userMarker);
-            }
-            
-            // Ajustar el mapa para mostrar todas las paradas
-            try {
-                const bounds = markersGroup.getBounds();
-                map.fitBounds(bounds, {
-                    padding: [50, 50],
-                    maxZoom: 16
-                });
-            } catch (e) {
-                console.error('Error al ajustar el mapa:', e);
-                
-                // Si hay error, centrar en el usuario o la primera parada
-                if (userMarker) {
-                    map.setView(userMarker.getLatLng(), 15);
-                } else if (paradas.length > 0) {
-                    map.setView([paradas[0].latitud, paradas[0].longitud], 15);
-                }
-            }
-        }
-        
-        // Mostrar lista de paradas
-        const html = paradas.length > 0 ? `
-            <div class="list-group paradas-lista">
-                ${paradas.map(parada => `
-                    <a href="#" class="list-group-item list-group-item-action parada-item" 
-                       data-lat="${parada.latitud}" data-lng="${parada.longitud}"
-                       role="button" aria-label="Ver parada ${parada.nombre}">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">
-                                <span class="badge rounded-pill bg-${parada.tipo === 'terminal' ? 'danger' : parada.tipo === 'estación' ? 'primary' : 'secondary'} me-1">
-                                    ${parada.tipo.charAt(0).toUpperCase()}
-                                </span>
-                                ${parada.nombre}
-                            </h5>
-                            <small>${parada.distancia} m</small>
-                        </div>
-                        <p class="mb-1">${parada.direccion}</p>
-                        <div>
-                            ${parada.accesibilidad.rampa ? 
-                                '<span class="badge bg-success me-1" title="Rampa accesible"><i class="bi bi-wheelchair"></i> Rampa</span>' : ''}
-                            ${parada.accesibilidad.semaforo_sonoro ? 
-                                '<span class="badge bg-success" title="Semáforo con señal sonora"><i class="bi bi-volume-up"></i> Semáforo sonoro</span>' : ''}
-                        </div>
-                        <div class="mt-2 rutas-container">
-                            <small>Rutas: </small>
-                            <div class="d-inline-block">
-                                ${parada.rutas.map(ruta => `<span class="badge bg-info me-1">${ruta}</span>`).join('')}
+        // Obtener las paradas desde la API
+        fetch('/api/paradas')
+            .then(response => response.json())
+            .then(datos => {
+                if (datos.status === 'success') {
+                    const paradas = datos.data;
+                    
+                    // Crear marcadores para cada parada
+                    paradas.forEach(parada => {
+                        // Determinar qué icono usar según la accesibilidad
+                        let icono = iconoRegular;
+                        if (parada.accesibilidad.rampa && parada.accesibilidad.semaforo_sonoro) {
+                            icono = iconoCompleto;
+                        } else if (parada.accesibilidad.rampa) {
+                            icono = iconoRampa;
+                        } else if (parada.accesibilidad.semaforo_sonoro) {
+                            icono = iconoSemaforo;
+                        }
+                        
+                        // Crear marcador
+                        let marker = L.marker([parada.latitud, parada.longitud], {
+                            icon: icono,
+                            title: parada.nombre
+                        });
+                        
+                        // Añadir popup con información de la parada
+                        let popupContent = `
+                            <div class="popup-content">
+                                <h5>${parada.nombre}</h5>
+                                <p><strong>Dirección:</strong> ${parada.direccion}</p>
+                                <p><strong>Tipo:</strong> ${parada.tipo.charAt(0).toUpperCase() + parada.tipo.slice(1)}</p>
+                                <div>
+                                    <strong>Accesibilidad:</strong>
+                                    <ul>
+                                        ${parada.accesibilidad.rampa ? '<li><span class="badge bg-success">Rampa</span></li>' : ''}
+                                        ${parada.accesibilidad.semaforo_sonoro ? '<li><span class="badge bg-info">Semáforo sonoro</span></li>' : ''}
+                                        ${!parada.accesibilidad.rampa && !parada.accesibilidad.semaforo_sonoro ? '<li><span class="badge bg-secondary">Estándar</span></li>' : ''}
+                                    </ul>
+                                </div>
+                                <a href="/paradas/${parada.id}" class="btn btn-sm btn-primary mt-2">Ver detalles</a>
                             </div>
-                        </div>
-                    </a>
-                `).join('')}
-            </div>
-        ` : '<p class="text-center">No se encontraron paradas cercanas con los filtros seleccionados.</p>';
-        
-        document.getElementById('paradasCercanas').innerHTML = html;
-        
-        // Añadir eventos a los elementos de la lista
-        document.querySelectorAll('.parada-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const lat = parseFloat(this.getAttribute('data-lat'));
-                const lng = parseFloat(this.getAttribute('data-lng'));
-                
-                map.setView([lat, lng], 18);
-                
-                // Buscar y abrir el popup correspondiente
-                map.eachLayer(layer => {
-                    if (layer.options && layer.options.title && 
-                        layer.getLatLng().lat === lat && 
-                        layer.getLatLng().lng === lng) {
-                        layer.openPopup();
+                        `;
+                        
+                        marker.bindPopup(popupContent);
+                        
+                        // Añadir a la capa de marcadores
+                        markersLayer.addLayer(marker);
+                        
+                        // Guardar referencia del marcador
+                        markers.push({
+                            id: parada.id,
+                            marker: marker,
+                            tieneRampa: parada.accesibilidad.rampa,
+                            tieneSemaforo: parada.accesibilidad.semaforo_sonoro,
+                            nombre: parada.nombre,
+                            direccion: parada.direccion
+                        });
+                    });
+                    
+                    // Ajustar el mapa para mostrar todas las paradas
+                    if (markers.length > 0) {
+                        const group = L.featureGroup(markers.map(m => m.marker));
+                        map.fitBounds(group.getBounds());
                     }
-                });
+                    
+                    // Aplicar filtros actuales
+                    aplicarFiltrosMapa();
+                } else {
+                    console.error('Error al cargar las paradas:', datos);
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar las paradas:', error);
+                document.getElementById('mapa-paradas').innerHTML = `
+                    <div class="alert alert-danger">
+                        Error al cargar el mapa de paradas. Por favor, intente nuevamente.
+                    </div>
+                `;
             });
-        });
     }
     
-    // Calcular distancia aproximada entre dos puntos (en metros)
-    function calcularDistancia(pos1, pos2) {
-        // Fórmula de Haversine simplificada para distancias cortas
-        const R = 6371000; // Radio de la Tierra en metros
-        const dLat = (pos2.lat - pos1.lat) * Math.PI / 180;
-        const dLng = (pos2.lng - pos1.lng) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(pos1.lat * Math.PI / 180) * Math.cos(pos2.lat * Math.PI / 180) *
-                  Math.sin(dLng/2) * Math.sin(dLng/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const d = R * c;
-        return Math.round(d); // Distancia en metros, redondeada
-    }
-    
-    // Cargar rutas para el selector de filtro
-    async function cargarRutasParaFiltro() {
-        try {
-            const response = await fetch('/api/rutas');
-            if (!response.ok) {
-                throw new Error('Error al cargar rutas');
-            }
-            
-            const data = await response.json();
-            if (data.status === 'success' && Array.isArray(data.rutas)) {
-                const datalist = document.getElementById('rutasSugeridas');
-                
-                // Limpiar datalist existente
-                datalist.innerHTML = '';
-                
-                // Añadir opciones para cada ruta
-                data.rutas.forEach(ruta => {
-                    const option = document.createElement('option');
-                    option.value = ruta.numero;
-                    option.textContent = `${ruta.numero} - ${ruta.nombre}`;
-                    datalist.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error('Error al cargar rutas para filtro:', error);
-        }
-    }
-    
-    // Eventos
-    document.getElementById('btnObtenerUbicacion').addEventListener('click', obtenerUbicacion);
-    document.getElementById('btnBuscarParadas').addEventListener('click', buscarParadasCercanas);
-    
-    // Permitir búsqueda al presionar Enter en el filtro de ruta
-    document.getElementById('filtroRuta').addEventListener('keypress', function(e) {
+    // Filtrado de paradas (en la tabla)
+    document.getElementById('btn-buscar').addEventListener('click', filtrarParadas);
+    document.getElementById('buscar-parada').addEventListener('keyup', function(e) {
         if (e.key === 'Enter') {
-            buscarParadasCercanas();
+            filtrarParadas();
         }
     });
     
-    // Inicializar mapa, obtener ubicación y cargar rutas para filtro
-    inicializarMapa();
-    obtenerUbicacion();
-    cargarRutasParaFiltro();
+    // Escuchar el evento personalizado smart-search para búsqueda por voz mejorada
+    document.getElementById('buscar-parada').addEventListener('smart-search', function(e) {
+        if (e.detail && e.detail.type === 'parada') {
+            // El comando de voz se ha normalizado, solo filtrar
+            filtrarParadas();
+        }
+    });
+    
+    // Filtros de accesibilidad
+    document.getElementById('filtro-rampa').addEventListener('change', () => {
+        filtrarParadas();
+        aplicarFiltrosMapa();
+    });
+    document.getElementById('filtro-semaforo').addEventListener('change', () => {
+        filtrarParadas();
+        aplicarFiltrosMapa();
+    });
+    
+    // Filtrar paradas en la tabla
+    function filtrarParadas() {
+        let busqueda = document.getElementById('buscar-parada').value.toLowerCase().trim();
+        const filtroRampa = document.getElementById('filtro-rampa').checked;
+        const filtroSemaforo = document.getElementById('filtro-semaforo').checked;
+        
+        // MEJORA: Normalización mejorada de la búsqueda
+        // Eliminar palabras comunes de comandos de voz
+        const palabrasComunes = ['buscar', 'la', 'parada', 'encontrar', 'mostrar'];
+        palabrasComunes.forEach(palabra => {
+            busqueda = busqueda.replace(new RegExp('\\b' + palabra + '\\b', 'gi'), '');
+        });
+        
+        busqueda = busqueda.trim();
+        
+        // MEJORA: Eliminar cualquier punto al final (problema común del reconocimiento de voz)
+        busqueda = busqueda.replace(/\.+$/, '');
+        
+        // Normalizar formatos de direcciones
+        busqueda = busqueda.replace(/(\d+)\s*[#°]\s*(\d+)/g, '$1 # $2');
+        
+        console.log("Término de búsqueda normalizado para paradas:", busqueda);
+        
+        const filas = document.querySelectorAll('#tabla-paradas tbody tr');
+        let encontrados = 0;
+        let sugerencias = [];
+        
+        filas.forEach(fila => {
+            const textoFila = fila.textContent.toLowerCase();
+            const tieneRampa = fila.dataset.rampa === 'true';
+            const tieneSemaforo = fila.dataset.semaforo === 'true'; // CORRECCIÓN: era 'false' en el original
+            
+            // Normalizar el texto de la fila para comparación más efectiva
+            let textoNormalizado = textoFila;
+            
+            // Normalizar direcciones
+            textoNormalizado = textoNormalizado.replace(/(\d+)\s*[#°]\s*(\d+)/g, '$1 # $2');
+            
+            // MEJORA: Primera verificación para coincidencia exacta
+            let mostrar = busqueda === '' || textoNormalizado.includes(busqueda);
+            
+            // Aplicar filtros de accesibilidad
+            if (filtroRampa && !tieneRampa) {
+                mostrar = false;
+            }
+            
+            if (filtroSemaforo && !tieneSemaforo) {
+                mostrar = false;
+            }
+            
+            // MEJORA: Si no hay coincidencia exacta, buscar coincidencias parciales
+            if (!mostrar && busqueda !== '' && busqueda.length > 2) {
+                // Verificar coincidencias parciales solo si no hay filtros de accesibilidad
+                // o si cumple con los filtros de accesibilidad
+                const cumpleFiltros = (!filtroRampa || tieneRampa) && (!filtroSemaforo || tieneSemaforo);
+                
+                if (cumpleFiltros) {
+                    // Buscar coincidencia parcial (por ejemplo, si buscaron "terminal" y hay "terminal calima")
+                    if (textoNormalizado.includes(busqueda.substring(0, busqueda.length-1)) || // Sin el último carácter
+                        busqueda.includes(textoNormalizado.substring(0, 5))) { // O si la búsqueda contiene el inicio
+                        
+                        // Obtener el nombre o dirección principal de la parada
+                        const nombreParada = fila.querySelector('td:first-child')?.textContent.trim();
+                        const direccion = fila.querySelector('td:nth-child(2)')?.textContent.trim();
+                        
+                        sugerencias.push({
+                            texto: nombreParada || direccion || textoFila.substring(0, 30),
+                            elemento: fila
+                        });
+                    }
+                }
+            }
+            
+            fila.style.display = mostrar ? '' : 'none';
+            
+            if (mostrar) {
+                encontrados++;
+            }
+        });
+        
+        // MEJORA: Mensaje mejorado cuando no hay resultados o hay sugerencias
+        const mensajeDiv = document.getElementById('mensaje-resultados') || 
+                          document.createElement('div');
+        
+        if (!document.getElementById('mensaje-resultados')) {
+            mensajeDiv.id = 'mensaje-resultados';
+            mensajeDiv.className = 'alert mt-3';
+            document.querySelector('#tabla-paradas').before(mensajeDiv);
+        }
+        
+        if (encontrados === 0 && busqueda !== '') {
+            if (sugerencias.length > 0) {
+                // Mostrar sugerencias si hay coincidencias parciales
+                mensajeDiv.className = 'alert alert-info mt-3';
+                let sugerenciasHTML = `<p>No se encontraron paradas para "<strong>${busqueda}</strong>". ¿Quizás buscabas alguna de estas?</p>`;
+                sugerenciasHTML += '<ul class="list-group list-group-flush mb-0 mt-2">';
+                
+                // Mostrar hasta 3 sugerencias
+                const maxSugerencias = Math.min(3, sugerencias.length);
+                for (let i = 0; i < maxSugerencias; i++) {
+                    sugerenciasHTML += `<li class="list-group-item py-1 px-2 border-0">
+                        <a href="#" class="sugerencia-link" data-sugerencia="${sugerencias[i].texto}">${sugerencias[i].texto}</a>
+                    </li>`;
+                }
+                sugerenciasHTML += '</ul>';
+                
+                mensajeDiv.innerHTML = sugerenciasHTML;
+                
+                // Añadir eventos a los enlaces de sugerencias
+                setTimeout(() => {
+                    document.querySelectorAll('.sugerencia-link').forEach(link => {
+                        link.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            document.getElementById('buscar-parada').value = this.dataset.sugerencia;
+                            filtrarParadas();
+                        });
+                    });
+                }, 100);
+            } else {
+                // Mensaje estándar si no hay sugerencias
+                mensajeDiv.className = 'alert alert-warning mt-3';
+                mensajeDiv.innerHTML = `No se encontraron paradas para "<strong>${busqueda}</strong>". <br>Intente con otro término o pruebe con el nombre exacto o dirección.`;
+            }
+            mensajeDiv.style.display = 'block';
+        } else {
+            mensajeDiv.style.display = 'none';
+        }
+        
+        // MEJORA: Si no hubo resultados pero sí hay sugerencias, mostrar la primera sugerencia
+        // especialmente útil para búsquedas por voz
+        if (encontrados === 0 && sugerencias.length > 0 && busqueda.length > 2) {
+            if (document.referrer.includes('smart-search')) {
+                sugerencias[0].elemento.style.display = ''; // Mostrar la primera sugerencia
+                encontrados = 1;
+                
+                // Notificar al usuario
+                const audioFeedback = new SpeechSynthesisUtterance(
+                    `No se encontró la parada exacta ${busqueda}, pero aquí hay una sugerencia similar.`
+                );
+                audioFeedback.lang = 'es-ES';
+                speechSynthesis.speak(audioFeedback);
+            }
+        }
+    }
+    
+    // Aplicar filtros al mapa
+    function aplicarFiltrosMapa() {
+        // MEJORA: Normalización mejorada del término de búsqueda
+        let busqueda = document.getElementById('buscar-parada').value.toLowerCase().trim();
+        const filtroRampa = document.getElementById('filtro-rampa').checked;
+        const filtroSemaforo = document.getElementById('filtro-semaforo').checked;
+        
+        // Eliminar palabras comunes y normalizar
+        const palabrasComunes = ['buscar', 'la', 'parada', 'encontrar', 'mostrar'];
+        palabrasComunes.forEach(palabra => {
+            busqueda = busqueda.replace(new RegExp('\\b' + palabra + '\\b', 'gi'), '');
+        });
+        
+        // Eliminar puntos finales (problema de reconocimiento de voz)
+        busqueda = busqueda.trim().replace(/\.+$/, '');
+        
+        // Normalizar formatos de direcciones
+        busqueda = busqueda.replace(/(\d+)\s*[#°]\s*(\d+)/g, '$1 # $2');
+        
+        markers.forEach(item => {
+            // Normalizar nombres y direcciones de las paradas para comparación
+            const nombreNormalizado = item.nombre.toLowerCase();
+            const direccionNormalizada = item.direccion.toLowerCase().replace(/(\d+)\s*[#°]\s*(\d+)/g, '$1 # $2');
+            
+            const coincideTexto = nombreNormalizado.includes(busqueda) || 
+                                 direccionNormalizada.includes(busqueda);
+            const coincideRampa = !filtroRampa || item.tieneRampa;
+            const coincideSemaforo = !filtroSemaforo || item.tieneSemaforo;
+            
+            if ((busqueda === '' || coincideTexto) && coincideRampa && coincideSemaforo) {
+                markersLayer.addLayer(item.marker);
+            } else {
+                markersLayer.removeLayer(item.marker);
+            }
+        });
+    }
+    
+    // Manejar botones "Ver en mapa"
+    document.querySelectorAll('.ver-parada').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const paradaId = this.getAttribute('data-id');
+            const lat = parseFloat(this.getAttribute('data-lat'));
+            const lng = parseFloat(this.getAttribute('data-lng'));
+            
+            // Centrar el mapa en la parada
+            map.setView([lat, lng], 17);
+            
+            // Buscar y abrir el popup del marcador correspondiente
+            markers.forEach(item => {
+                if (item.id == paradaId) {
+                    item.marker.openPopup();
+                }
+            });
+        });
+    });
+    
+    // Inicializar el mapa modal de detalle
+    let mapModal = null;
+    
+    // Inicializar el mapa modal al abrir el modal
+    document.getElementById('modalDetalleParada').addEventListener('shown.bs.modal', function (event) {
+        if (!mapModal) {
+            mapModal = L.map('mapa-detalle-parada').setView([3.4516, -76.5320], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(mapModal);
+        }
+        
+        // Limpiar marcadores existentes
+        mapModal.eachLayer(function (layer) {
+            if (layer instanceof L.Marker) {
+                mapModal.removeLayer(layer);
+            }
+        });
+        
+        // Obtener datos de la parada desde el botón que abrió el modal
+        const button = event.relatedTarget;
+        const lat = parseFloat(button.getAttribute('data-lat'));
+        const lng = parseFloat(button.getAttribute('data-lng'));
+        const id = button.getAttribute('data-id');
+        
+        // Añadir marcador
+        const marker = L.marker([lat, lng]).addTo(mapModal);
+        mapModal.setView([lat, lng], 17);
+        
+        // Cargar información detallada de la parada
+        fetch(`/api/paradas/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const parada = data.data;
+                    
+                    // Mostrar información en el modal
+                    document.getElementById('info-detalle-parada').innerHTML = `
+                        <h4>${parada.nombre}</h4>
+                        <p><strong>Dirección:</strong> ${parada.direccion}</p>
+                        <p><strong>Tipo:</strong> ${parada.tipo.charAt(0).toUpperCase() + parada.tipo.slice(1)}</p>
+                        <div class="mt-2">
+                            <strong>Accesibilidad:</strong>
+                            <div class="mt-1">
+                                ${parada.accesibilidad.rampa ? '<span class="badge bg-success me-2">Rampa</span>' : ''}
+                                ${parada.accesibilidad.semaforo_sonoro ? '<span class="badge bg-info me-2">Semáforo sonoro</span>' : ''}
+                                ${!parada.accesibilidad.rampa && !parada.accesibilidad.semaforo_sonoro ? '<span class="badge bg-secondary">Estándar</span>' : ''}
+                            </div>
+                        </div>
+                        ${parada.descripcion ? `<p class="mt-3"><strong>Descripción:</strong> ${parada.descripcion}</p>` : ''}
+                    `;
+                    
+                    // Actualizar título del modal
+                    document.getElementById('modalDetalleParadaLabel').textContent = `Parada: ${parada.nombre}`;
+                    
+                    // Cargar rutas que pasan por esta parada
+                    fetch(`/api/paradas/${id}/rutas`)
+                        .then(response => response.json())
+                        .then(rutasData => {
+                            if (rutasData.status === 'success' && rutasData.data.length > 0) {
+                                let rutasHTML = `
+                                    <div class="mt-3">
+                                        <strong>Rutas que pasan por esta parada:</strong>
+                                        <ul class="list-group list-group-flush mt-1">
+                                `;
+                                
+                                rutasData.data.forEach(ruta => {
+                                    rutasHTML += `
+                                        <li class="list-group-item py-2">
+                                            <a href="/rutas/${ruta.id}" class="text-decoration-none">
+                                                <span class="badge bg-primary me-2">${ruta.numero}</span>
+                                                ${ruta.nombre}
+                                            </a>
+                                        </li>
+                                    `;
+                                });
+                                
+                                rutasHTML += `
+                                        </ul>
+                                    </div>
+                                `;
+                                
+                                document.getElementById('info-detalle-parada').innerHTML += rutasHTML;
+                            }
+                        })
+                        .catch(error => console.error('Error al cargar rutas de la parada:', error));
+                }
+            })
+            .catch(error => console.error('Error al cargar detalles de la parada:', error));
+    });
+    
+    // Resetear el mapa modal al cerrar
+    document.getElementById('modalDetalleParada').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('info-detalle-parada').innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></div>';
+    });
+    
+    // Cargar las paradas al iniciar
+    cargarParadas();
 });
 </script>
 {% endblock %}

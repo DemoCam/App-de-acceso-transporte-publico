@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+
+{% block title %}Asistente de Voz - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">Asistente de Voz - Guía de Uso</h1>
+    
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        El Asistente de Voz es una característica de accesibilidad que permite interactuar con la aplicación mediante comandos de voz.
+    </div>
+    
+    <div class="row">
+        <!-- Menú lateral -->
+        <div class="col-lg-3 mb-4">
+            <div class="sticky-top pt-3" style="top: 70px;">
+                <div class="list-group mb-4">
+                    <a href="#activacion" class="list-group-item list-group-item-action">Activación del Asistente</a>
+                    <a href="#comandos-generales" class="list-group-item list-group-item-action">Comandos Generales</a>
+                    <a href="#comandos-rutas" class="list-group-item list-group-item-action">Comandos para Rutas</a>
+                    <a href="#comandos-paradas" class="list-group-item list-group-item-action">Comandos para Paradas</a>
+                    <a href="#atajos" class="list-group-item list-group-item-action">Atajos de Teclado</a>
+                    <a href="#configuracion" class="list-group-item list-group-item-action">Configuración</a>
+                    <a href="#ejemplos" class="list-group-item list-group-item-action">Ejemplos de Uso</a>
+                    <a href="#problemas" class="list-group-item list-group-item-action">Solución de Problemas</a>
+                </div>
+                
+                <!-- Botón para probar el asistente -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">¿Quieres probarlo?</h5>
+                        <p class="card-text">Haz clic en el botón azul en la esquina inferior derecha o usa Alt+A para activar el asistente.</p>
+                        <button class="btn btn-primary" onclick="activateAssistant()">
+                            <i class="bi bi-mic-fill me-2"></i> Probar Ahora
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contenido principal -->
+        <div class="col-lg-9">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 id="activacion" class="border-bottom pb-2 mb-3">Activación del Asistente</h2>
+                    <p>Hay varias formas de activar el asistente de voz:</p>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="p-3 bg-light rounded">
+                                <i class="bi bi-mic-fill text-primary" style="font-size: 2rem;"></i>
+                                <h5 class="mt-2">Botón de Asistente</h5>
+                                <p>Haz clic en el botón azul redondo ubicado en la esquina inferior derecha de la pantalla.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="p-3 bg-light rounded">
+                                <i class="bi bi-keyboard text-primary" style="font-size: 2rem;"></i>
+                                <h5 class="mt-2">Atajo de Teclado</h5>
+                                <p>Presiona <code>Alt + A</code> para activar o desactivar el asistente.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="p-3 bg-light rounded">
+                                <i class="bi bi-info-circle text-primary" style="font-size: 2rem;"></i>
+                                <h5 class="mt-2">Banner de Descripción</h5>
+                                <p>Al cargar una página, aparece temporalmente un banner que permite describir la página.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 id="comandos-generales" class="border-bottom pb-2 mb-3">Comandos Generales</h2>
+                    
+                    <h4 class="mt-4 mb-3">Navegación</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Comando</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>"ir a inicio"</code> o <code>"ir a home"</code></td>
+                                    <td>Navega a la página principal</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"ir a rutas"</code></td>
+                                    <td>Navega a la sección de rutas</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"ir a paradas"</code></td>
+                                    <td>Navega a la sección de paradas</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"ir a ayuda"</code></td>
+                                    <td>Navega a la página de ayuda</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"ir a perfil"</code></td>
+                                    <td>Navega a tu perfil de usuario</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"volver atrás"</code> o <code>"regresar"</code></td>
+                                    <td>Regresa a la página anterior</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"subir"</code> o <code>"inicio de página"</code></td>
+                                    <td>Desplaza al inicio de la página actual</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h4 class="mt-4 mb-3">Información</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Comando</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>"describir esta página"</code> o <code>"información"</code></td>
+                                    <td>Proporciona una descripción detallada de la página actual</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"ayuda"</code> o <code>"comandos disponibles"</code></td>
+                                    <td>Muestra ayuda sobre los comandos que puedes utilizar</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"leer tabla"</code></td>
+                                    <td>Lee el contenido de la tabla principal en la página actual</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"leer mapa"</code></td>
+                                    <td>Describe el contenido del mapa en la página actual</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"leer título"</code></td>
+                                    <td>Lee el título principal de la página actual</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 id="comandos-rutas" class="border-bottom pb-2 mb-3">Comandos para Rutas</h2>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Comando</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>"buscar ruta [número/nombre]"</code></td>
+                                    <td>Busca una ruta específica por su número o nombre</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"filtrar rutas con rampa"</code></td>
+                                    <td>Muestra solo las rutas que tienen rampa de acceso</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"filtrar rutas con audio"</code></td>
+                                    <td>Muestra solo las rutas que tienen anuncios de audio</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"mostrar rutas con espacio para sillas"</code></td>
+                                    <td>Muestra solo las rutas con espacio para sillas de ruedas</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"mostrar todas las rutas"</code></td>
+                                    <td>Muestra todas las rutas sin filtrar</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 id="comandos-paradas" class="border-bottom pb-2 mb-3">Comandos para Paradas</h2>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Comando</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>"buscar parada [nombre/dirección]"</code></td>
+                                    <td>Busca una parada específica por su nombre o dirección</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"filtrar paradas con rampa"</code></td>
+                                    <td>Muestra solo las paradas que tienen rampa de acceso</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"mostrar paradas con semáforo sonoro"</code></td>
+                                    <td>Muestra solo las paradas que cuentan con semáforo sonoro</td>
+                                </tr>
+                                <tr>
+                                    <td><code>"mostrar todas las paradas"</code></td>
+                                    <td>Muestra todas las paradas sin filtrar</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 id="atajos" class="border-bottom pb-2 mb-3">Atajos de Teclado</h2>
+                    
+                    <p>Para facilitar la accesibilidad, se han configurado los siguientes atajos de teclado:</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Atajo</th>
+                                    <th>Función</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><kbd>Alt</kbd> + <kbd>A</kbd></td>
+                                    <td>Activar/desactivar el asistente de voz</td>
+                                </tr>
+                                <tr>
+                                    <td><kbd>Alt</kbd> + <kbd>H</kbd></td>
+                                    <td>Mostrar ayuda sobre los comandos disponibles</td>
+                                </tr>
+                                <tr>
+                                    <td><kbd>Alt</kbd> + <kbd>D</kbd></td>
+                                    <td>Describir la página actual</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 id="configuracion" class="border-bottom pb-2 mb-3">Configuración de Accesibilidad</h2>
+                    
+                    <p>El asistente incluye un panel de configuración para personalizar tu experiencia:</p>
+                    
+                    <ol>
+                        <li>Haz clic en el botón gris con un icono de engranaje ubicado en la esquina inferior izquierda.</li>
+                        <li>En el panel que aparece, puedes:
+                            <ul>
+                                <li>Activar/desactivar la descripción automática de páginas</li>
+                                <li>Ver los atajos de teclado disponibles</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    
+                    <div class="text-center my-4">
+                        <img src="{{ url_for('static', filename='images/voice-assistant-config.jpg') }}" alt="Panel de configuración del asistente de voz" class="img-fluid border rounded">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 id="ejemplos" class="border-bottom pb-2 mb-3">Ejemplos de Uso</h2>
+                    
+                    <div class="accordion" id="accordionExamples">
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Escenario 1: Buscar una ruta específica
+                                </button>
+                            </h3>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExamples">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Activa el asistente de voz (presiona <kbd>Alt</kbd> + <kbd>A</kbd> o haz clic en el botón azul)</li>
+                                        <li>Di: <code>"buscar ruta T31"</code></li>
+                                        <li>El asistente buscará la ruta T31 y mostrará los resultados</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Escenario 2: Encontrar paradas accesibles
+                                </button>
+                            </h3>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExamples">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Activa el asistente de voz</li>
+                                        <li>Di: <code>"ir a paradas"</code></li>
+                                        <li>Cuando estés en la página de paradas, di: <code>"filtrar paradas con rampa"</code></li>
+                                        <li>Para obtener información sobre el listado, di: <code>"leer tabla"</code></li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Escenario 3: Obtener detalles de una ruta
+                                </button>
+                            </h3>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExamples">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Navega a una ruta específica</li>
+                                        <li>Activa el asistente de voz</li>
+                                        <li>Di: <code>"describir esta página"</code> para obtener información general</li>
+                                        <li>Di: <code>"leer mapa"</code> para obtener una descripción del trazado</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 id="problemas" class="border-bottom pb-2 mb-3">Solución de Problemas</h2>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Problema</th>
+                                    <th>Solución</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>El asistente no responde</td>
+                                    <td>Verifica que tu navegador tenga acceso al micrófono. En la mayoría de los navegadores, aparecerá un icono en la barra de direcciones para permitir el acceso.</td>
+                                </tr>
+                                <tr>
+                                    <td>No se reconoce un comando</td>
+                                    <td>Intenta hablar más despacio y claramente. Si el problema persiste, usa "ayuda" para ver los comandos disponibles.</td>
+                                </tr>
+                                <tr>
+                                    <td>El asistente se activa pero no escucha</td>
+                                    <td>Cierra y vuelve a abrir el asistente presionando <kbd>Alt</kbd> + <kbd>A</kbd> dos veces.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Nota:</strong> El asistente de voz funciona mejor en navegadores basados en Chromium como Google Chrome y Microsoft Edge.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function activateAssistant() {
+        // Esta función intentará activar el asistente de voz
+        // Primero, verificar si existe la función toggleVoiceRecognition
+        if (typeof toggleVoiceRecognition === 'function') {
+            toggleVoiceRecognition();
+        } else {
+            // Si la función no existe, buscar el botón del asistente y hacer clic en él
+            const assistantButton = document.getElementById('voice-assistant-btn');
+            if (assistantButton) {
+                assistantButton.click();
+            } else {
+                alert('No se pudo activar el asistente automáticamente. Por favor, haz clic en el botón azul en la esquina inferior derecha de la pantalla.');
+            }
+        }
+    }
+    
+    // Scroll suave optimizado para las anclas en esta página
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función para realizar el scroll suave con compensación de offset
+        function scrollToElement(elementId) {
+            const targetElement = document.getElementById(elementId);
+            
+            if (targetElement) {
+                // Offset para la barra de navegación fija y un poco de espacio adicional
+                const offset = 100;
+                const targetPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = targetPosition + window.pageYOffset - offset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+                
+                // Actualizar el estado activo del menú
+                document.querySelectorAll('.list-group-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                document.querySelector(`a[href="#${elementId}"]`).classList.add('active');
+                
+                // Actualizar URL sin recargar
+                history.pushState(null, null, `#${elementId}`);
+                
+                return false; // Prevenir comportamiento predeterminado
+            }
+        }
+        
+        // Añadir el evento a todos los enlaces del menú
+        document.querySelectorAll('.list-group-item').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1); // Eliminar el #
+                scrollToElement(targetId);
+            });
+        });
+        
+        // Manejar el hash inicial de la URL
+        if (window.location.hash) {
+            const initialHash = window.location.hash.substring(1);
+            // Pequeño retardo para asegurar que la página esté completamente cargada
+            setTimeout(() => {
+                scrollToElement(initialHash);
+            }, 500);
+        }
+    });
+</script>
+{% endblock %}
