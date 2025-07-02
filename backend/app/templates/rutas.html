@@ -231,24 +231,143 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Escuchar el evento personalizado smart-search para búsqueda por voz mejorada
+    document.getElementById('buscar-ruta').addEventListener('smart-search', function(e) {
+        if (e.detail && e.detail.type === 'ruta') {
+            // El comando de voz se ha normalizado, solo filtrar
+            filtrarRutas();
+        }
+    });
+    
     // Eventos para filtros de accesibilidad
     document.getElementById('filtro-rampa').addEventListener('change', aplicarFiltros);
     document.getElementById('filtro-audio').addEventListener('change', aplicarFiltros);
     
     function filtrarRutas() {
-        const busqueda = document.getElementById('buscar-ruta').value.toLowerCase();
+        let busqueda = document.getElementById('buscar-ruta').value.toLowerCase().trim();
         const tarjetas = document.querySelectorAll('#lista-rutas .card');
+        
+        // MEJORA: Normalización mejorada de la búsqueda
+        busqueda = busqueda.replace(/\s+/g, ' '); // Normalizar espacios múltiples
+        
+        // Eliminar palabras comunes de comandos de voz
+        const palabrasComunes = ['buscar', 'la', 'ruta', 'encontrar', 'mostrar'];
+        palabrasComunes.forEach(palabra => {
+            busqueda = busqueda.replace(new RegExp('\\b' + palabra + '\\b', 'gi'), '');
+        });
+        
+        busqueda = busqueda.trim();
+        
+        // MEJORA: Eliminar cualquier punto al final (problema común de reconocimiento de voz)
+        busqueda = busqueda.replace(/\.+$/, '');
+        
+        // Normalizar patrones como "A 15", "A-15", "A.15" -> "A15"
+        const rutaPattern = /([a-z])\s*[-\.]\s*(\d+)/gi;
+        busqueda = busqueda.replace(rutaPattern, '$1$2');
+        
+        // También normalizar "A 15" -> "A15"
+        const espacioPattern = /([a-z])\s+(\d+)/gi;
+        busqueda = busqueda.replace(espacioPattern, '$1$2');
+        
+        console.log("Término de búsqueda normalizado:", busqueda);
+        
+        // MEJORA: Variables para seguimiento de coincidencias
+        let encontrados = 0;
+        let sugerencias = [];
         
         tarjetas.forEach(tarjeta => {
             const textoTarjeta = tarjeta.textContent.toLowerCase();
             const columna = tarjeta.closest('.col');
             
-            if (textoTarjeta.includes(busqueda)) {
+            // Normalizar también el texto de la tarjeta para la comparación
+            let textoNormalizado = textoTarjeta;
+            textoNormalizado = textoNormalizado.replace(rutaPattern, '$1$2');
+            textoNormalizado = textoNormalizado.replace(espacioPattern, '$1$2');
+            
+            // MEJORA: Búsqueda más flexible que permite coincidencias parciales
+            if (busqueda === '' || textoNormalizado.includes(busqueda)) {
                 columna.style.display = '';
+                encontrados++;
             } else {
+                // Si no hay coincidencia exacta, verificar si hay coincidencia parcial
+                // que podría ser útil como sugerencia
+                if (busqueda.length > 1 && 
+                    (textoNormalizado.includes(busqueda.substring(0, busqueda.length-1)) || // Buscar sin el último carácter
+                     busqueda.includes(textoNormalizado.substring(0, 3)))) { // O si la búsqueda contiene el inicio del texto
+                    // Almacenar como sugerencia pero mantener oculto por ahora
+                    sugerencias.push({
+                        texto: tarjeta.querySelector('.card-title')?.textContent.trim() || textoTarjeta,
+                        elemento: columna
+                    });
+                }
                 columna.style.display = 'none';
             }
         });
+        
+        // MEJORA: Mensaje mejorado cuando no hay resultados o hay sugerencias
+        const mensajeDiv = document.getElementById('mensaje-resultados') || 
+                          document.createElement('div');
+        
+        if (!document.getElementById('mensaje-resultados')) {
+            mensajeDiv.id = 'mensaje-resultados';
+            mensajeDiv.className = 'alert mt-3';
+            document.querySelector('#lista-rutas').before(mensajeDiv);
+        }
+        
+        if (encontrados === 0 && busqueda !== '') {
+            if (sugerencias.length > 0) {
+                // Mostrar sugerencias si hay coincidencias parciales
+                mensajeDiv.className = 'alert alert-info mt-3';
+                let sugerenciasHTML = `<p>No se encontraron rutas para "<strong>${busqueda}</strong>". ¿Quizás buscabas alguna de estas?</p>`;
+                sugerenciasHTML += '<ul class="list-group list-group-flush mb-0 mt-2">';
+                
+                // Mostrar hasta 3 sugerencias
+                const maxSugerencias = Math.min(3, sugerencias.length);
+                for (let i = 0; i < maxSugerencias; i++) {
+                    sugerenciasHTML += `<li class="list-group-item py-1 px-2 border-0">
+                        <a href="#" class="sugerencia-link" data-sugerencia="${sugerencias[i].texto}">${sugerencias[i].texto}</a>
+                    </li>`;
+                }
+                sugerenciasHTML += '</ul>';
+                
+                mensajeDiv.innerHTML = sugerenciasHTML;
+                
+                // Añadir eventos a los enlaces de sugerencias
+                setTimeout(() => {
+                    document.querySelectorAll('.sugerencia-link').forEach(link => {
+                        link.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            document.getElementById('buscar-ruta').value = this.dataset.sugerencia;
+                            filtrarRutas();
+                        });
+                    });
+                }, 100);
+            } else {
+                // Mensaje estándar si no hay sugerencias
+                mensajeDiv.className = 'alert alert-warning mt-3';
+                mensajeDiv.innerHTML = `No se encontraron rutas para "<strong>${busqueda}</strong>". <br>Intente con otro término o verifique el formato (ejemplo: A15).`;
+            }
+            mensajeDiv.style.display = 'block';
+        } else {
+            mensajeDiv.style.display = 'none';
+        }
+        
+        // MEJORA: Si no hubo resultados pero sí hay sugerencias, mostrar la primera sugerencia
+        if (encontrados === 0 && sugerencias.length > 0 && busqueda.length > 2) {
+            // Opcional: Mostrar automáticamente la primera sugerencia
+            // (Esto es útil especialmente para búsquedas por voz)
+            if (document.referrer.includes('smart-search')) {
+                sugerencias[0].elemento.style.display = ''; // Mostrar la primera sugerencia
+                encontrados = 1;
+                
+                // Notificar al usuario
+                const audioFeedback = new SpeechSynthesisUtterance(
+                    `No se encontró la ruta exacta ${busqueda}, pero aquí hay una sugerencia similar.`
+                );
+                audioFeedback.lang = 'es-ES';
+                speechSynthesis.speak(audioFeedback);
+            }
+        }
         
         // Aplicar el mismo filtro al mapa
         aplicarFiltros();

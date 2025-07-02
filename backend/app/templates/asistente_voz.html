@@ -14,25 +14,27 @@
     <div class="row">
         <!-- Menú lateral -->
         <div class="col-lg-3 mb-4">
-            <div class="list-group sticky-top">
-                <a href="#activacion" class="list-group-item list-group-item-action">Activación del Asistente</a>
-                <a href="#comandos-generales" class="list-group-item list-group-item-action">Comandos Generales</a>
-                <a href="#comandos-rutas" class="list-group-item list-group-item-action">Comandos para Rutas</a>
-                <a href="#comandos-paradas" class="list-group-item list-group-item-action">Comandos para Paradas</a>
-                <a href="#atajos" class="list-group-item list-group-item-action">Atajos de Teclado</a>
-                <a href="#configuracion" class="list-group-item list-group-item-action">Configuración</a>
-                <a href="#ejemplos" class="list-group-item list-group-item-action">Ejemplos de Uso</a>
-                <a href="#problemas" class="list-group-item list-group-item-action">Solución de Problemas</a>
-            </div>
-            
-            <!-- Botón para probar el asistente -->
-            <div class="card mt-4">
-                <div class="card-body text-center">
-                    <h5 class="card-title">¿Quieres probarlo?</h5>
-                    <p class="card-text">Haz clic en el botón azul en la esquina inferior derecha o usa Alt+A para activar el asistente.</p>
-                    <button class="btn btn-primary" onclick="activateAssistant()">
-                        <i class="bi bi-mic-fill me-2"></i> Probar Ahora
-                    </button>
+            <div class="sticky-top pt-3" style="top: 70px;">
+                <div class="list-group mb-4">
+                    <a href="#activacion" class="list-group-item list-group-item-action">Activación del Asistente</a>
+                    <a href="#comandos-generales" class="list-group-item list-group-item-action">Comandos Generales</a>
+                    <a href="#comandos-rutas" class="list-group-item list-group-item-action">Comandos para Rutas</a>
+                    <a href="#comandos-paradas" class="list-group-item list-group-item-action">Comandos para Paradas</a>
+                    <a href="#atajos" class="list-group-item list-group-item-action">Atajos de Teclado</a>
+                    <a href="#configuracion" class="list-group-item list-group-item-action">Configuración</a>
+                    <a href="#ejemplos" class="list-group-item list-group-item-action">Ejemplos de Uso</a>
+                    <a href="#problemas" class="list-group-item list-group-item-action">Solución de Problemas</a>
+                </div>
+                
+                <!-- Botón para probar el asistente -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">¿Quieres probarlo?</h5>
+                        <p class="card-text">Haz clic en el botón azul en la esquina inferior derecha o usa Alt+A para activar el asistente.</p>
+                        <button class="btn btn-primary" onclick="activateAssistant()">
+                            <i class="bi bi-mic-fill me-2"></i> Probar Ahora
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -400,22 +402,54 @@
         }
     }
     
-    // Añadir evento para anclas suaves (smooth scroll)
+    // Scroll suave optimizado para las anclas en esta página
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        // Función para realizar el scroll suave con compensación de offset
+        function scrollToElement(elementId) {
+            const targetElement = document.getElementById(elementId);
+            
+            if (targetElement) {
+                // Offset para la barra de navegación fija y un poco de espacio adicional
+                const offset = 100;
+                const targetPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = targetPosition + window.pageYOffset - offset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+                
+                // Actualizar el estado activo del menú
+                document.querySelectorAll('.list-group-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                document.querySelector(`a[href="#${elementId}"]`).classList.add('active');
+                
+                // Actualizar URL sin recargar
+                history.pushState(null, null, `#${elementId}`);
+                
+                return false; // Prevenir comportamiento predeterminado
+            }
+        }
+        
+        // Añadir el evento a todos los enlaces del menú
+        document.querySelectorAll('.list-group-item').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 20,
-                        behavior: 'smooth'
-                    });
-                }
+                const targetId = this.getAttribute('href').substring(1); // Eliminar el #
+                scrollToElement(targetId);
             });
         });
+        
+        // Manejar el hash inicial de la URL
+        if (window.location.hash) {
+            const initialHash = window.location.hash.substring(1);
+            // Pequeño retardo para asegurar que la página esté completamente cargada
+            setTimeout(() => {
+                scrollToElement(initialHash);
+            }, 500);
+        }
     });
 </script>
 {% endblock %}

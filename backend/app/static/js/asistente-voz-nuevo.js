@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
         'paradas_detalle': 'Estás consultando los detalles de una parada específica. En esta página puedes ver la ubicación exacta en el mapa, la dirección completa, todas las rutas que pasan por esta parada con sus respectivos horarios, y las características de accesibilidad disponibles como rampas o semáforos sonoros.',
         'ayuda': 'En esta sección encontrarás guías de uso de la aplicación, consejos de accesibilidad y respuestas a preguntas frecuentes sobre el sistema de transporte.',
         'perfil': 'Esta es tu página de perfil personal donde puedes ver y actualizar tu información, revisar tu historial y personalizar tus preferencias.',
-        'admin': 'Estás en el panel de administración donde puedes gestionar rutas, paradas, asociaciones entre rutas y paradas, y usuarios del sistema.'
+        'admin': 'Estás en el panel de administración donde puedes gestionar rutas, paradas, asociaciones entre rutas y paradas, y usuarios del sistema.',
+        'asistente_voz': 'Estás en la guía del Asistente de Voz, una herramienta de accesibilidad que permite interactuar con la aplicación mediante comandos hablados. Aquí encontrarás instrucciones sobre cómo activar el asistente, los comandos disponibles para navegar por la aplicación, buscar rutas y paradas, y obtener información sobre el sistema de transporte. También puedes probar el asistente directamente desde esta página usando el botón de micrófono ubicado en la esquina inferior derecha de la pantalla.'
     };
     
     // Verificar soporte para reconocimiento de voz
@@ -287,9 +288,10 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {SpeechRecognitionEvent} event - El evento de reconocimiento
      */
     function handleVoiceCommand(event) {
-        const command = event.results[0][0].transcript.toLowerCase().trim();
-        console.log("Comando de voz recibido:", command);
-        showVoiceOutput(`"${command}"`);
+        const commandRaw = event.results[0][0].transcript.trim();
+        const command = commandRaw.toLowerCase();
+        console.log("Comando de voz recibido:", commandRaw);
+        showVoiceOutput(`"${commandRaw}"`);
         
         // Procesar diferentes comandos
         if (command.includes('ir a') || command.includes('navegar a') || command.includes('abrir')) {
@@ -297,10 +299,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (command.includes('describir') || command.includes('explica') || command.includes('información') || 
                   command.includes('qué es') || command.includes('que hay') || command.includes('dónde estoy')) {
             describeCurrentPage();
-        } else if (command.includes('buscar ruta') || command.includes('buscar la ruta') || command.includes('encontrar ruta')) {
-            searchRoute(command);
-        } else if (command.includes('buscar parada') || command.includes('buscar la parada') || command.includes('encontrar parada')) {
-            searchStop(command);
+        } else if (command.match(/buscar\s+((la\s+)?ruta|a|t|p|e)/i) || 
+                  command.match(/encontrar\s+(ruta|a|t|p|e)/i) || 
+                  command.match(/ruta\s+[a-z0-9]+/i)) {
+            // Detectar patrones como "buscar ruta A15", "buscar A 15", "buscar T31", etc.
+            searchRoute(commandRaw); // Usar el comando original para preservar mayúsculas
+        } else if (command.match(/buscar\s+((la\s+)?parada)/i) || command.includes('encontrar parada')) {
+            searchStop(commandRaw); // Usar el comando original para preservar mayúsculas
         } else if (command.includes('filtrar') || command.includes('mostrar solo') || command.includes('mostrar rutas') || command.includes('mostrar paradas')) {
             filterContent(command);
         } else if ((command.includes('ayuda') && !command.includes('ir a')) || command.includes('asistente') || command.includes('comandos disponibles')) {
@@ -344,8 +349,11 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (command.includes('administrador') || command.includes('admin')) {
             targetPage = '/admin';
             pageName = 'administrador';
+        } else if (command.includes('asistente') || command.includes('voz') || command.includes('asistente de voz') || command.includes('guía de voz')) {
+            targetPage = '/asistente_voz';
+            pageName = 'asistente de voz';
         } else {
-            speakText('No reconozco esa página. Puedo navegar a inicio, rutas, paradas, ayuda o perfil.');
+            speakText('No reconozco esa página. Puedo navegar a inicio, rutas, paradas, ayuda, perfil o asistente de voz.');
             return;
         }
         
@@ -419,6 +427,13 @@ document.addEventListener('DOMContentLoaded', function() {
             description = pageDescriptions.perfil;
         } else if (currentPath.includes('/admin')) {
             description = pageDescriptions.admin;
+        } else if (currentPath.includes('/asistente_voz') || currentPath.includes('/asistente-voz')) {
+            description = pageDescriptions.asistente_voz;
+            // Añadir información adicional sobre las secciones disponibles en esta página
+            const secciones = document.querySelectorAll('.list-group-item').length;
+            if (secciones > 0) {
+                description += ` La página está dividida en ${secciones} secciones que explican los diferentes aspectos del asistente. Puedes navegar entre ellas usando el menú lateral izquierdo.`;
+            }
         } else {
             description = 'No tengo información detallada sobre esta página específica.';
         }
@@ -558,13 +573,47 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {string} command - El comando recibido
      */
     function searchRoute(command) {
-        // Extraer el número o nombre de la ruta del comando
-        let searchQuery = command.replace(/buscar ruta|buscar la ruta|encontrar ruta|ruta /g, '').trim();
+        // Extraer solo el identificador de la ruta del comando, eliminando todas las palabras clave
+        let searchQuery = command;
+        
+        // Patrones para eliminar
+        const patternesToRemove = [
+            /\bbuscar\b/i, 
+            /\bla\b/i, 
+            /\bruta\b/i, 
+            /\bencontrar\b/i, 
+            /\bmostrar\b/i
+        ];
+        
+        // Eliminar cada patrón
+        patternesToRemove.forEach(pattern => {
+            searchQuery = searchQuery.replace(pattern, '');
+        });
+        
+        // Limpiar y normalizar
+        searchQuery = searchQuery.trim();
+        
+        // MEJORA: Eliminar cualquier punto al final (problema común de reconocimiento de voz)
+        // Aseguramos que esto funcione correctamente con una expresión más específica
+        searchQuery = searchQuery.replace(/\.+$/, '');
         
         if (!searchQuery) {
             speakText('Por favor, indica el número o nombre de la ruta que quieres buscar.');
             return;
         }
+        
+        // MEJORA: Normalización más robusta para formatos de rutas
+        // Normalizar espacios múltiples
+        searchQuery = searchQuery.replace(/\s+/g, ' ');
+        
+        // Normalizar formatos comunes de rutas (A-15, A.15, A 15 -> A15)
+        searchQuery = searchQuery.replace(/([A-Za-z])\s*[-\.]\s*(\d+)/gi, '$1$2'); 
+        searchQuery = searchQuery.replace(/([A-Za-z])\s+(\d+)/gi, '$1$2');
+        
+        // Manejar casos especiales como "ruta A15" -> "A15"
+        searchQuery = searchQuery.replace(/^ruta\s+([A-Za-z\d]+)$/i, '$1');
+        
+        console.log("Búsqueda de ruta normalizada:", searchQuery);
         
         // Verificar si estamos en la página de rutas
         if (!window.location.pathname.includes('/rutas')) {
@@ -578,10 +627,18 @@ document.addEventListener('DOMContentLoaded', function() {
         // Si ya estamos en la página de rutas, realizar la búsqueda
         const searchInput = document.getElementById('buscar-ruta');
         if (searchInput) {
+            // Establecer el valor de búsqueda normalizada
             searchInput.value = searchQuery;
             searchInput.focus();
             
-            // Intentar ejecutar la función de búsqueda existente o simular un clic en el botón de búsqueda
+            // Crear y enviar un evento personalizado para búsqueda inteligente
+            const customEvent = new CustomEvent('smart-search', { 
+                detail: { query: searchQuery, type: 'ruta' },
+                bubbles: true 
+            });
+            searchInput.dispatchEvent(customEvent);
+            
+            // Como fallback, también activamos el comportamiento estándar de búsqueda
             const searchButton = document.getElementById('btn-buscar');
             if (searchButton) {
                 searchButton.click();
@@ -603,12 +660,56 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function searchStop(command) {
         // Extraer el nombre de la parada del comando
-        let searchQuery = command.replace(/buscar parada|buscar la parada|encontrar parada|parada /g, '').trim();
+        let searchQuery = command;
+        
+        // Patrones para eliminar
+        const patternesToRemove = [
+            /\bbuscar\b/i, 
+            /\bla\b/i, 
+            /\bparada\b/i, 
+            /\bencontrar\b/i, 
+            /\bmostrar\b/i
+        ];
+        
+        // Eliminar cada patrón
+        patternesToRemove.forEach(pattern => {
+            searchQuery = searchQuery.replace(pattern, '');
+        });
+        
+        // Limpiar y normalizar
+        searchQuery = searchQuery.trim();
+        
+        // MEJORA: Eliminar cualquier punto al final (problema común de reconocimiento de voz)
+        // Aseguramos que esto funcione correctamente con una expresión más específica
+        searchQuery = searchQuery.replace(/\.+$/, '');
         
         if (!searchQuery) {
             speakText('Por favor, indica el nombre o dirección de la parada que quieres buscar.');
             return;
         }
+        
+        // MEJORA: Normalización más robusta para paradas
+        // Normalizar espacios múltiples
+        searchQuery = searchQuery.replace(/\s+/g, ' ').trim();
+        
+        // Manejar formatos de direcciones y nombres comunes en Cali
+        searchQuery = searchQuery.replace(/(\d+)\s*[#°]\s*(\d+)/g, '$1 # $2'); // Normalizar formato de direcciones
+        
+        // Normalizar nombres de sectores o barrios comunes (usando strings para los patrones)
+        const sectorPatterns = [
+            { pattern: /\bsan\s+fernando\b/i, replacement: 'San Fernando' },
+            { pattern: /\bel\s+poblado\b/i, replacement: 'El Poblado' },
+            { pattern: /\bla\s+flora\b/i, replacement: 'La Flora' },
+            { pattern: /\bciudad\s+jardin\b/i, replacement: 'Ciudad Jardín' }
+            // Añadir más normalizaciones según sea necesario
+        ];
+        
+        // Aplicar normalizaciones de sectores
+        sectorPatterns.forEach(item => {
+            searchQuery = searchQuery.replace(item.pattern, item.replacement);
+        });
+        
+        console.log("Búsqueda de parada normalizada:", searchQuery);
         
         // Verificar si estamos en la página de paradas
         if (!window.location.pathname.includes('/paradas')) {
@@ -625,7 +726,14 @@ document.addEventListener('DOMContentLoaded', function() {
             searchInput.value = searchQuery;
             searchInput.focus();
             
-            // Intentar ejecutar la función de búsqueda existente o simular un clic en el botón de búsqueda
+            // Crear y enviar un evento personalizado para búsqueda inteligente
+            const customEvent = new CustomEvent('smart-search', { 
+                detail: { query: searchQuery, type: 'parada' },
+                bubbles: true 
+            });
+            searchInput.dispatchEvent(customEvent);
+            
+            // Como fallback, también activamos el comportamiento estándar de búsqueda
             const searchButton = document.getElementById('btn-buscar');
             if (searchButton) {
                 searchButton.click();
@@ -760,33 +868,155 @@ document.addEventListener('DOMContentLoaded', function() {
         if (command.includes('tabla') || command.includes('listado')) {
             // Leer información de tablas
             let tableContent = '';
+            
+            // MEJORA: Búsqueda exhaustiva de tablas y elementos tipo tabla en cualquier pestaña
+            
+            // 1. Intentar identificar tablas por selectores específicos según la pestaña actual
+            let tableRows = [];
+            let tableTitle = '';
+            
+            // Búsqueda específica por tipo de página (orden de prioridad)
             if (currentPath.includes('/rutas')) {
-                const tableRows = document.querySelectorAll('.ruta-item');
-                if (tableRows.length > 0) {
+                tableRows = document.querySelectorAll('.ruta-item, .route-item, #lista-rutas .card, .tabla-rutas tr, .route-card');
+                tableTitle = 'rutas';
+            } else if (currentPath.includes('/paradas')) {
+                tableRows = document.querySelectorAll('.parada-item, .stop-item, #tabla-paradas tr, #lista-paradas .card, .stop-card');
+                tableTitle = 'paradas';
+            } else if (currentPath.includes('/admin')) {
+                tableRows = document.querySelectorAll('.admin-table tbody tr, .data-table tr');
+                tableTitle = 'registros';
+            }
+            
+            // 2. Si no se encontraron elementos específicos, buscar tablas HTML estándar
+            if (tableRows.length === 0) {
+                const htmlTables = document.querySelectorAll('table.table, table');
+                
+                if (htmlTables.length > 0) {
+                    console.log("Encontradas tablas HTML:", htmlTables.length);
+                    // Usar la primera tabla HTML como contenido tabular
+                    const table = htmlTables[0];
+                    const rows = table.querySelectorAll('tbody tr');
+                    
+                    if (rows.length > 0) {
+                        // Intentar determinar un título para la tabla
+                        const tableCaption = table.querySelector('caption')?.textContent.trim();
+                        const nearbyHeader = table.closest('div, section')?.querySelector('h1, h2, h3, h4')?.textContent.trim();
+                        tableTitle = tableCaption || nearbyHeader || 'datos';
+                        
+                        tableContent = `La tabla de ${tableTitle} muestra ${rows.length} filas de datos. `;
+                        
+                        // Obtener los encabezados para entender la estructura
+                        const headers = Array.from(table.querySelectorAll('thead th, th')).map(th => th.textContent.trim());
+                        
+                        // Leer las primeras 5 filas como máximo
+                        const maxRows = Math.min(rows.length, 5);
+                        for (let i = 0; i < maxRows; i++) {
+                            const cells = rows[i].querySelectorAll('td');
+                            if (cells.length > 0) {
+                                // Si hay encabezados, usarlos para dar contexto
+                                if (headers.length >= cells.length) {
+                                    tableContent += `Fila ${i+1}: `;
+                                    for (let j = 0; j < Math.min(cells.length, 3); j++) {
+                                        tableContent += `${headers[j]}: ${cells[j].textContent.trim()}. `;
+                                    }
+                                } else {
+                                    // Si no hay encabezados, solo leer el contenido de las celdas
+                                    tableContent += `Fila ${i+1}: ${cells[0].textContent.trim()}, ${cells.length > 1 ? cells[1].textContent.trim() : ''}. `;
+                                }
+                            }
+                        }
+                        
+                        if (rows.length > 5) {
+                            tableContent += 'Y otras filas más. ';
+                        }
+                    }
+                } else {
+                    // 3. Si no hay tablas, buscar estructuras tipo lista o cards
+                    
+                    // Intentar con diferentes selectores comunes para listas
+                    const listSelectors = [
+                        '.list-group-item',
+                        '.card',
+                        '.item',
+                        'li.data-item',
+                        '.list-item',
+                        '.result-item',
+                        'ul.results li',
+                        '.collection-item',
+                        '.data-row',
+                        'div[role="listitem"]',
+                        '.element-list > *'
+                    ];
+                    
+                    // Buscar en cada selector hasta encontrar elementos
+                    let listItems = [];
+                    for (const selector of listSelectors) {
+                        const items = document.querySelectorAll(selector);
+                        if (items.length > 0) {
+                            listItems = items;
+                            break;
+                        }
+                    }
+                    
+                    if (listItems.length > 0) {
+                        // Intentar determinar qué tipo de lista es
+                        const containerElement = listItems[0].closest('div, section, ul');
+                        const listHeader = containerElement?.querySelector('h1, h2, h3, h4')?.textContent.trim();
+                        const sectionTitle = document.querySelector('h1, h2')?.textContent.trim();
+                        tableTitle = listHeader || sectionTitle || 'elementos';
+                        
+                        tableContent = `Encontré una lista con ${listItems.length} ${tableTitle}. `;
+                        
+                        // Leer los primeros 5 elementos
+                        const maxItems = Math.min(listItems.length, 5);
+                        for (let i = 0; i < maxItems; i++) {
+                            tableContent += `Elemento ${i+1}: ${listItems[i].textContent.trim().substring(0, 100).replace(/\s+/g, ' ')}. `;
+                        }
+                        
+                        if (listItems.length > 5) {
+                            tableContent += 'Y otros elementos más. ';
+                        }
+                    }
+                }
+            } else {
+                // Procesar elementos específicos encontrados
+                if (currentPath.includes('/rutas')) {
                     tableContent = `La tabla muestra ${tableRows.length} rutas. `;
                     // Leer las primeras 5 rutas como máximo
                     const maxRows = Math.min(tableRows.length, 5);
                     for (let i = 0; i < maxRows; i++) {
-                        const routeNumber = tableRows[i].querySelector('.route-number')?.textContent.trim();
-                        const routeName = tableRows[i].querySelector('.route-name')?.textContent.trim();
-                        if (routeNumber && routeName) {
-                            tableContent += `Ruta ${routeNumber}: ${routeName}. `;
+                        // Intentar diferentes selectores para adaptarse a diversas estructuras HTML
+                        const routeNumber = tableRows[i].querySelector('.route-number, .numero-ruta, [data-route-id], .card-title')?.textContent.trim();
+                        let routeName = tableRows[i].querySelector('.route-name, .nombre-ruta, .card-subtitle, .card-text')?.textContent.trim();
+                        
+                        // Si no se encontraron elementos específicos, usar el texto completo
+                        if (!routeNumber && !routeName) {
+                            tableContent += `Ruta ${i+1}: ${tableRows[i].textContent.trim().substring(0, 100).replace(/\s+/g, ' ')}. `;
+                        } else {
+                            // Si solo se encontró un valor, usarlo como número de ruta
+                            if (routeNumber && !routeName) {
+                                tableContent += `Ruta ${routeNumber}. `;
+                            } else if (!routeNumber && routeName) {
+                                tableContent += `Ruta: ${routeName}. `;
+                            } else {
+                                tableContent += `Ruta ${routeNumber}: ${routeName}. `;
+                            }
                         }
                     }
                     if (tableRows.length > 5) {
                         tableContent += 'Y otras rutas más. ';
                     }
-                }
-            } else if (currentPath.includes('/paradas')) {
-                const tableRows = document.querySelectorAll('.parada-item');
-                if (tableRows.length > 0) {
+                } else if (currentPath.includes('/paradas')) {
                     tableContent = `La tabla muestra ${tableRows.length} paradas. `;
                     // Leer las primeras 5 paradas como máximo
                     const maxRows = Math.min(tableRows.length, 5);
                     for (let i = 0; i < maxRows; i++) {
-                        const stopName = tableRows[i].querySelector('.stop-name')?.textContent.trim();
-                        const stopAddress = tableRows[i].querySelector('.stop-address')?.textContent.trim();
-                        if (stopName) {
+                        const stopName = tableRows[i].querySelector('.stop-name, .nombre-parada, .card-title')?.textContent.trim();
+                        const stopAddress = tableRows[i].querySelector('.stop-address, .direccion-parada, .card-text')?.textContent.trim();
+                        
+                        if (!stopName && !stopAddress) {
+                            tableContent += `Parada ${i+1}: ${tableRows[i].textContent.trim().substring(0, 100).replace(/\s+/g, ' ')}. `;
+                        } else if (stopName) {
                             tableContent += `Parada ${stopName}`;
                             if (stopAddress) {
                                 tableContent += ` ubicada en ${stopAddress}`;
@@ -797,13 +1027,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (tableRows.length > 5) {
                         tableContent += 'Y otras paradas más. ';
                     }
+                } else {
+                    // Para otros tipos de tablas (administración, usuarios, etc.)
+                    tableContent = `La tabla muestra ${tableRows.length} ${tableTitle || 'registros'}. `;
+                    // Leer las primeras 5 filas como máximo
+                    const maxRows = Math.min(tableRows.length, 5);
+                    for (let i = 0; i < maxRows; i++) {
+                        tableContent += `Registro ${i+1}: ${tableRows[i].textContent.trim().substring(0, 100).replace(/\s+/g, ' ')}. `;
+                    }
+                    if (tableRows.length > 5) {
+                        tableContent += 'Y otros registros más. ';
+                    }
                 }
             }
             
             if (tableContent) {
                 contentToRead = tableContent;
             } else {
-                contentToRead = 'No encuentro información tabular para leer en esta página.';
+                contentToRead = 'No encuentro información tabular para leer en esta página. Si estás seguro que hay una tabla, intenta con otro comando como "describir página".';
             }
         } else if (command.includes('mapa')) {
             // Describir mapa si existe
@@ -969,4 +1210,123 @@ document.addEventListener('DOMContentLoaded', function() {
             updateMuteVisualState();
         }
     }
+    
+    /**
+     * Sistema de búsqueda inteligente que maneja coincidencias parciales y sugerencias
+     * Esto mejora la experiencia de búsqueda del usuario cuando los comandos de voz
+     * no son reconocidos perfectamente
+     */
+    document.addEventListener('smart-search', function(e) {
+        // Extraer datos del evento
+        const query = e.detail.query;
+        const type = e.detail.type; // 'ruta' o 'parada'
+        
+        if (!query) return;
+        
+        console.log(`Sistema de búsqueda inteligente activado para ${type}: "${query}"`);
+        
+        // Identificar el contenedor de resultados según el tipo
+        let itemSelector, containerSelector;
+        
+        if (type === 'ruta') {
+            itemSelector = '.ruta-item'; // Ajustar según la estructura HTML real
+            containerSelector = '#lista-rutas'; // Ajustar según la estructura HTML real
+        } else if (type === 'parada') {
+            itemSelector = '.parada-item'; // Ajustar según la estructura HTML real
+            containerSelector = '#lista-paradas'; // Ajustar según la estructura HTML real
+        } else {
+            return; // Tipo no reconocido
+        }
+        
+        // Función para puntuar la similitud de una cadena con la consulta
+        function getSimilarityScore(text, query) {
+            if (!text || !query) return 0;
+            
+            text = text.toLowerCase();
+            query = query.toLowerCase();
+            
+            // Coincidencia exacta
+            if (text.includes(query)) return 1.0;
+            
+            // Si la consulta es una letra seguida de números (ej: "A15")
+            if (/^[a-z]\d+$/.test(query)) {
+                const letter = query.charAt(0);
+                const number = query.substring(1);
+                
+                // Buscar patrones como "A 15", "A-15", "A.15", etc.
+                if (text.includes(`${letter} ${number}`) || 
+                    text.includes(`${letter}-${number}`) ||
+                    text.includes(`${letter}.${number}`)) {
+                    return 0.9;
+                }
+                
+                // Si contiene la letra sola
+                if (text.includes(` ${letter} `)) return 0.3;
+                
+                // Si contiene el número solo
+                if (text.includes(` ${number} `)) return 0.2;
+            }
+            
+            // Para búsquedas de texto más generales
+            let matchCount = 0;
+            const words = query.split(/\s+/);
+            
+            words.forEach(word => {
+                if (text.includes(word)) matchCount++;
+            });
+            
+            // Calcular un puntaje basado en cuántas palabras coinciden
+            return words.length > 0 ? matchCount / words.length * 0.7 : 0;
+        }
+        
+        // Buscar todos los elementos y calcular su puntuación de similitud
+        setTimeout(() => {
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+            
+            const items = container.querySelectorAll(itemSelector);
+            if (!items || items.length === 0) return;
+            
+            let visibleCount = 0;
+            let hasExactMatch = false;
+            
+            // Analizar cada elemento y calcular su puntaje
+            items.forEach(item => {
+                const text = item.textContent;
+                const score = getSimilarityScore(text, query);
+                
+                // Elementos con puntaje alto se consideran coincidencias
+                if (score >= 0.8) {
+                    item.style.display = '';
+                    visibleCount++;
+                    hasExactMatch = true;
+                    
+                    // Destacar la coincidencia
+                    item.style.backgroundColor = 'rgba(255, 255, 0, 0.2)';
+                    setTimeout(() => {
+                        item.style.backgroundColor = '';
+                    }, 3000);
+                } 
+                // Si no hay coincidencias exactas, mostrar sugerencias parciales
+                else if (!hasExactMatch && score >= 0.2) {
+                    item.style.display = '';
+                    visibleCount++;
+                }
+            });
+            
+            // Mensaje para el usuario cuando hay resultados similares
+            if (visibleCount > 0 && !hasExactMatch) {
+                speakText(`No encontré coincidencias exactas para ${query}, pero te muestro ${visibleCount} resultados similares.`);
+            } 
+            // Mensaje cuando no hay resultados
+            else if (visibleCount === 0) {
+                speakText(`No encontré coincidencias para ${query}. Intenta con otra búsqueda.`);
+                
+                // Mostrar todas las opciones como ayuda
+                items.forEach(item => {
+                    item.style.display = '';
+                });
+            }
+        }, 500); // Pequeño retardo para asegurar que la búsqueda estándar también se procese
+    });
 });
