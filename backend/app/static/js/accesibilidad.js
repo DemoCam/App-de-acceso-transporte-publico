@@ -43,6 +43,17 @@ function setupAccessibilityButtons() {
         }
     }
     
+    // Toggle de modo oscuro
+    const darkModeButton = document.getElementById('toggle-dark-mode');
+    if (darkModeButton) {
+        darkModeButton.addEventListener('click', toggleDarkMode);
+        
+        // Aplicar el estado guardado (si existe)
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+    }
+    
     // Botón para silenciar asistente de voz en la barra de navegación
     const voiceMuteButton = document.getElementById('toggle-voice-mute');
     if (voiceMuteButton) {
@@ -117,6 +128,24 @@ function toggleFontSize() {
 }
 
 /**
+ * Alterna el modo oscuro
+ */
+function toggleDarkMode() {
+    const body = document.body;
+    body.classList.toggle('dark-mode');
+    
+    // Guardar preferencia
+    localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+    
+    // Anuncio para lectores de pantalla
+    announceForScreenReader(
+        body.classList.contains('dark-mode') 
+            ? 'Modo oscuro activado' 
+            : 'Modo oscuro desactivado'
+    );
+}
+
+/**
  * Mejora la visibilidad del foco del teclado
  */
 function enhanceKeyboardFocus() {
@@ -170,6 +199,12 @@ function loadAccessibilitySettings() {
     const savedContrast = localStorage.getItem('highContrast');
     if (savedContrast === 'true') {
         document.body.classList.add('high-contrast');
+    }
+    
+    // Cargar configuración de modo oscuro
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'true') {
+        document.body.classList.add('dark-mode');
     }
     
     // Cargar configuración de animaciones reducidas
@@ -261,6 +296,7 @@ function setupAccessibilityFloatingPanel() {
     // Configurar botones del panel
     const contrastBtn = document.getElementById('accessibility-contrast');
     const fontSizeBtn = document.getElementById('accessibility-text-increase');
+    const darkModeBtn = document.getElementById('accessibility-dark-mode');
     const voiceToggleBtn = document.getElementById('accessibility-voice-toggle');
     
     // Botón de contraste
@@ -268,6 +304,13 @@ function setupAccessibilityFloatingPanel() {
         contrastBtn.addEventListener('click', toggleHighContrast);
         // Sincronizar estado visual
         updateButtonState(contrastBtn, 'highContrast');
+    }
+    
+    // Botón de modo oscuro
+    if (darkModeBtn) {
+        darkModeBtn.addEventListener('click', toggleDarkMode);
+        // Sincronizar estado visual
+        updateButtonState(darkModeBtn, 'darkMode');
     }
     
     // Botón de tamaño de texto
